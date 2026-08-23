@@ -1,58 +1,169 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
-    <link rel="stylesheet" href="login.css">
-</head>
-<body>
-    <header >
-        <section >
-            <img src="..//img/logo_drogaria_ponteAlta.png" alt="Icone com um P e +">
-            <div>
-                <p>Drogaria Popular</p>
-                <p>Ponte Alta</p>
-            </div>
-        </section>
-        <section>
-            <h1>Sua conta, seus pedidos, sempre a mão</h1>
-            <p>Entre para acompanhar suas
-            compras, salvar favoritos e receber
-            avisos quando seu remédio de uso
-            contínuo estiver acabando.</p>
+    <link rel="stylesheet" href="../css/login.css" />
+  </head>
+  <body>
+
+    <!-- LADO AZUL -->
+    <header>
+      <section class="logo-titulo-section">
+        <div class="symbols-square">
+          <img
+            src="..//img/logo_drogaria_ponteAlta.png"
+            alt="Icone com um P e +"
+          />
+        </div>
+        <div class="logo-titulo-texto">
+          <p class="logo-titulo-texto-p1 p1">Drogaria Popular</p>
+          <p class="logo-titulo-texto-p2 p2">Ponte Alta</p>
+        </div>
+      </section>
+      <section class="texto-central-section">
+        <h1>Sua conta, seus pedidos, sempre a mão</h1>
+        <p class="p2">
+          Entre para acompanhar suas compras, salvar favoritos e receber avisos
+          quando seu remédio de uso contínuo estiver acabando.
+        </p>
+      </section>
+
+      <section class="lista-info-section">
+        <ul>
+          <li>
+            <div class="symbols-square"></div>
+            <span>
+              <p>Acompanhe seus pedidos</p>
+              <p>Do preparo até a entrega</p>
+            </span>
+          </li>
+          <li>
+            <div class="symbols-square"></div>
+            <span>
+              <p>Salve seus favoritos</p>
+              <p>Compra mais rápido da proxima vez</p>
+            </span>
+          </li>
+          <li>
+            <div class="symbols-square"></div>
+            <span>
+              <p>Recompra rápida</p>
+              <p>Avisamos quando o remédio esta acabando</p>
+            </span>
+          </li>
+        </ul>
+      </section>
+    </header>
+
+    <!-- LADO BRANCO COM OS CAMPOS -->
+    <main>
+      <section class="section-principal">
+        <nav>
+          <button class="entrar-btn">Entrar</button>
+          <button class="criarConta-btn">Criar Conta</button>
+        </nav>
+
+        <section class="form-section login-section">
+          <h1 class="title">Que bom te ver de novo</h1>
+          <p class="subtextp">Entre com e-mail ou CPF para continuar</p>
+          <form action="">
+            <fieldset class="campo-fieldset">
+              <label for="emailCpf" class="label-input">E-mail ou CPF</label>
+              <div class="input-div">
+                <input type="text" />
+              </div>
+            </fieldset>
+            <fieldset class="campo-fieldset">
+              <label for="senha">Senha</label>
+              <div class="input-div">
+                <input type="number" />
+              </div>
+            </fieldset>
+            <fieldset class="campo-fieldset">
+              <div>
+                <label for="lembrarDeMim">Lembrar de mim</label>
+                <input type="checkbox" name="lembrarDeMim" id="" />
+              </div>
+              <div>
+                <a href="">Esqueci minha senha</a>
+              </div>
+            </fieldset>
+
+            <input type="submit" value="Entrar → " class="submit-input" />
+          </form>
+
+          <div class="linha-com-texto">
+            <span>ou</span>
+          </div>
+
+          <button>Precisa de ajuda? Fale no WhatsApp</button>
+
+          <p>Ainda não tem conta? <a href="">Criar conta</a></p>
         </section>
 
-        <nav>
-            <ul>
-                <li>
-                    <div></div>
-                    <span>
-                        <p>Acompanhe seus pedidos</p>
-                        <p>Do preparo até a entrega</p>
-                    </span>
-                </li>
-                <li>
-                    <div></div>
-                    <span>
-                        <p>Salve seus favoritos</p>
-                        <p>Compra mais rápido da proxima vez</p>
-                    </span>
-                </li>
-                <li>
-                    <div></div>
-                    <span>
-                        <p>Recompra rápida</p>
-                        <p>Avisamos quando o remédio esta acabando</p>
-                    </span>
-                </li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section>
-            
+        <section class="form-section signUp-section">
+          <h1>Crie sua conta</h1>
+          <p>Leva menos de 2 minutos</p>
+
+          <form action="">
+            <fieldset class="campo-fieldset">
+              <label for="nomeCompleto">Nome completo</label>
+              <div class="input-div">
+                <input type="text" />
+              </div>
+            </fieldset>
+
+            <fieldset class="campo-fieldset">
+              <div>
+                <label for="CPF">CPF</label>
+                <div class="input-div">
+                  <input type="text" />
+                </div>
+              </div>
+              <div>
+                <label for="telefone">Telefone</label>
+                <div class="input-div">
+                  <input type="tel" />
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="campo-fieldset">
+              <label for="emaik">E-mail</label>
+              <div class="input-div">
+                <input type="email" name="email" id="" />
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <label for="endereco">Endereço para entrega</label>
+              <div class="input-div">
+                <input type="text" />
+              </div>
+            </fieldset>
+
+            <fieldset class="campo-fieldset">
+              <label for="criarSenha">Criar senha</label>
+              <div class="input-div">
+                <input type="password" name="criarSenha" id="" />
+              </div>
+              <span>Use letras, números e pelo menos 1 caractere especial</span>
+            </fieldset>
+
+            <input type="submit" value="Criar minha conta →" class="submit-input" />
+            <span
+              >Ao criar sua conta, você concorda com os
+              <a href="">Termos de uso</a> e a
+              <a href="">Política de privacidade</a> da Drogaria Popular Ponte
+              Alta.</span
+            >
+          </form>
+
+          <p>Ja tem conta? <a href="">Entrar</a></p>
         </section>
+      </section>
     </main>
-</body>
+  </body>
 </html>
