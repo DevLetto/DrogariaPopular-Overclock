@@ -1,0 +1,292 @@
+/* hero */
+.about-hero {
+    width: 100%;
+    background-color: var(--cor-primaria);
+    /* quando tiver a imagem, trocar o none pelo arquivo dela */
+    background-image: linear-gradient(rgba(14, 20, 66, 0.85), rgba(14, 20, 66, 0.85)), none; 
+    background-size: cover;
+    background-position: center;
+    padding: 100px 5%;
+    margin-bottom: 60px;
+    display: flex;
+    justify-content: center; 
+}
+
+.about-hero-content {
+    width: 100%;
+    max-width: var(--max-width-container); 
+    color: var(--cor-branca);
+    text-align: left; 
+}
+
+.section-tag-hero {
+    background-color: rgba(227, 30, 36, 0.15);
+    border: 1px solid var(--cor-secundaria); 
+    color: #ffb4b4; 
+    padding: 6px 18px;
+    border-radius: 25px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 2px; /
+    display: inline-block;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+}
+
+.about-hero h1 {
+    font-size: 3.5rem;
+    line-height: 1.1;
+    font-weight: 800;
+    margin-bottom: 25px;
+    letter-spacing: -1px;
+}
+
+.about-hero p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    line-height: 1.5;
+    max-width: 600px;
+}
+
+.about-trajectory, .about-testimonials, .about-locations, .about-team {
+    width: 100%;
+    background-color: transparent; 
+    padding: 40px 5%;
+}
+
+.about-trajectory .section-container, 
+.about-testimonials .section-container, 
+.about-locations .section-container,
+.about-team .section-container {
+    max-width: var(--max-width-container);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.trajectory-desc, .team-desc, .testimonials-desc, .locations-desc {
+    color: var(--cor-texto-claro);
+    font-size: 1rem;
+    max-width: 800px;
+    margin-bottom: 40px;
+}
+
+/* trajetória */
+.trajectory-cards {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.card-trajectory {
+    background: var(--cor-branca);
+    border: 1px solid var(--borda-suave);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: left;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+}
+
+.icon-trajectory {
+    width: 55px;
+    height: 55px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.icon-missao { background-color: var(--cor-primaria); } 
+.icon-visao { background-color: var(--cor-secundaria); }
+.icon-valores { background-color: #1e3072; } 
+
+.icon-trajectory img {
+    width: 26px;
+    height: 26px;
+    filter: brightness(0) invert(1);
+}
+
+.card-trajectory h3 {
+    color: var(--cor-primaria);
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.card-trajectory p {
+    font-size: 0.95rem;
+    color: var(--cor-texto-claro);
+}
+
+.values-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pill {
+    background-color: #d6e4f8;
+    color: var(--cor-primaria);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+/* equipe */
+.team-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+@media (min-width: 1024px) {
+    .team-grid { grid-template-columns: repeat(5, 1fr); }
+}
+
+.team-member {
+    background: var(--cor-branca);
+    border: 1px solid var(--borda-suave);
+    border-radius: 12px;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.member-initial {
+    width: 60px;
+    height: 60px;
+    background-color: var(--cor-fundo-site);
+    color: var(--cor-primaria);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 auto 20px auto;
+}
+
+.team-member h3 {
+    color: var(--cor-primaria);
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.team-member p {
+    font-size: 0.85rem;
+    color: var(--cor-texto-claro);
+    line-height: 1.4;
+}
+
+/* depoimentos */
+.testimonials-grid {
+    display: grid;
+    gap: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+}
+
+.testimonial-card {
+    background: var(--cor-branca);
+    border: 1px solid var(--borda-suave);
+    border-radius: 16px;
+    padding: 40px;
+    position: relative;
+}
+
+.quote-icon {
+    font-size: 4rem;
+    color: #d1d5db;
+    font-family: serif !important;
+    line-height: 1;
+    position: absolute;
+    top: 20px;
+    left: 40px;
+}
+
+.quote-text {
+    font-size: 0.95rem;
+    color: var(--cor-texto);
+    font-style: italic;
+    margin-top: 20px;
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 2;
+}
+
+.quote-author {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--cor-primaria);
+}
+
+/* lojas e mapa */
+.locations-grid {
+    display: grid;
+    gap: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+}
+
+.location-card {
+    background: var(--cor-branca);
+    border: 1px solid var(--borda-suave);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.map-embed {
+    width: 100%;
+    height: 250px;
+    background-color: #e5e7eb; 
+}
+
+.map-embed iframe {
+    display: block; 
+}
+
+.location-info {
+    padding: 30px;
+}
+
+.location-info h3 {
+    color: var(--cor-primaria);
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.location-details {
+    margin-bottom: 20px;
+}
+
+.location-details li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: var(--cor-texto-claro);
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.location-details li img {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    opacity: 0.6;
+}
+
+.store-status.status-green, .store-status.status-green * {
+    color: #10b981 !important;
+    font-weight: 800;
+    font-size: 0.85rem;
+}
+
+/* responsividade */
+@media (max-width: 992px) {
+    .about-hero h1 { font-size: 2.5rem; }
+    .about-hero-content { text-align: center; }
+    .testimonials-grid, .locations-grid { grid-template-columns: 1fr; }
+}
