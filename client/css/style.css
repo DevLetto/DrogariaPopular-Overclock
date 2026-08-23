@@ -5,6 +5,7 @@
     --cor-fundo-site: #f4f7fb;
     --cor-fundo-destaque: #e8eef5;
     --cor-texto: #333333;
+    --cor-texto-hover: #0B1157;
     --cor-texto-claro: #666666;
     --cor-branca: #ffffff;
     --borda-suave: #e0e0e0;
@@ -116,12 +117,25 @@ img {
     align-items: center;
     gap: 6px;
     position: relative;
+
+    transition: transform 0.3s ease;
 }
 
 .action-item img {
     width: 20px;
     height: 20px;
     object-fit: contain;
+}
+
+.action-item:hover{
+    transform: scale(1.2);
+    color: var(--cor-texto-hover);
+    
+}
+
+.action-item img:hover{
+
+    transform: rotate(-8deg);
 }
 
 .cart-badge {
@@ -134,6 +148,8 @@ img {
     padding: 2px 6px;
     font-size: 0.7rem;
     font-weight: bold;
+
+    
 }
 
 .btn-whatsapp-header {
@@ -147,6 +163,12 @@ img {
     display: flex;
     align-items: center;
     gap: 6px;
+    transition: transform 0.3s ease;
+}
+
+.btn-whatsapp-header:hover{
+    background-color: #54cf81 ;
+    transform: scale(1.1);
 }
 
 .btn-whatsapp-header img {
@@ -167,6 +189,7 @@ img {
     display: flex;
     justify-content: center;
     gap: 40px;
+    overflow-y: hidden;    
 }
 
 .main-nav li {
@@ -182,6 +205,14 @@ img {
     color: var(--cor-primaria);
     padding: 15px 0;
     border-bottom: 2px solid transparent;
+
+    transition: transform 0.3s ease;
+}
+
+.main-nav a:hover{
+    
+    transform: scale(1.1);
+
 }
 
 .main-nav li.active a {
