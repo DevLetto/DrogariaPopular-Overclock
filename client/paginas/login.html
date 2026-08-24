@@ -5,11 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
     <link rel="stylesheet" href="../css/login.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
   </head>
   <body>
-
     <!-- LADO AZUL -->
     <header>
       <section class="logo-titulo-section">
@@ -36,9 +41,7 @@
         <ul>
           <li>
             <div class="symbols-square">
-              <span class="material-symbols-outlined">
-                check_circle
-              </span>
+              <span class="material-symbols-outlined"> check_circle </span>
             </div>
             <span>
               <p class="t">Acompanhe seus pedidos</p>
@@ -47,9 +50,7 @@
           </li>
           <li>
             <div class="symbols-square">
-              <span class="material-symbols-outlined">
-              favorite
-            </span>
+              <span class="material-symbols-outlined"> favorite </span>
             </div>
             <span>
               <p class="t">Salve seus favoritos</p>
@@ -58,9 +59,7 @@
           </li>
           <li>
             <div class="symbols-square">
-              <span class="material-symbols-outlined">
-                award_star
-             </span>
+              <span class="material-symbols-outlined"> award_star </span>
             </div>
             <span>
               <p class="t">Recompra rápida</p>
@@ -74,33 +73,61 @@
     <!-- LADO BRANCO COM OS CAMPOS -->
     <main>
       <section class="section-principal">
-        <nav>
-          <button class="entrar-btn">Entrar</button>
-          <button class="criarConta-btn">Criar Conta</button>
+        <nav class="toggle-nav">
+          <button
+            class="autenticacao-btn active"
+            id="tabLogin"
+            onclick="showTab('login')"
+          >
+            Entrar
+          </button>
+          <button
+            class="autenticacao-btn"
+            id="tabCadastro"
+            onclick="showTab('cadastro')"
+          >
+            Criar Conta
+          </button>
         </nav>
 
-        <section class="form-section login-section">
-          <h1 class="title">Que bom te ver de novo</h1>
-          <p class="subtextp">Entre com e-mail ou CPF para continuar</p>
+        <!-- LOGIN -->
+
+        <section class="form-section login-section" id="loginForm">
+          <div class="welcome-div">
+            <h1 class="title">Que bom te ver de novo</h1>
+            <p class="subtextp">Entre com e-mail ou CPF para continuar</p>
+          </div>
+
           <form action="">
             <fieldset class="campo-fieldset">
               <label for="emailCpf" class="label-input">E-mail ou CPF</label>
               <div class="input-div">
-                <input type="text" />
+                <span class="material-symbols-outlined auth-symbols">
+                  person
+                </span>
+                <input
+                  type="text"
+                  placeholder="seuemail@exemplo,com ou 000.000.000-00"
+                />
               </div>
             </fieldset>
+
             <fieldset class="campo-fieldset">
               <label for="senha">Senha</label>
               <div class="input-div">
-                <input type="number" />
+                <span class="material-symbols-outlined auth-symbols">
+                  lock
+                </span>
+                <input type="text" placeholder="Sua senha" />
               </div>
             </fieldset>
-            <fieldset class="campo-fieldset">
-              <div>
-                <label for="lembrarDeMim">Lembrar de mim</label>
+
+            <fieldset class="campo-fieldset lembrar-de-mim-field">
+              <div class="lembrar-de-mim-div">
                 <input type="checkbox" name="lembrarDeMim" id="" />
+                <label for="lembrarDeMim">Lembrar de mim</label>
               </div>
-              <div>
+              <div class="esqueci-senha-div">
                 <a href="">Esqueci minha senha</a>
               </div>
             </fieldset>
@@ -112,34 +139,49 @@
             <span>ou</span>
           </div>
 
-          <button>Precisa de ajuda? Fale no WhatsApp</button>
+          <button class="whatsapp">Precisa de ajuda? Fale no WhatsApp</button>
 
-          <p>Ainda não tem conta? <a href="">Criar conta</a></p>
+          <p class="sobre-conta">
+            Ainda não tem conta? <a href="">Criar conta</a>
+          </p>
         </section>
 
-        <section class="form-section signUp-section">
-          <h1>Crie sua conta</h1>
-          <p>Leva menos de 2 minutos</p>
+        <!-- CADASTRO -->
+
+        <section class="form-section signUp-section" id="cadastroForm">
+          <div class="welcome-div">
+            <h1 class="title">Crie sua conta</h1>
+            <p class="subtextp">Leva menos de 2 minutos</p>
+          </div>
 
           <form action="">
             <fieldset class="campo-fieldset">
               <label for="nomeCompleto">Nome completo</label>
               <div class="input-div">
-                <input type="text" />
+                <span class="material-symbols-outlined auth-symbols">
+                  person
+                </span>
+                <input type="text" placeholder="Seu nome completo" />
               </div>
             </fieldset>
 
-            <fieldset class="campo-fieldset">
+            <fieldset class="campo-fieldset campo-partido-fieldset">
               <div>
                 <label for="CPF">CPF</label>
                 <div class="input-div">
-                  <input type="text" />
+                  <span class="material-symbols-outlined auth-symbols">
+                    article
+                  </span>
+                  <input type="text" placeholder="000.000.000-00" />
                 </div>
               </div>
               <div>
                 <label for="telefone">Telefone</label>
                 <div class="input-div">
-                  <input type="tel" />
+                  <span class="material-symbols-outlined auth-symbols">
+                    call
+                  </span>
+                  <input type="tel" placeholder="(61) 90000-0000" />
                 </div>
               </div>
             </fieldset>
@@ -147,27 +189,52 @@
             <fieldset class="campo-fieldset">
               <label for="emaik">E-mail</label>
               <div class="input-div">
-                <input type="email" name="email" id="" />
+                <span class="material-symbols-outlined auth-symbols">
+                  mail
+                </span>
+                <input
+                  type="email"
+                  name="email"
+                  id=""
+                  placeholder="seuemail@exemplo.com"
+                />
               </div>
             </fieldset>
 
             <fieldset>
               <label for="endereco">Endereço para entrega</label>
               <div class="input-div">
-                <input type="text" />
+                <span class="material-symbols-outlined auth-symbols">
+                  location_on
+                </span>
+                <input type="text" placeholder="Rua, número, bairro" />
               </div>
             </fieldset>
 
             <fieldset class="campo-fieldset">
               <label for="criarSenha">Criar senha</label>
               <div class="input-div">
-                <input type="password" name="criarSenha" id="" />
+                <span class="material-symbols-outlined auth-symbols">
+                  lock
+                </span>
+                <input
+                  type="text"
+                  name="criarSenha"
+                  id=""
+                  placeholder="Mínimo 8 caracteres"
+                />
               </div>
-              <span>Use letras, números e pelo menos 1 caractere especial</span>
+              <span class="dica-senha"
+                >Use letras, números e pelo menos 1 caractere especial</span
+              >
             </fieldset>
 
-            <input type="submit" value="Criar minha conta →" class="submit-input" />
-            <span
+            <input
+              type="submit"
+              value="Criar minha conta →"
+              class="submit-input"
+            />
+            <span class="politica-privacidade"
               >Ao criar sua conta, você concorda com os
               <a href="">Termos de uso</a> e a
               <a href="">Política de privacidade</a> da Drogaria Popular Ponte
@@ -175,9 +242,11 @@
             >
           </form>
 
-          <p>Ja tem conta? <a href="">Entrar</a></p>
+          <p class="sobre-conta">Ja tem conta? <a href="">Entrar</a></p>
         </section>
       </section>
     </main>
+
+    <script src="/client/javaScript/login.js"></script>
   </body>
 </html>
