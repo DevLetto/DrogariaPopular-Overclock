@@ -17,11 +17,12 @@
   <body>
     <!-- LADO AZUL -->
     <header>
-      <section class="logo-titulo-section">
-        <div class="symbols-square">
+      <section class="logo-titulo-section ">
+        <div class="symbols-square ">
           <img
             src="..//img/logo_drogaria_ponteAlta.png"
-            alt="Icone com um P e +"
+            alt="Icone com um P e +
+            "
           />
         </div>
         <div class="logo-titulo-texto">
@@ -98,33 +99,38 @@
             <p class="subtextp">Entre com e-mail ou CPF para continuar</p>
           </div>
 
-          <form action="">
+          <p class="form-error" id="loginError" style="display:none;"></p>
+
+          <form action="" id="formLogin">
             <fieldset class="campo-fieldset">
-              <label for="emailCpf" class="label-input">E-mail ou CPF</label>
+              <label for="loginIdentificador" class="label-input">E-mail ou CPF</label>
               <div class="input-div">
                 <span class="material-symbols-outlined auth-symbols">
                   person
                 </span>
                 <input
                   type="text"
+                  id="loginIdentificador"
+                  name="identificador"
                   placeholder="seuemail@exemplo,com ou 000.000.000-00"
+                  required
                 />
               </div>
             </fieldset>
 
             <fieldset class="campo-fieldset">
-              <label for="senha">Senha</label>
+              <label for="loginSenha">Senha</label>
               <div class="input-div">
                 <span class="material-symbols-outlined auth-symbols">
                   lock
                 </span>
-                <input type="text" placeholder="Sua senha" />
+                <input type="password" id="loginSenha" name="senha" placeholder="Sua senha" required />
               </div>
             </fieldset>
 
             <fieldset class="campo-fieldset lembrar-de-mim-field">
               <div class="lembrar-de-mim-div">
-                <input type="checkbox" name="lembrarDeMim" id="" />
+                <input type="checkbox" name="lembrarDeMim" id="lembrarDeMim" />
                 <label for="lembrarDeMim">Lembrar de mim</label>
               </div>
               <div class="esqueci-senha-div">
@@ -132,7 +138,7 @@
               </div>
             </fieldset>
 
-            <input type="submit" value="Entrar → " class="submit-input" />
+            <input type="submit" value="Entrar → " class="submit-input" id="loginSubmit" />
           </form>
 
           <div class="linha-com-texto">
@@ -142,7 +148,7 @@
           <button class="whatsapp">Precisa de ajuda? Fale no WhatsApp</button>
 
           <p class="sobre-conta">
-            Ainda não tem conta? <a href="">Criar conta</a>
+            Ainda não tem conta? <a href="" onclick="event.preventDefault(); showTab('cadastro')">Criar conta</a>
           </p>
         </section>
 
@@ -154,40 +160,42 @@
             <p class="subtextp">Leva menos de 2 minutos</p>
           </div>
 
-          <form action="">
+          <p class="form-error" id="cadastroError" style="display:none;"></p>
+
+          <form action="" id="formCadastro">
             <fieldset class="campo-fieldset">
-              <label for="nomeCompleto">Nome completo</label>
+              <label for="cadNome">Nome completo</label>
               <div class="input-div">
                 <span class="material-symbols-outlined auth-symbols">
                   person
                 </span>
-                <input type="text" placeholder="Seu nome completo" />
+                <input type="text" id="cadNome" name="nome" placeholder="Seu nome completo" required />
               </div>
             </fieldset>
 
             <fieldset class="campo-fieldset campo-partido-fieldset">
               <div>
-                <label for="CPF">CPF</label>
+                <label for="cadCpf">CPF</label>
                 <div class="input-div">
                   <span class="material-symbols-outlined auth-symbols">
                     article
                   </span>
-                  <input type="text" placeholder="000.000.000-00" />
+                  <input type="text" id="cadCpf" name="cpf" placeholder="000.000.000-00" required />
                 </div>
               </div>
               <div>
-                <label for="telefone">Telefone</label>
+                <label for="cadTelefone">Telefone</label>
                 <div class="input-div">
                   <span class="material-symbols-outlined auth-symbols">
                     call
                   </span>
-                  <input type="tel" placeholder="(61) 90000-0000" />
+                  <input type="tel" id="cadTelefone" name="telefone" placeholder="(61) 90000-0000" required />
                 </div>
               </div>
             </fieldset>
 
             <fieldset class="campo-fieldset">
-              <label for="emaik">E-mail</label>
+              <label for="cadEmail">E-mail</label>
               <div class="input-div">
                 <span class="material-symbols-outlined auth-symbols">
                   mail
@@ -195,33 +203,36 @@
                 <input
                   type="email"
                   name="email"
-                  id=""
+                  id="cadEmail"
                   placeholder="seuemail@exemplo.com"
+                  required
                 />
               </div>
             </fieldset>
 
             <fieldset>
-              <label for="endereco">Endereço para entrega</label>
+              <label for="cadEndereco">Endereço para entrega</label>
               <div class="input-div">
                 <span class="material-symbols-outlined auth-symbols">
                   location_on
                 </span>
-                <input type="text" placeholder="Rua, número, bairro" />
+                <input type="text" id="cadEndereco" name="endereco" placeholder="Rua, número, bairro" required />
               </div>
             </fieldset>
 
             <fieldset class="campo-fieldset">
-              <label for="criarSenha">Criar senha</label>
+              <label for="cadSenha">Criar senha</label>
               <div class="input-div">
                 <span class="material-symbols-outlined auth-symbols">
                   lock
                 </span>
                 <input
-                  type="text"
+                  type="password"
                   name="criarSenha"
-                  id=""
+                  id="cadSenha"
                   placeholder="Mínimo 8 caracteres"
+                  minlength="8"
+                  required
                 />
               </div>
               <span class="dica-senha"
@@ -233,6 +244,7 @@
               type="submit"
               value="Criar minha conta →"
               class="submit-input"
+              id="cadastroSubmit"
             />
             <span class="politica-privacidade"
               >Ao criar sua conta, você concorda com os
@@ -242,7 +254,7 @@
             >
           </form>
 
-          <p class="sobre-conta">Ja tem conta? <a href="">Entrar</a></p>
+          <p class="sobre-conta">Ja tem conta? <a href="" onclick="event.preventDefault(); showTab('login')">Entrar</a></p>
         </section>
       </section>
     </main>
