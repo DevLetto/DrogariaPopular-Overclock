@@ -17,16 +17,30 @@ A **Drogaria Popular Ponte Alta** possui duas unidades e atende presencialmente 
 
 Este repositório reúne a documentação produzida pela equipe **Overclock** para o desenvolvimento de uma plataforma digital que centralize as informações institucionais da drogaria e facilite o acesso dos clientes aos seus serviços — incluindo, em uma frente mais ampla do estudo, o desenho de um fluxo completo de e-commerce de farmácia (cadastro, catálogo, carrinho, checkout e área administrativa).
 
-### Problema identificado
-> A falta de um canal digital centralizado para reunir informações sobre a Drogaria Popular Ponte Alta dificulta o acesso dos clientes a informações importantes sobre a empresa, suas unidades e seus serviços.
+## Objetivo Geral
 
-### Solução proposta
-Uma aplicação/web site institucional centralizando:
-- Informações sobre a empresa, missão, visão e valores
-- Informações sobre as unidades e formas de contato
-- Acesso ao atendimento pelo WhatsApp
-- Informações sobre produtos e categorias
-- Depoimentos de clientes
+Desenvolver um sistema web para a Drogaria Popular Ponte Alta, com o objetivo de apresentar a empresa, sua história, produtos e serviços de forma organizada e acessível. O sistema contará com uma interface simples e intuitiva, permitindo que os clientes encontrem as informações com facilidade. Também será desenvolvido um carrinho de compras, no qual o usuário poderá adicionar produtos, visualizar os itens selecionados e consultar o valor da compra.
+
+## Objetivos Específicos
+
+- Apresentar a história e as principais informações da Drogaria Popular Ponte Alta;
+- Disponibilizar informações sobre os produtos comercializados pela farmácia;
+- Apresentar os serviços oferecidos pela drogaria de forma clara e organizada;
+- Criar um catálogo de produtos contendo nome, descrição, imagem e preço;
+- Desenvolver um carrinho de compras que permita adicionar, remover e visualizar os produtos selecionados;
+- Facilitar o acesso dos clientes às informações da farmácia por meio da internet;
+- Proporcionar uma navegação simples e intuitiva para os usuários;
+- Auxiliar na divulgação dos produtos, serviços e informações da Drogaria Popular Ponte Alta.
+
+## Problema
+
+Atualmente, os clientes da Drogaria Popular Ponte Alta podem ter dificuldade para obter informações sobre os produtos e serviços oferecidos pela farmácia sem precisar entrar em contato ou se deslocar até uma das unidades. A ausência de um espaço digital com essas informações organizadas pode tornar a busca por produtos, preços e serviços menos prática. Além disso, a farmácia possui poucas ferramentas para divulgar sua história, seus produtos e seus serviços pela internet.
+
+## Justificativa
+
+A criação de um sistema web para a Drogaria Popular Ponte Alta busca facilitar o acesso dos clientes às informações da farmácia. Por meio do sistema, será possível consultar produtos e serviços de forma mais rápida e prática, além de conhecer melhor a empresa sem precisar ir até uma unidade apenas para obter essas informações.
+
+O sistema também poderá contribuir para a divulgação da drogaria e fortalecer sua presença no ambiente digital, reunindo informações institucionais, produtos e serviços em um único espaço. Além disso, o carrinho de compras permitirá que o cliente selecione e visualize os produtos de seu interesse de maneira mais organizada.
 
 ### Missão, Visão e Valores
 - **Missão:** estar presente no dia a dia dos clientes, oferecendo cuidado, qualidade e economia para toda a comunidade.
@@ -76,4 +90,9 @@ Toda a documentação de análise está consolidada em **[`Documentos-Overclock.
 
 ## 👥 Equipe Overclock
 
-*Projeto Integrador desenvolvido para a Drogaria Popular Ponte Alta.*
+*-Brenda Estefany Alves de Azevedo*
+*-Gabriel Letto Sousa Santos*
+*-Adler Moraes Guimarães*
+*-Arthur Duarte de Jesus*
+*-Carlos Daniel*
+*-Carina*
