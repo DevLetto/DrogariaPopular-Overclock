@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Lojas</title>
+    <link rel="stylesheet" href="../css/admin_global.css">
+    <link rel="stylesheet" href="../css/admin_lojas.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-container">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <img src="../img/logo_drogaria_ponteAlta.png">
+                </div>
+                <div class="logo-text">
+                    <h2>PONTE ALTA</h2>
+                    <span>PAINEL ADMIN</span>
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <span class="menu-label">VENDAS</span>
+                <ul>
+                    <li><a href="admin_produtos.html"><img src="../img/pedidos_icon.png" alt="" class="sidebar-icon"> Produtos</a></li>
+                    <li><a href="admin_pedidos.html"><img src="../img/carrinho_icon.png" alt="" class="sidebar-icon"> Pedidos</a></li>
+                    <li><a href="admin_promocoes.html"><img src="../img/coracao_icon.png" alt="" class="sidebar-icon"> Promoções</a></li>
+                    <li><a href="admin_categorias.html"><img src="../img/categorias_icon.png" alt="" class="sidebar-icon"> Categorias</a></li>
+                </ul>
+
+                <span class="menu-label">PESSOAS & LOJAS</span>
+                <ul>
+                    <li><a href="admin_clientes.html"><img src="../img/usuario_icon.png" alt="" class="sidebar-icon"> Clientes</a></li>
+                    <li class="active"><a href="admin_lojas.html"><img src="../img/localizacao_icon.png" alt="" class="sidebar-icon"> Lojas</a></li>
+                    <li><a href="admin_servicos.html"><img src="../img/servicos_icon.png" alt="" class="sidebar-icon"> Serviços</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <strong>Admin</strong>
+                    <span>Gerência</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            
+            <div class="content-header-container">
+                <div class="content-header" style="margin-bottom: 0;">
+                    <h1>Lojas</h1>
+                    <p>Cadastre endereço, telefone e horário de cada unidade.</p>
+                </div>
+                <button class="btn-primary">
+                    <img src="../img/adicionar_icon.png" alt="Adicionar" class="btn-icon-img"> Nova loja
+                </button>
+            </div>
+
+            <div class="content-box" style="margin-top: 24px;">
+                <div class="table-container" style="border: none;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>LOJA</th>
+                                <th>ENDEREÇO</th>
+                                <th>HORÁRIO</th>
+                                <th>STATUS</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Ponte Alta Norte</strong></td>
+                                <td>QN 05, Conjunto 3 · Gama - DF</td>
+                                <td>Seg-Sáb 7h-22h</td>
+                                <td><span class="status-loja-aberta">Aberta</span></td>
+                                <td class="action-cell">
+                                    <button class="btn-icon" title="Editar"><img src="../img/edicao_icon.png" alt="Editar"></button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>Ponte Alta Sul</strong></td>
+                                <td>Quadra 15, Lote 2 · Gama - DF</td>
+                                <td>Seg-Sáb 7h-21h</td>
+                                <td><span class="status-loja-aberta">Aberta</span></td>
+                                <td class="action-cell">
+                                    <button class="btn-icon" title="Editar"><img src="../img/edicao_icon.png" alt="Editar"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos - Painel Admin Ponte Alta</title>
+    <link rel="stylesheet" href="../css/admin_global.css" />
+    <link rel="stylesheet" href="../css/admin_produtos.css" />
+</head>
+<body class="admin-body">
+
+    <div class="admin-container">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <img src="../img/logo_drogaria_ponteAlta.png">
+                </div>
+                <div class="logo-text">
+                    <h2>PONTE ALTA</h2>
+                    <span>PAINEL ADMIN</span>
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <span class="menu-label">VENDAS</span>
+                <ul>
+                    <li class="active"><a href="admin_produtos.html"><img src="../img/pedidos_icon.png" alt="" class="sidebar-icon"> Produtos</a></li>
+                    <li><a href="admin_pedidos.html"><img src="../img/carrinho_icon.png" alt="" class="sidebar-icon"> Pedidos</a></li>
+                    <li><a href="admin_promocoes.html"><img src="../img/coracao_icon.png" alt="" class="sidebar-icon"> Promoções</a></li>
+                    <li><a href="admin_categorias.html"><img src="../img/categorias_icon.png" alt="" class="sidebar-icon"> Categorias</a></li>
+                </ul>
+
+                <span class="menu-label">PESSOAS & LOJAS</span>
+                <ul>
+                    <li><a href="admin_clientes.html"><img src="../img/usuario_icon.png" alt="" class="sidebar-icon"> Clientes</a></li>
+                    <li><a href="admin_lojas.html"><img src="../img/localizacao_icon.png" alt="" class="sidebar-icon"> Lojas</a></li>
+                    <li><a href="admin_servicos.html"><img src="../img/servicos_icon.png" alt="" class="sidebar-icon"> Serviços</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <strong>Admin</strong>
+                    <span>Gerência</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <div class="content-header-container">
+                <div class="content-header">
+                    <h1>PRODUTOS</h1>
+                    <p>Cadastre, edite e controle o estoque do catálogo.</p>
+                </div>
+                <button class="btn-primary">
+                    <img src="../img/adicionar_icon.png" alt="" class="btn-icon-img"> Novo produto
+                </button>
+            </div>
+
+            <div class="summary-cards">
+                <div class="card">
+                    <span class="card-title">TOTAL DE PRODUTOS</span>
+                    <h2 class="card-value">128</h2>
+                </div>
+                <div class="card">
+                    <span class="card-title">EM PROMOÇÃO</span>
+                    <h2 class="card-value">14</h2>
+                </div>
+                <div class="card">
+                    <span class="card-title">ESTOQUE BAIXO</span>
+                    <h2 class="card-value">6</h2>
+                    <span class="card-subtitle text-warning">Revisar reposição</span>
+                </div>
+                <div class="card">
+                    <span class="card-title">ESGOTADOS</span>
+                    <h2 class="card-value">3</h2>
+                    <span class="card-subtitle text-warning">Marcar reposição</span>
+                </div>
+            </div>
+
+            <div class="content-box">
+                
+                <div class="table-controls">
+                    <div class="search-box">
+                        <img src="../img/lupa_icon.png" alt="" class="search-icon">
+                        <input type="text" placeholder="Buscar produto...">
+                    </div>
+                    <div class="filter-pills">
+                        <button class="pill active">Todos</button>
+                        <button class="pill">Em estoque</button>
+                        <button class="pill">Baixo</button>
+                        <button class="pill">Esgotado</button>
+                    </div>
+                </div>
+
+                <div class="table-container" style="border: none;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>PRODUTO</th>
+                                <th>CATEGORIA</th>
+                                <th>PREÇO</th>
+                                <th>ESTOQUE</th>
+                                <th>STATUS</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="product-cell">
+                                    <div class="product-icon-box">
+                                        <img src="../img/medicamentos_icon.png" alt="">
+                                    </div>
+                                    <div class="product-info">
+                                        <strong>Dipirona Sódica 500mg</strong>
+                                        <span>20 comprimidos</span>
+                                    </div>
+                                </td>
+                                <td>Medicamentos</td>
+                                <td>R$ 6,90</td>
+                                <td><span class="badge-stock">42</span></td>
+                                <td><span class="status-badge status-ativo">Ativo</span></td>
+                                <td class="action-cell">
+                                    <button class="btn-icon" title="Editar"><img src="../img/edicao_icon.png" alt="Editar"></button>
+                                    <button class="btn-icon" title="Excluir"><img src="../img/lixeira_icon.png" alt="Excluir"></button>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="product-cell">
+                                    <div class="product-icon-box">
+                                        <img src="../img/infantil_icon.png" alt="">
+                                    </div>
+                                    <div class="product-info">
+                                        <strong>Fralda infantil M</strong>
+                                        <span>Pacote 40un</span>
+                                    </div>
+                                </td>
+                                <td>Infantil</td>
+                                <td>R$ 32,50</td>
+                                <td><span class="badge-stock">4</span></td>
+                                <td><span class="status-badge status-baixo">Estoque baixo</span></td>
+                                <td class="action-cell">
+                                    <button class="btn-icon" title="Editar"><img src="../img/edicao_icon.png" alt="Editar"></button>
+                                    <button class="btn-icon" title="Excluir"><img src="../img/lixeira_icon.png" alt="Excluir"></button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="product-cell">
+                                    <div class="product-icon-box">
+                                        <img src="../img/medicamentos_icon.png" alt="">
+                                    </div>
+                                    <div class="product-info">
+                                        <strong>Vitamina D3 2000UI</strong>
+                                        <span>60 cápsulas</span>
+                                    </div>
+                                </td>
+                                <td>Medicamentos</td>
+                                <td>R$ 32,90</td>
+                                <td><span class="badge-stock">0</span></td>
+                                <td><span class="status-badge status-esgotado">Esgotado</span></td>
+                                <td class="action-cell">
+                                    <button class="btn-icon" title="Editar"><img src="../img/edicao_icon.png" alt="Editar"></button>
+                                    <button class="btn-icon" title="Excluir"><img src="../img/lixeira_icon.png" alt="Excluir"></button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="product-cell">
+                                    <div class="product-icon-box">
+                                        <img src="../img/higiene_icon.png" alt="">
+                                    </div>
+                                    <div class="product-info">
+                                        <strong>Protetor solar FPS 60</strong>
+                                        <span>120g</span>
+                                    </div>
+                                </td>
+                                <td>Higiene</td>
+                                <td>R$ 39,90</td>
+                                <td><span class="badge-stock">27</span></td>
+                                <td><span class="status-badge status-ativo">Ativo</span></td>
+                                <td class="action-cell">
+                                    <button class="btn-icon" title="Editar"><img src="../img/edicao_icon.png" alt="Editar"></button>
+                                    <button class="btn-icon" title="Excluir"><img src="../img/lixeira_icon.png" alt="Excluir"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
