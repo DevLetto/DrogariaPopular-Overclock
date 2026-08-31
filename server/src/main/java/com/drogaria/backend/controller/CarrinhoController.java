@@ -36,7 +36,8 @@ public class CarrinhoController {
 				carrinhoService.adicionar(
 						request.getIdUsuario(),
 						request.getIdProduto(),
-						request.getQuantidade()
+						request.getQuantidade(),
+						request.getSalvoParaDepois()
 						)
 				
 				);

@@ -26,7 +26,7 @@ public class CarrinhoService {
 
 	}
 
-	public CarrinhoResponse adicionar(Integer idUsuario, Integer idProduto, Integer quantidade) {
+	public CarrinhoResponse adicionar(Integer idUsuario, Integer idProduto, Integer quantidade, Integer salvoParaDepois) {
 
 		Optional<Carrinho_itens> itemExistence = carrinhoRepository.findByIdUsuarioAndIdProduto(idUsuario, idProduto);	
 		
@@ -48,6 +48,7 @@ public class CarrinhoService {
 			item.setIdUsuario(idUsuario);
 			item.setIdProduto(idProduto);
 			item.setQuantidade(quantidade);
+			item.setSalvoParaDepois(salvoParaDepois);
 			
 			
 		}

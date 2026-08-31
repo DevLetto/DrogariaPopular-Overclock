@@ -6,10 +6,18 @@ public class CarrinhoRequest {
     private Integer idUsuario;
     private Integer idProduto;
     private Integer quantidade;
+    private Integer salvoParaDepois;
 
 
+    public Integer getSalvoParaDepois() {
+		return salvoParaDepois;
+	}
 
-    public Integer getIdProduto() {
+	public void setSalvoParaDepois(Integer salvoParaDepois) {
+		this.salvoParaDepois = salvoParaDepois;
+	}
+
+	public Integer getIdProduto() {
 		return idProduto;
 	}
 
