@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Serviços</title>
+    <link rel="stylesheet" href="../css/admin_global.css">
+    <link rel="stylesheet" href="../css/admin_servicos.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-container">
+        
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <img src="../img/logo_drogaria_ponteAlta.png">
+                </div>
+                <div class="logo-text">
+                    <h2>PONTE ALTA</h2>
+                    <span>PAINEL ADMIN</span>
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <span class="menu-label">VENDAS</span>
+                <ul>
+                    <li><a href="admin_produtos.html"><img src="../img/pedidos_icon.png" alt="" class="sidebar-icon"> Produtos</a></li>
+                    <li><a href="admin_pedidos.html"><img src="../img/carrinho_icon.png" alt="" class="sidebar-icon"> Pedidos</a></li>
+                    <li><a href="admin_promocoes.html"><img src="../img/coracao_icon.png" alt="" class="sidebar-icon"> Promoções</a></li>
+                    <li><a href="admin_categorias.html"><img src="../img/categorias_icon.png" alt="" class="sidebar-icon"> Categorias</a></li>
+                </ul>
+
+                <span class="menu-label">PESSOAS & LOJAS</span>
+                <ul>
+                    <li><a href="admin_clientes.html"><img src="../img/usuario_icon.png" alt="" class="sidebar-icon"> Clientes</a></li>
+                    <li><a href="admin_lojas.html"><img src="../img/localizacao_icon.png" alt="" class="sidebar-icon"> Lojas</a></li>
+                    <li class="active"><a href="admin_servicos.html"><img src="../img/servicos_icon.png" alt="" class="sidebar-icon"> Serviços</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <strong>Admin</strong>
+                    <span>Gerência</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            
+            <div class="content-header-container">
+                <div class="content-header" style="margin-bottom: 0;">
+                    <h1>Serviços</h1>
+                    <p>Gerencie os serviços oferecidos e seus valores.</p>
+                </div>
+                <button class="btn-primary">
+                    <img src="../img/adicionar_icon.png" alt="Adicionar" class="btn-icon-img"> Novo serviço
+                </button>
+            </div>
+
+            <div class="content-box" style="margin-top: 24px;">
+                <div class="table-container" style="border: none;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>SERVIÇO</th>
+                                <th>VALOR</th>
+                                <th>DURAÇÃO</th>
+                                <th>AGENDAMENTO</th>
+                                <th>STATUS</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Aplicação de injeções</strong></td>
+                                <td>R$ 8,00</td>
+                                <td>10min</td>
+                                <td>Não exige</td>
+                                <td><span class="status-servico-ativo">Ativo</span></td>
+                                <td class="action-cell">
+                                    <button class="btn-icon" title="Editar"><img src="../img/edicao_icon.png" alt="Editar"></button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>Furação de orelha</strong></td>
+                                <td>R$ 35,00</td>
+                                <td>15min</td>
+                                <td>Recomendado</td>
+                                <td><span class="status-servico-ativo">Ativo</span></td>
+                                <td class="action-cell">
+                                    <button class="btn-icon" title="Editar"><img src="../img/edicao_icon.png" alt="Editar"></button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>Aferição de pressão</strong></td>
+                                <td>Gratuito</td>
+                                <td>5min</td>
+                                <td>Não exige</td>
+                                <td><span class="status-servico-ativo">Ativo</span></td>
+                                <td class="action-cell">
+                                    <button class="btn-icon" title="Editar"><img src="../img/edicao_icon.png" alt="Editar"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>

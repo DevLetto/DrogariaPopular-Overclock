@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Clientes</title>
+    <link rel="stylesheet" href="../css/admin_global.css">
+    <link rel="stylesheet" href="../css/admin_clientes.css">
+</head>
+<body class="admin-body">
+
+    <div class="admin-container">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <img src="../img/logo_drogaria_ponteAlta.png">
+                </div>
+                <div class="logo-text">
+                    <h2>PONTE ALTA</h2>
+                    <span>PAINEL ADMIN</span>
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <span class="menu-label">VENDAS</span>
+                <ul>
+                    <li><a href="admin_produtos.html"><img src="../img/pedidos_icon.png" alt="" class="sidebar-icon"> Produtos</a></li>
+                    <li><a href="admin_pedidos.html"><img src="../img/carrinho_icon.png" alt="" class="sidebar-icon"> Pedidos</a></li>
+                    <li><a href="admin_promocoes.html"><img src="../img/coracao_icon.png" alt="" class="sidebar-icon"> Promoções</a></li>
+                    <li><a href="admin_categorias.html"><img src="../img/categorias_icon.png" alt="" class="sidebar-icon"> Categorias</a></li>
+                </ul>
+
+                <span class="menu-label">PESSOAS & LOJAS</span>
+                <ul>
+                    <li class="active"><a href="admin_clientes.html"><img src="../img/usuario_icon.png" alt="" class="sidebar-icon"> Clientes</a></li>
+                    <li><a href="admin_lojas.html"><img src="../img/localizacao_icon.png" alt="" class="sidebar-icon"> Lojas</a></li>
+                    <li><a href="admin_servicos.html"><img src="../img/servicos_icon.png" alt="" class="sidebar-icon"> Serviços</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <strong>Admin</strong>
+                    <span>Gerência</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            
+            <div class="content-header" style="margin-bottom: 24px;">
+                <h1>Clientes</h1>
+                <p>Consulte os clientes cadastrados na plataforma.</p>
+            </div>
+
+            <div class="content-box-search">
+                
+                <div class="search-box" style="margin-bottom: 24px; max-width: 100%;">
+                    <img src="../img/lupa_icon.png" alt="Buscar">
+                    <input type="text" placeholder="Buscar cliente por nome ou CPF...">
+                </div>
+
+                <div class="table-container" style="border: none;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>CLIENTE</th>
+                                <th>CPF</th>
+                                <th>TELEFONE</th>
+                                <th>PEDIDOS</th>
+                                <th>CADASTRO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Marcos Silveira</strong></td>
+                                <td>000.111.222-33</td>
+                                <td>(61) 90000-1122</td>
+                                <td>7</td>
+                                <td>12/03/2026</td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>Renata Cordeiro</strong></td>
+                                <td>000.222.333-44</td>
+                                <td>(61) 90000-3344</td>
+                                <td>3</td>
+                                <td>28/05/2026</td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>João Pedro Alves</strong></td>
+                                <td>000.333.444-55</td>
+                                <td>(61) 90000-5566</td>
+                                <td>14</td>
+                                <td>02/01/2026</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>

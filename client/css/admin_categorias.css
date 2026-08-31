@@ -1,0 +1,43 @@
+.status-categoria-ativa {
+    background-color: #dcfce7;
+    color: #166534;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.categoria-nome-celula {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.categoria-nome-celula img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.category-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.categoria-icon-box {
+    width: 38px;
+    height: 38px;
+    background-color: #f1f5f9; 
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.categoria-icon-box img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}

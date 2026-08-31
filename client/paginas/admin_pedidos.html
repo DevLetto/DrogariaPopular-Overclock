@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos - Painel Admin Ponte Alta</title>
+    <link rel="stylesheet" href="../css/admin_global.css" />
+    <link rel="stylesheet" href="../css/admin_pedidos.css" />
+</head>
+<body class="admin-body">
+
+    <div class="admin-container">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <img src="../img/logo_drogaria_ponteAlta.png">
+                </div>
+                <div class="logo-text">
+                    <h2>PONTE ALTA</h2>
+                    <span>PAINEL ADMIN</span>
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <span class="menu-label">VENDAS</span>
+                <ul>
+                    <li><a href="admin_produtos.html"><img src="../img/pedidos_icon.png" alt="" class="sidebar-icon"> Produtos</a></li>
+                    <li class="active"><a href="admin_pedidos.html"><img src="../img/carrinho_icon.png" alt="" class="sidebar-icon"> Pedidos</a></li>
+                    <li><a href="admin_promocoes.html"><img src="../img/coracao_icon.png" alt="" class="sidebar-icon"> Promoções</a></li>
+                    <li><a href="admin_categorias.html"><img src="../img/categorias_icon.png" alt="" class="sidebar-icon"> Categorias</a></li>
+                </ul>
+
+                <span class="menu-label">PESSOAS & LOJAS</span>
+                <ul>
+                    <li><a href="admin_clientes.html"><img src="../img/usuario_icon.png" alt="" class="sidebar-icon"> Clientes</a></li>
+                    <li><a href="admin_lojas.html"><img src="../img/localizacao_icon.png" alt="" class="sidebar-icon"> Lojas</a></li>
+                    <li><a href="admin_servicos.html"><img src="../img/servicos_icon.png" alt="" class="sidebar-icon"> Serviços</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <strong>Admin</strong>
+                    <span>Gerência</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <div class="content-header-container">
+                <div class="content-header">
+                    <h1>PEDIDOS</h1>
+                    <p>Acompanhe e atualize o status dos pedidos recebidos.</p>
+                </div>
+            </div>
+
+            <div class="summary-cards">
+                <div class="card">
+                    <span class="card-title">NOVOS HOJE</span>
+                    <h2 class="card-value">12</h2>
+                </div>
+                <div class="card">
+                    <span class="card-title">EM PREPARO</span>
+                    <h2 class="card-value">4</h2>
+                </div>
+                <div class="card">
+                    <span class="card-title">A CAMINHO</span>
+                    <h2 class="card-value">3</h2>
+                </div>
+                <div class="card">
+                    <span class="card-title">ENTREGUES HOJE</span>
+                    <h2 class="card-value">9</h2>
+                    <span class="card-subtitle text-green">R$ 612,40 em vendas</span>
+                </div>
+            </div>
+
+            <div class="content-box">
+                
+                <div class="table-controls">
+                    <div class="search-box">
+                        <img src="../img/lupa_icon.png" alt="" class="search-icon">
+                        <input type="text" placeholder="Buscar pedido ou cliente...">
+                    </div>
+                    <div class="filter-pills">
+                        <button class="pill active">Todos</button>
+                        <button class="pill">Preparando</button>
+                        <button class="pill">A caminho</button>
+                        <button class="pill">Entregue</button>
+                    </div>
+                </div>
+
+                <div class="table-container" style="border: none;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>PEDIDO</th>
+                                <th>CLIENTE</th>
+                                <th>ENTREGA</th>
+                                <th>TOTAL</th>
+                                <th>STATUS</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="pedido-id">#4521</td>
+                                <td>Marcos Silveira</td>
+                                <td>Entrega</td>
+                                <td>R$ 87,10</td>
+                                <td>
+                                    <select class="status-select status-caminho" onchange="mudarCorStatus(this)">
+                                        <option value="caminho" selected>A caminho</option>
+                                        <option value="preparando">Preparando</option>
+                                        <option value="entregue">Entregue</option>
+                                        <option value="cancelado">Cancelado</option>
+                                    </select>
+                                </td>
+                                <td class="action-cell">
+                                    <button class="btn-icon" title="Ver Detalhes"><img src="../img/visao_icon.png" alt="Ver"></button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="pedido-id">#4520</td>
+                                <td>Renata Cordeiro</td>
+                                <td>Retirada</td>
+                                <td>R$ 24,90</td>
+                                <td>
+                                    <select class="status-select status-preparando" onchange="mudarCorStatus(this)">
+                                        <option value="caminho">A caminho</option>
+                                        <option value="preparando" selected>Preparando</option>
+                                        <option value="entregue">Entregue</option>
+                                        <option value="cancelado">Cancelado</option>
+                                    </select>
+                                </td>
+                                <td class="action-cell">
+                                    <button class="btn-icon" title="Ver Detalhes"><img src="../img/visao_icon.png" alt="Ver"></button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="pedido-id">#4519</td>
+                                <td>João Pedro Alves</td>
+                                <td>Entrega</td>
+                                <td>R$ 132,00</td>
+                                <td>
+                                    <select class="status-select status-entregue" onchange="mudarCorStatus(this)">
+                                        <option value="caminho">A caminho</option>
+                                        <option value="preparando">Preparando</option>
+                                        <option value="entregue" selected>Entregue</option>
+                                        <option value="cancelado">Cancelado</option>
+                                    </select>
+                                </td>
+                                <td class="action-cell">
+                                    <button class="btn-icon" title="Ver Detalhes"><img src="../img/visao_icon.png" alt="Ver"></button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="pedido-id">#4518</td>
+                                <td>Beatriz Nogueira</td>
+                                <td>Retirada</td>
+                                <td>R$ 18,50</td>
+                                <td>
+                                    <select class="status-select status-cancelado" onchange="mudarCorStatus(this)">
+                                        <option value="caminho">A caminho</option>
+                                        <option value="preparando">Preparando</option>
+                                        <option value="entregue">Entregue</option>
+                                        <option value="cancelado" selected>Cancelado</option>
+                                    </select>
+                                </td>
+                                <td class="action-cell">
+                                    <button class="btn-icon" title="Ver Detalhes"><img src="../img/visao_icon.png" alt="Ver"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function mudarCorStatus(selectElement) {
+            selectElement.classList.remove('status-caminho', 'status-preparando', 'status-entregue', 'status-cancelado');
+            selectElement.classList.add('status-' + selectElement.value);
+        }
+    </script>
+</body>
+</html>
