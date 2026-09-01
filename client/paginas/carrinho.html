@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carrinho</title>
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/carrinho.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="top-bar">
+        <span>📍 Entregamos em toda a Ponte Alta e região</span>
+        <span>📞 (61) 3333-4455 · Seg a Sáb, 7h-22h</span>
+      </div>
+
+      <div class="main-header">
+        <section class="logo-titulo-section">
+          <div class="symbols-square" onclick="history.back()">
+            <img
+              src="../img/logo_drogaria_ponteAlta.png"
+              alt="Icone com um P e +
+            "
+            />
+          </div>
+          <div class="logo-titulo-texto">
+            <p class="logo-titulo-texto-p1 p1">Drogaria Popular</p>
+            <p class="logo-titulo-texto-p2 p2">Ponte Alta</p>
+          </div>
+        </section>
+
+
+      </div>
+
+      <section class="top-toggle-section">
+          <nav class="top-toggle-nav">
+            <button class="toggle-btn activeToggle">
+                Carrinho
+            </button>
+            <button class="toggle-btn">
+                Checkout
+            </button>
+          
+          </nav>
+          <div></div>
+      </section>
+    </header>
+
+    <main class="mainCarrinho">
+        <nav class="progress-steps">
+            <div class="step active"><div>1</div>Carrinho</div>
+            <div class="step"><div>2</div>Entrega e pagamento</div>
+            <div class="step"><div>3</div>Confirmação</div>
+        </nav>
+
+        <h1>Seu carrinho</h1>
+
+        <section class="separador-main">
+            <section class="section-listas">
+                <section class="section-lista-comprar-agora">
+                    <p class="lista-comprar-p" id="quantidadeComprar">Para comprar agora</p>
+                    <div class="lista-comprar-agora">
+                        
+                    </div>
+                    <hr>
+                    <p class="esvazia-carrinho">Esvaziar carrinho</p>
+                </section>
+                <section class="section-salvo-para-depois">
+                    <p class="lista-salvo-depois-p" id="quantidadeSalvoDepois">Salvos para depois</p>
+                    <div class="lista-salvo-depois"></div>
+                </section>
+            </section>
+            <aside class="resumo-pedido">
+                <div class="resumo-pedido-div">
+                    <div class="resumo-pedido-title resumo"></div>
+                    <div class="subtotal">
+                        <p>Subtotal</p>
+                        <p></p>
+                    </div>
+                    <div class="desconto resumo">
+                        <p>Desconto</p>
+                        <p></p>
+                    </div>
+                    <div class="frete resumo">
+                        <p>Frete</p>
+                        <p>Calculado no checkout</p>
+                    </div>
+
+                    <div class="calcular-desconto-div ">
+                        <input type="text" placeholder="Cupom de desconto">
+                        <button>Aplicar</button>
+                    </div>
+
+                </div>
+                <hr>
+                <div class="total-txt-div resumo">
+                    <p>Total</p>
+                    <p></p>
+                </div>
+                <button>Continuar para entrega →</button>
+            </aside>
+        </section>
+    </main>
+
+    <script src="../javaScript/carrinho.js"></script>
+  </body>
+</html>

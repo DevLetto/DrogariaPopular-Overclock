@@ -1,0 +1,370 @@
+:root {
+  --navy-900: #060b3d;
+  --navy-800: #0b1157;
+  --navy-700: #161f7a;
+  --red: #ed1c24;
+  --red-dark: #b8121a;
+  --paper: #f4f6fc;
+  --paper-dim: #e7ebf7;
+  --ink: #0b1157;
+  --ink-soft: #565f8c;
+  --white: #ffffff;
+  --green: #1c8a4b;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  font-family: "Inter", sans-serif;
+  background-color: var(--paper);
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+h1 {
+  font-family: "Barlow Condensed", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.logo-titulo-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-titulo-texto-p1 {
+  font-family: "Barlow Condensed";
+  font-size: 10.5px;
+  letter-spacing: 0.016em;
+  color: #b9c0ee;
+  text-transform: uppercase;
+}
+
+.logo-titulo-texto-p2 {
+  font-family: "Barlow Condensed";
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.symbols-square {
+  width: 40px;
+  height: 40px;
+  background-color: var(--navy-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.symbols-square > img {
+  object-fit: contain;
+  width: 80%;
+}
+
+.top-toggle-section {
+  width: 100%;
+  height: 50px;
+  background-color: var(--navy-800);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.top-toggle-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.toggle-btn {
+  width: 100px;
+  height: 30px;
+  border-radius: 15px;
+  border: 1px solid var(--navy-700);
+  color: var(--paper-dim);
+  background-color: var(--ink-soft);
+  font-weight: 650;
+}
+
+.activeToggle {
+  background-color: white;
+  border: none;
+  color: var(--ink);
+}
+
+.mainCarrinho {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+.progress-steps {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.progress-steps .step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-steps .step div {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: var(--paper-dim);
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.progress-steps .step.active {
+  color: var(--navy-800);
+  font-weight: 600;
+}
+.progress-steps .step.active div {
+  background-color: var(--navy-800);
+  color: var(--white);
+}
+
+.mainCarrinho h1 {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.separador-main {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.section-listas {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-lista-comprar-agora,
+.section-salvo-para-depois {
+  background-color: var(--white);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.lista-comprar-p,
+.lista-salvo-depois-p {
+  font-family: "Barlow Condensed", sans-serif;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  letter-spacing: 0.03em;
+  margin-bottom: 12px;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 48px 1fr auto auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--paper-dim);
+}
+.item:last-child {
+  border-bottom: none;
+}
+
+.item-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background-color: var(--paper-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--navy-700);
+}
+
+.item-nome {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+.item-preco-unit {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.item-desconto-badge {
+  display: inline-block;
+  margin-top: 4px;
+  background-color: #fdecea;
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.item-qtd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qtd-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--paper-dim);
+  background-color: var(--white);
+  color: var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.qtd-valor {
+  min-width: 16px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.item-precos {
+  text-align: right;
+}
+.item-preco-original {
+  font-size: 12px;
+  color: var(--ink-soft);
+  text-decoration: line-through;
+}
+.item-preco-total {
+  font-weight: 700;
+}
+
+.item-acoes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.salvar-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+.remover-btn {
+  border: none;
+  background: none;
+  color: #b6bad0;
+  cursor: not-allowed;
+  font-size: 12px;
+}
+
+.esvazia-carrinho {
+  text-align: right;
+  font-size: 13px;
+  color: var(--red);
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.carrinho-vazio {
+  color: var(--ink-soft);
+  font-size: 14px;
+  padding: 20px 0;
+  text-align: center;
+}
+
+.resumo-pedido {
+  background-color: var(--white);
+  border-radius: 12px;
+  padding: 20px;
+  position: sticky;
+  top: 20px;
+}
+
+.resumo-pedido-title {
+  font-family: "Barlow Condensed", sans-serif;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.resumo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: var(--ink-soft);
+}
+.desconto p:last-child {
+  color: var(--green);
+}
+
+.calcular-desconto-div {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.calcular-desconto-div input {
+  flex: 1;
+  border: 1px solid var(--paper-dim);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+.calcular-desconto-div button {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  background-color: var(--paper-dim);
+  color: var(--ink-soft);
+  font-weight: 600;
+  cursor: not-allowed;
+}
+
+.total-txt-div {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 16px;
+  margin: 14px 0;
+}
+
+.resumo-pedido button:last-child {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background-color: var(--navy-800);
+  color: var(--white);
+  font-weight: 600;
+  cursor: pointer;
+}
