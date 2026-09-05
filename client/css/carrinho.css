@@ -281,8 +281,8 @@ h1 {
 .remover-btn {
   border: none;
   background: none;
-  color: #b6bad0;
-  cursor: not-allowed;
+  color: var(--red);
+  cursor: pointer;
   font-size: 12px;
 }
 

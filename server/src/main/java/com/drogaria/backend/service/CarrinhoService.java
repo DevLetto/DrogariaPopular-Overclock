@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.drogaria.backend.dto.CarrinhoResponse;
 import com.drogaria.backend.entity.Carrinho_itens;
+import com.drogaria.backend.exception.ApiException;
 import com.drogaria.backend.repository.CarrinhoRepository;
 
 @Service
@@ -26,37 +27,62 @@ public class CarrinhoService {
 
 	}
 
-	public CarrinhoResponse adicionar(Integer idUsuario, Integer idProduto, Integer quantidade, Integer salvoParaDepois) {
+	public CarrinhoResponse adicionar(Integer idUsuario, Integer idProduto, Integer quantidade,
+			Integer salvoParaDepois) {
 
-		Optional<Carrinho_itens> itemExistence = carrinhoRepository.findByIdUsuarioAndIdProduto(idUsuario, idProduto);	
-		
+		Optional<Carrinho_itens> itemExistence = carrinhoRepository.findByIdUsuarioAndIdProduto(idUsuario, idProduto);
+
 		Carrinho_itens item;
-		
-		if(itemExistence.isPresent()) {
-			
+
+		if (itemExistence.isPresent()) {
+
 			item = itemExistence.get();
-			
-			item.setQuantidade(
-					item.getQuantidade() + quantidade
-			);
-			
-			
+
+			item.setQuantidade(item.getQuantidade() + quantidade);
+
 		} else {
-			
+
 			item = new Carrinho_itens();
-			
+
 			item.setIdUsuario(idUsuario);
 			item.setIdProduto(idProduto);
 			item.setQuantidade(quantidade);
 			item.setSalvoParaDepois(salvoParaDepois);
-			
-			
-		}
-		
-		Carrinho_itens itemSalvo = carrinhoRepository.save(item);
-		
-		return new CarrinhoResponse(itemSalvo);	
 
+		}
+
+		Carrinho_itens itemSalvo = carrinhoRepository.save(item);
+
+		return new CarrinhoResponse(itemSalvo);
+
+	}
+
+	public CarrinhoResponse editar(Integer idUsuario, Integer idProduto, Integer quantidade, Integer salvoParaDepois) {
+
+		Optional<Carrinho_itens> itemExistence = carrinhoRepository.findByIdUsuarioAndIdProduto(idUsuario, idProduto);
+
+		Carrinho_itens item;
+
+		item = itemExistence.get();
+
+		item.setQuantidade(item.getQuantidade() + quantidade);
+
+		item.setSalvoParaDepois(salvoParaDepois);
+
+		Carrinho_itens itemSalvo = carrinhoRepository.save(item);
+
+		return new CarrinhoResponse(itemSalvo);
+	}
+	
+	public CarrinhoResponse deletar(Integer idUsuario, Integer idProduto) {
+		
+		Optional<Carrinho_itens> itemExistence = carrinhoRepository.findByIdUsuarioAndIdProduto(idUsuario, idProduto);
+		
+		Carrinho_itens item = itemExistence.get();
+		
+		carrinhoRepository.delete(item);
+		
+		return new CarrinhoResponse(item);
 	}
 
 }

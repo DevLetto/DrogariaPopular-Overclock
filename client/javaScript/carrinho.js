@@ -93,11 +93,11 @@ function criarItemHTML(item) {
           <input type="checkbox" class="salvar-checkbox" ${item.salvoParaDepois ? "checked" : ""} />
           ${item.salvoParaDepois ? "Mover p/ carrinho" : "Salvar p/ depois"}
         </label>
-        <button class="remover-btn" disabled title="Em breve">🗑 Remover</button>
+        <button class="remover-btn" title="Deletar-Item">🗑 Remover</button>
       </div>
     </div>
   `;
-}
+} 
 
 function bindItemEvents(itemEl) {
   const idProduto = Number(itemEl.dataset.idProduto);
@@ -105,32 +105,34 @@ function bindItemEvents(itemEl) {
   const qtdSpan = itemEl.querySelector(".qtd-valor");
 
   itemEl.querySelector(".mais").addEventListener("click", () => {
-    atualizarItem(idProduto, Number(qtdSpan.textContent) + 1, salvoAtual);
+    atualizarItem(idProduto, 1, salvoAtual);
   });
 
   itemEl.querySelector(".menos").addEventListener("click", () => {
     const novaQtd = Number(qtdSpan.textContent) - 1;
     if (novaQtd <= 0) return; // sem função de remover ainda, trava em 1
-    atualizarItem(idProduto, novaQtd, salvoAtual);
+    atualizarItem(idProduto, -1, salvoAtual);
   });
 
   itemEl.querySelector(".salvar-checkbox").addEventListener("change", (e) => {
     atualizarItem(
       idProduto,
-      Number(qtdSpan.textContent),
+      0,
       e.target.checked ? 1 : 0,
     );
   });
+
+  itemEl.querySelector(".remover-btn").addEventListener("click", () => {
+    deletarItem(idProduto)
+  })
 }
 
 async function atualizarItem(idProduto, quantidade, salvoParaDepois) {
   try {
-    const res = await fetch(API_CARRINHO, {
-      method: "POST",
+    const res = await fetch(`${API_CARRINHO}/${ID_USUARIO}/${idProduto}`, {
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        idUsuario: ID_USUARIO,
-        idProduto,
         quantidade,
         salvoParaDepois,
       }),
@@ -139,6 +141,20 @@ async function atualizarItem(idProduto, quantidade, salvoParaDepois) {
     await carregarCarrinho();
   } catch (err) {
     console.error(err);
+  }
+}
+
+async function deletarItem(idProduto){
+  try{
+    const res = await fetch(`${API_CARRINHO}/${ID_USUARIO}/${idProduto}`, {
+      method: "DELETE",
+    })
+
+    if(!res.ok) throw new Error("Erro ao apagar a lista")
+    await carregarCarrinho()
+
+  }catch (err){
+    console.error(err)
   }
 }
 
