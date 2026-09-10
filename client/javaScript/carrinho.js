@@ -1,6 +1,6 @@
-const API_CARRINHO = "http://localhost:8080/api/carrinho"; // ajusta a base URL
+const API_CARRINHO = "http://localhost:8080/api/carrinho";
 const API_PRODUTO = "http://localhost:8080/api/produto";
-const clienteLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
+const clienteLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
 const ID_CLIENTE = clienteLogado?.idCliente ?? clienteLogado?.idUsuario;
 
 const listaComprarEl = document.querySelector(".lista-comprar-agora");
@@ -23,12 +23,27 @@ function csrfHeaders() {
 }
 
 async function carregarCarrinho() {
+  if (!ID_CLIENTE) {
+    listaComprarEl.innerHTML = '<p class="carrinho-vazio">Faça login para ver o carrinho.</p>';
+    if (qtdComprarEl) qtdComprarEl.textContent = "Para comprar agora (0 itens)";
+    if (qtdSalvoEl) qtdSalvoEl.textContent = "Salvos para depois (0 itens)";
+    return;
+  }
+
   try {
-    const res = await fetch(`${API_CARRINHO}/${ID_CLIENTE}`, { credentials: "include" });
-    if (!res.ok) throw new Error("Erro ao buscar carrinho");
+    const res = await fetch(`${API_CARRINHO}/${ID_CLIENTE}`, {
+      credentials: "include",
+      headers: csrfHeaders(),
+    });
+    if (!res.ok) {
+      if (res.status === 401 || res.status === 403) {
+        throw new Error("Sessão expirada. Faça login novamente.");
+      }
+      throw new Error("Erro ao buscar carrinho");
+    }
+
     const itensRaw = await res.json();
 
-    // pra cada item do carrinho, busca os dados do produto correspondente
     carrinhoItens = await Promise.all(
       itensRaw.map(async (item) => {
         let produto = {};
@@ -38,13 +53,14 @@ async function carregarCarrinho() {
         } catch {
           produto = {};
         }
+
         return {
           id: item.id,
           idProduto: item.idProduto,
-          quantidade: item.quantidade,
-          salvoParaDepois: item.salvoParaDepois ?? 0,
+          quantidade: Number(item.quantidade || 0),
+          salvoParaDepois: Number(item.salvoParaDepois ?? 0),
           nomeProduto: produto.nomeProduto || "Produto indisponível",
-          precoProduto: produto.precoProduto ?? 0,
+          precoProduto: Number(produto.precoProduto ?? 0),
           imagemURL: produto.imagemURL || null,
         };
       }),
@@ -53,24 +69,28 @@ async function carregarCarrinho() {
     renderizarCarrinho();
   } catch (err) {
     console.error(err);
+    listaComprarEl.innerHTML = `<p class="carrinho-vazio">${err.message}</p>`;
   }
 }
 
 function formatarPreco(valor) {
-  return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  return Number(valor || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 }
 
 function renderizarCarrinho() {
-  const comprarAgora = carrinhoItens.filter((i) => !i.salvoParaDepois);
-  const salvosDepois = carrinhoItens.filter((i) => i.salvoParaDepois);
+  const comprarAgora = carrinhoItens.filter((item) => !item.salvoParaDepois);
+  const salvosDepois = []; 
 
   qtdComprarEl.textContent = `Para comprar agora (${comprarAgora.length} ${comprarAgora.length === 1 ? "item" : "itens"})`;
-  qtdSalvoEl.textContent = `Salvos para depois (${salvosDepois.length} ${salvosDepois.length === 1 ? "item" : "itens"})`;
+  qtdSalvoEl.textContent = `Salvos para depois (0 itens)`;
 
   listaComprarEl.innerHTML =
     comprarAgora.map(criarItemHTML).join("") ||
-    `<p class="carrinho-vazio">Seu carrinho está vazio.</p>`;
-  listaSalvoEl.innerHTML = salvosDepois.map(criarItemHTML).join("");
+    '<p class="carrinho-vazio">Seu carrinho está vazio.</p>';
+  listaSalvoEl.innerHTML = "";
 
   document.querySelectorAll(".item").forEach(bindItemEvents);
   atualizarResumo(comprarAgora);
@@ -82,7 +102,7 @@ function criarItemHTML(item) {
     : `<span class="material-symbols-outlined">medication</span>`;
 
   return `
-    <div class="item" data-id-produto="${item.idProduto}" data-salvo="${item.salvoParaDepois}">
+    <div class="item" data-id-produto="${item.idProduto}">
       <div class="item-icon">${iconeOuImagem}</div>
       <div class="item-info">
         <p class="item-nome">${item.nomeProduto}</p>
@@ -97,95 +117,109 @@ function criarItemHTML(item) {
         <p class="item-preco-total">${formatarPreco(item.precoProduto * item.quantidade)}</p>
       </div>
       <div class="item-acoes">
-        <label class="salvar-label">
-          <input type="checkbox" class="salvar-checkbox" ${item.salvoParaDepois ? "checked" : ""} />
-          ${item.salvoParaDepois ? "Mover p/ carrinho" : "Salvar p/ depois"}
-        </label>
-        <button class="remover-btn" title="Deletar-Item">🗑 Remover</button>
+        <button class="remover-btn" title="Remover item">🗑 Remover</button>
       </div>
     </div>
   `;
-} 
+}
 
 function bindItemEvents(itemEl) {
   const idProduto = Number(itemEl.dataset.idProduto);
-  const salvoAtual = Number(itemEl.dataset.salvo); // 0 ou 1
   const qtdSpan = itemEl.querySelector(".qtd-valor");
 
   itemEl.querySelector(".mais").addEventListener("click", () => {
-    atualizarItem(idProduto, 1, salvoAtual);
+    atualizarItem(idProduto, 1);
   });
 
   itemEl.querySelector(".menos").addEventListener("click", () => {
     const novaQtd = Number(qtdSpan.textContent) - 1;
-    if (novaQtd <= 0) return; // sem função de remover ainda, trava em 1
-    atualizarItem(idProduto, -1, salvoAtual);
-  });
-
-  itemEl.querySelector(".salvar-checkbox").addEventListener("change", (e) => {
-    atualizarItem(
-      idProduto,
-      0,
-      e.target.checked ? 1 : 0,
-    );
+    if (novaQtd <= 0) {
+      deletarItem(idProduto);
+      return;
+    }
+    atualizarItem(idProduto, -1);
   });
 
   itemEl.querySelector(".remover-btn").addEventListener("click", () => {
-    deletarItem(idProduto)
-  })
+    deletarItem(idProduto);
+  });
 }
 
-async function atualizarItem(idProduto, quantidade, salvoParaDepois) {
+async function atualizarItem(idProduto, quantidade) {
   try {
     const res = await fetch(`${API_CARRINHO}/${ID_CLIENTE}/${idProduto}`, {
       method: "PUT",
       credentials: "include",
       headers: { "Content-Type": "application/json", ...csrfHeaders() },
-      body: JSON.stringify({
-        quantidade,
-        salvoParaDepois,
-      }),
+      body: JSON.stringify({ quantidade, salvoParaDepois: 0 }),
     });
-    if (!res.ok) throw new Error("Erro ao atualizar item");
+
+    if (!res.ok) {
+      const erro = await res.json().catch(() => ({}));
+      throw new Error(erro.mensagem || "Erro ao atualizar item");
+    }
+
     await carregarCarrinho();
   } catch (err) {
     console.error(err);
+    alert(err.message || "Erro ao atualizar item do carrinho.");
   }
 }
 
-async function deletarItem(idProduto){
-  try{
+async function deletarItem(idProduto) {
+  try {
     const res = await fetch(`${API_CARRINHO}/${ID_CLIENTE}/${idProduto}`, {
       method: "DELETE",
       credentials: "include",
       headers: csrfHeaders(),
-    })
+    });
 
-    if(!res.ok) throw new Error("Erro ao apagar a lista")
-    await carregarCarrinho()
+    if (!res.ok) throw new Error("Erro ao remover item do carrinho");
+    await carregarCarrinho();
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Erro ao remover item do carrinho.");
+  }
+}
 
-  }catch (err){
-    console.error(err)
+async function esvaziarCarrinho() {
+  if (!carrinhoItens.length) return;
+
+  try {
+    for (const item of carrinhoItens) {
+      const res = await fetch(`${API_CARRINHO}/${ID_CLIENTE}/${item.idProduto}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: csrfHeaders(),
+      });
+      if (!res.ok) throw new Error("Erro ao esvaziar o carrinho");
+    }
+    await carregarCarrinho();
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Erro ao esvaziar o carrinho.");
   }
 }
 
 function atualizarResumo(comprarAgora) {
   const subtotal = comprarAgora.reduce(
-    (acc, i) => acc + i.precoProduto * i.quantidade,
+    (acc, item) => acc + Number(item.precoProduto || 0) * Number(item.quantidade || 0),
     0,
   );
 
   subtotalEl.textContent = `${formatarPreco(subtotal)} (${comprarAgora.length} ${comprarAgora.length === 1 ? "item" : "itens"})`;
-  descontoEl.textContent = formatarPreco(0); // sem dado de desconto no back ainda
+  descontoEl.textContent = formatarPreco(0);
   totalEl.textContent = formatarPreco(subtotal);
 }
 
 esvaziarBtn.addEventListener("click", () => {
-  alert("Função de esvaziar carrinho ainda não disponível.");
+  esvaziarCarrinho();
 });
 
 const btnCupom = document.querySelector(".calcular-desconto-div button");
-btnCupom.disabled = true;
-btnCupom.title = "Em breve";
+if (btnCupom) {
+  btnCupom.disabled = true;
+  btnCupom.title = "Em breve";
+}
 
 carregarCarrinho();

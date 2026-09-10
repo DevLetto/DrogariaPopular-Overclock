@@ -15,7 +15,7 @@ public class CarrinhoResponse {
 		this.idProduto = item.getIdProduto();
 		this.quantidade = item.getQuantidade();
 		this.precoUnitario = item.getPrecoUnitario();
-		this.salvoParaDepois = null;
+		this.salvoParaDepois = 0;
 	}
 
 	public Integer getId() { return id; }
