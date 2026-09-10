@@ -1,0 +1,3 @@
+package com.drogaria.backend.dto;
+import jakarta.validation.constraints.NotBlank; import jakarta.validation.constraints.NotNull;
+public class ReceitaRequest { @NotBlank private String arquivo; @NotNull private Integer idCliente; public String getArquivo(){return arquivo;} public void setArquivo(String v){arquivo=v;} public Integer getIdCliente(){return idCliente;} public void setIdCliente(Integer v){idCliente=v;} }

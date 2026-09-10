@@ -1,0 +1,3 @@
+package com.drogaria.backend.dto;
+import com.drogaria.backend.entity.Agendamento; import java.time.LocalDateTime;
+public class AgendamentoResponse { private Integer id; private LocalDateTime dataHora; private String status; public AgendamentoResponse(Agendamento a){id=a.getId();dataHora=a.getDataHora();status=a.getStatus();} public Integer getId(){return id;} public LocalDateTime getDataHora(){return dataHora;} public String getStatus(){return status;} }

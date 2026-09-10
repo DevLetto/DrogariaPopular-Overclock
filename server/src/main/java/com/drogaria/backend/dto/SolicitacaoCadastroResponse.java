@@ -1,0 +1,3 @@
+package com.drogaria.backend.dto;
+import com.drogaria.backend.entity.SolicitacaoCadastro; import java.time.LocalDate;
+public class SolicitacaoCadastroResponse { private Integer id; private String status; private LocalDate dataSolicitacao; private LocalDate dataAnalise; public SolicitacaoCadastroResponse(SolicitacaoCadastro s){id=s.getId();status=s.getStatus();dataSolicitacao=s.getDataSolicitacao();dataAnalise=s.getDataAnalise();} public Integer getId(){return id;} public String getStatus(){return status;} public LocalDate getDataSolicitacao(){return dataSolicitacao;} public LocalDate getDataAnalise(){return dataAnalise;} }

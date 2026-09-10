@@ -1,0 +1,3 @@
+package com.drogaria.backend.dto;
+import com.drogaria.backend.entity.Pagamento; import java.math.BigDecimal;
+public class PagamentoResponse { private Integer id; private String metodo; private BigDecimal valor; private String status; public PagamentoResponse(Pagamento p){id=p.getId();metodo=p.getMetodo();valor=p.getValor();status=p.getStatus();} public Integer getId(){return id;} public String getMetodo(){return metodo;} public BigDecimal getValor(){return valor;} public String getStatus(){return status;} }

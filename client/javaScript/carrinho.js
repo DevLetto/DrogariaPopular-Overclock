@@ -1,7 +1,7 @@
 const API_CARRINHO = "http://localhost:8080/api/carrinho"; // ajusta a base URL
 const API_PRODUTO = "http://localhost:8080/api/produto";
-const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
-const ID_USUARIO = usuarioLogado?.idUsuario; // ajusta conforme tua auth
+const clienteLogado = JSON.parse(localStorage.getItem("usuarioLogado"))
+const ID_CLIENTE = clienteLogado?.idCliente ?? clienteLogado?.idUsuario;
 
 const listaComprarEl = document.querySelector(".lista-comprar-agora");
 const listaSalvoEl = document.querySelector(".lista-salvo-depois");
@@ -14,9 +14,17 @@ const esvaziarBtn = document.querySelector(".esvazia-carrinho");
 
 let carrinhoItens = [];
 
+function csrfHeaders() {
+  const token = document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith("XSRF-TOKEN="))
+    ?.split("=")[1];
+  return token ? { "X-XSRF-TOKEN": decodeURIComponent(token) } : {};
+}
+
 async function carregarCarrinho() {
   try {
-    const res = await fetch(`${API_CARRINHO}/${ID_USUARIO}`);
+    const res = await fetch(`${API_CARRINHO}/${ID_CLIENTE}`, { credentials: "include" });
     if (!res.ok) throw new Error("Erro ao buscar carrinho");
     const itensRaw = await res.json();
 
@@ -129,9 +137,10 @@ function bindItemEvents(itemEl) {
 
 async function atualizarItem(idProduto, quantidade, salvoParaDepois) {
   try {
-    const res = await fetch(`${API_CARRINHO}/${ID_USUARIO}/${idProduto}`, {
+    const res = await fetch(`${API_CARRINHO}/${ID_CLIENTE}/${idProduto}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
       body: JSON.stringify({
         quantidade,
         salvoParaDepois,
@@ -146,8 +155,10 @@ async function atualizarItem(idProduto, quantidade, salvoParaDepois) {
 
 async function deletarItem(idProduto){
   try{
-    const res = await fetch(`${API_CARRINHO}/${ID_USUARIO}/${idProduto}`, {
+    const res = await fetch(`${API_CARRINHO}/${ID_CLIENTE}/${idProduto}`, {
       method: "DELETE",
+      credentials: "include",
+      headers: csrfHeaders(),
     })
 
     if(!res.ok) throw new Error("Erro ao apagar a lista")

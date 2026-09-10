@@ -1,0 +1,3 @@
+package com.drogaria.backend.dto;
+import jakarta.validation.constraints.NotBlank; import jakarta.validation.constraints.NotNull; import java.math.BigDecimal;
+public class ServicoRequest { @NotBlank private String nome; private String descricao; @NotNull private BigDecimal valor; @NotNull private Integer idLoja; public String getNome(){return nome;} public void setNome(String v){nome=v;} public String getDescricao(){return descricao;} public void setDescricao(String v){descricao=v;} public BigDecimal getValor(){return valor;} public void setValor(BigDecimal v){valor=v;} public Integer getIdLoja(){return idLoja;} public void setIdLoja(Integer v){idLoja=v;} }

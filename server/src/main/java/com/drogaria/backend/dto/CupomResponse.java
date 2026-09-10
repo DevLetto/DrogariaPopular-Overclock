@@ -1,0 +1,3 @@
+package com.drogaria.backend.dto;
+import com.drogaria.backend.entity.Cupom; import java.math.BigDecimal; import java.time.LocalDate;
+public class CupomResponse { private Integer id; private String codigo; private BigDecimal desconto; private String regras; private LocalDate validade; public CupomResponse(Cupom c){id=c.getId();codigo=c.getCodigo();desconto=c.getDesconto();regras=c.getRegras();validade=c.getValidade();} public Integer getId(){return id;} public String getCodigo(){return codigo;} public BigDecimal getDesconto(){return desconto;} public String getRegras(){return regras;} public LocalDate getValidade(){return validade;} }

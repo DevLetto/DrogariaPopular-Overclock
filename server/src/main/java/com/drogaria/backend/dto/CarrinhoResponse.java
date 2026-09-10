@@ -1,6 +1,6 @@
 package com.drogaria.backend.dto;
 
-import com.drogaria.backend.entity.Carrinho_itens;
+import com.drogaria.backend.entity.ItemCarrinho;
 
 public class CarrinhoResponse {
 
@@ -8,12 +8,14 @@ public class CarrinhoResponse {
 	private Integer idProduto;
 	private Integer quantidade;
 	private Integer salvoParaDepois;
+	private java.math.BigDecimal precoUnitario;
 
-	public CarrinhoResponse(Carrinho_itens item) {
-		this.id = item.getIdCarrinho();
+	public CarrinhoResponse(ItemCarrinho item) {
+		this.id = item.getId();
 		this.idProduto = item.getIdProduto();
 		this.quantidade = item.getQuantidade();
-		this.salvoParaDepois = item.getSalvoParaDepois(); // confere se esse getter existe na entidade
+		this.precoUnitario = item.getPrecoUnitario();
+		this.salvoParaDepois = null;
 	}
 
 	public Integer getId() { return id; }
@@ -24,4 +26,6 @@ public class CarrinhoResponse {
 	public void setQuantidade(Integer quantidade) { this.quantidade = quantidade; }
 	public Integer getSalvoParaDepois() { return salvoParaDepois; }
 	public void setSalvoParaDepois(Integer salvoParaDepois) { this.salvoParaDepois = salvoParaDepois; }
+	public java.math.BigDecimal getPrecoUnitario() { return precoUnitario; }
+	public void setPrecoUnitario(java.math.BigDecimal precoUnitario) { this.precoUnitario = precoUnitario; }
 }

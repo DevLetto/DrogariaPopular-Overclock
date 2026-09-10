@@ -1,0 +1,3 @@
+package com.drogaria.backend.dto;
+import jakarta.validation.constraints.NotNull; import java.math.BigDecimal; import java.time.LocalDate;
+public class PromocaoRequest { @NotNull private BigDecimal precoPromocional; @NotNull private LocalDate dataInicio; @NotNull private LocalDate dataFim; @NotNull private Integer idProduto; public BigDecimal getPrecoPromocional(){return precoPromocional;} public void setPrecoPromocional(BigDecimal v){precoPromocional=v;} public LocalDate getDataInicio(){return dataInicio;} public void setDataInicio(LocalDate v){dataInicio=v;} public LocalDate getDataFim(){return dataFim;} public void setDataFim(LocalDate v){dataFim=v;} public Integer getIdProduto(){return idProduto;} public void setIdProduto(Integer v){idProduto=v;} }

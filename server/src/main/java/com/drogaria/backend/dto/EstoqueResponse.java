@@ -1,0 +1,3 @@
+package com.drogaria.backend.dto;
+import com.drogaria.backend.entity.Estoque;
+public class EstoqueResponse { private Integer id; private Integer quantidade; private Integer estoqueMinimo; private Integer idProduto; public EstoqueResponse(Estoque e){id=e.getId();quantidade=e.getQuantidade();estoqueMinimo=e.getEstoqueMinimo();idProduto=e.getProduto().getIdProduto();} public Integer getId(){return id;} public Integer getQuantidade(){return quantidade;} public Integer getEstoqueMinimo(){return estoqueMinimo;} public Integer getIdProduto(){return idProduto;} }

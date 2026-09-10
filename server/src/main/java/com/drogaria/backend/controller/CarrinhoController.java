@@ -3,6 +3,7 @@ package com.drogaria.backend.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,17 +27,21 @@ public class CarrinhoController {
 		this.carrinhoService = carrinhoService;
 	}
 
-	@GetMapping("/{idUsuario}")
-	public ResponseEntity<List<CarrinhoResponse>> buscar(@PathVariable Integer idUsuario) {
-		return ResponseEntity.ok(carrinhoService.buscar(idUsuario));
+	@GetMapping("/{idCliente}")
+	public ResponseEntity<List<CarrinhoResponse>> buscar(@PathVariable Integer idCliente,
+			Authentication authentication) {
+		carrinhoService.validarAcesso(idCliente, authentication);
+		return ResponseEntity.ok(carrinhoService.buscar(idCliente));
 	}
 
 	@PostMapping
-	public ResponseEntity<CarrinhoResponse> adicionar(@RequestBody CarrinhoRequest request){
+	public ResponseEntity<CarrinhoResponse> adicionar(@RequestBody CarrinhoRequest request,
+			Authentication authentication){
+		carrinhoService.validarAcesso(request.getIdCliente(), authentication);
 		
 		return ResponseEntity.ok(
 				carrinhoService.adicionar(
-						request.getIdUsuario(),
+						request.getIdCliente(),
 						request.getIdProduto(),
 						request.getQuantidade(),
 						request.getSalvoParaDepois()
@@ -45,14 +50,15 @@ public class CarrinhoController {
 				);
 	}
 
-	@PutMapping("/{idUsuario}/{idProduto}")
-	public ResponseEntity<CarrinhoResponse> editar(@PathVariable Integer idUsuario,
+	@PutMapping("/{idCliente}/{idProduto}")
+	public ResponseEntity<CarrinhoResponse> editar(@PathVariable Integer idCliente,
 			@PathVariable Integer idProduto, 
-			@RequestBody CarrinhoRequest request){
+			@RequestBody CarrinhoRequest request, Authentication authentication){
+		carrinhoService.validarAcesso(idCliente, authentication);
 			
 		return ResponseEntity.ok(
 				carrinhoService.editar(
-						idUsuario, 
+						idCliente,
 						idProduto,
 						request.getQuantidade(),
 						request.getSalvoParaDepois()
@@ -60,11 +66,12 @@ public class CarrinhoController {
 		
 	}
 	
-	@DeleteMapping("/{idUsuario}/{idProduto}")
-	public ResponseEntity<CarrinhoResponse> deletar(@PathVariable Integer idUsuario,
-			@PathVariable Integer idProduto){
+	@DeleteMapping("/{idCliente}/{idProduto}")
+	public ResponseEntity<CarrinhoResponse> deletar(@PathVariable Integer idCliente,
+			@PathVariable Integer idProduto, Authentication authentication){
+		carrinhoService.validarAcesso(idCliente, authentication);
 		
 		return ResponseEntity.ok(
-				carrinhoService.deletar(idUsuario, idProduto));
+				carrinhoService.deletar(idCliente, idProduto));
 	}
 }

@@ -1,0 +1,3 @@
+package com.drogaria.backend.dto;
+import jakarta.validation.constraints.NotNull; import java.time.LocalDateTime;
+public class AgendamentoRequest { @NotNull private LocalDateTime dataHora; @NotNull private Integer idCliente; @NotNull private Integer idServico; @NotNull private Integer idLoja; public LocalDateTime getDataHora(){return dataHora;} public void setDataHora(LocalDateTime v){dataHora=v;} public Integer getIdCliente(){return idCliente;} public void setIdCliente(Integer v){idCliente=v;} public Integer getIdServico(){return idServico;} public void setIdServico(Integer v){idServico=v;} public Integer getIdLoja(){return idLoja;} public void setIdLoja(Integer v){idLoja=v;} }

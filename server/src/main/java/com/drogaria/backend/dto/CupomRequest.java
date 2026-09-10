@@ -1,0 +1,3 @@
+package com.drogaria.backend.dto;
+import jakarta.validation.constraints.NotBlank; import jakarta.validation.constraints.NotNull; import java.math.BigDecimal; import java.time.LocalDate;
+public class CupomRequest { @NotBlank private String codigo; @NotNull private BigDecimal desconto; private String regras; @NotNull private LocalDate validade; public String getCodigo(){return codigo;} public void setCodigo(String v){codigo=v;} public BigDecimal getDesconto(){return desconto;} public void setDesconto(BigDecimal v){desconto=v;} public String getRegras(){return regras;} public void setRegras(String v){regras=v;} public LocalDate getValidade(){return validade;} public void setValidade(LocalDate v){validade=v;} }

@@ -1,86 +1,122 @@
 package com.drogaria.backend.service;
 
-import com.drogaria.backend.dto.CadastroRequest;
-import com.drogaria.backend.dto.LoginRequest;
-import com.drogaria.backend.dto.UsuarioResponse;
-import com.drogaria.backend.entity.Endereco;
-import com.drogaria.backend.entity.Usuario;
-import com.drogaria.backend.exception.ApiException;
-import com.drogaria.backend.repository.EnderecoRepository;
-import com.drogaria.backend.repository.UsuarioRepository;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import com.drogaria.backend.dto.CadastroRequest;
+import com.drogaria.backend.dto.ClienteResponse;
+import com.drogaria.backend.dto.LoginRequest;
+import com.drogaria.backend.entity.Cliente;
+import com.drogaria.backend.exception.ApiException;
+import com.drogaria.backend.repository.ClienteRepository;
+import com.drogaria.backend.repository.EnderecoRepository;
 
 @Service
 public class AuthService {
 
-    private final UsuarioRepository usuarioRepository;
+    private final ClienteRepository clienteRepository;
     private final EnderecoRepository enderecoRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public AuthService(UsuarioRepository usuarioRepository, EnderecoRepository enderecoRepository) {
-        this.usuarioRepository = usuarioRepository;
+    @Value("${app.security.admin-emails:}")
+    private String adminEmails;
+    @Value("${app.security.pharmacist-emails:}")
+    private String pharmacistEmails;
+    @Value("${app.security.attendant-emails:}")
+    private String attendantEmails;
+    @Value("${app.security.stock-emails:}")
+    private String stockEmails;
+
+    public AuthService(ClienteRepository clienteRepository, EnderecoRepository enderecoRepository,
+            BCryptPasswordEncoder passwordEncoder) {
+        this.clienteRepository = clienteRepository;
         this.enderecoRepository = enderecoRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public UsuarioResponse login(LoginRequest request) {
+    public ClienteResponse login(LoginRequest request) {
         String identificador = request.getIdentificador().trim();
         String cpfLimpo = identificador.replaceAll("\\D", "");
 
-        Optional<Usuario> usuarioOpt;
+        Optional<Cliente> clienteOpt;
         if (identificador.contains("@")) {
-            usuarioOpt = usuarioRepository.findByEmail(identificador.toLowerCase());
+            clienteOpt = clienteRepository.findByEmail(identificador.toLowerCase());
         } else {
-            usuarioOpt = usuarioRepository.findByCpf(cpfLimpo);
+            clienteOpt = clienteRepository.findByCpf(cpfLimpo);
         }
 
-        Usuario usuario = usuarioOpt
+        Cliente cliente = clienteOpt
                 .orElseThrow(() -> new ApiException("E-mail/CPF ou senha invalidos", HttpStatus.UNAUTHORIZED));
 
-        if (!passwordEncoder.matches(request.getSenha(), usuario.getSenha())) {
+        if (!passwordEncoder.matches(request.getSenha(), cliente.getSenha())) {
             throw new ApiException("E-mail/CPF ou senha invalidos", HttpStatus.UNAUTHORIZED);
         }
 
-        if (!"ATIVO".equals(usuario.getStatusCadastro())) {
-            throw new ApiException("Cadastro ainda nao esta ativo (" + usuario.getStatusCadastro() + ")",
-                    HttpStatus.FORBIDDEN);
+        if (!cliente.isContaAprovada()) {
+            throw new ApiException("Cadastro ainda nao foi aprovado", HttpStatus.FORBIDDEN);
         }
 
-        return new UsuarioResponse(usuario);
+        autenticarNaSessao(cliente);
+        return new ClienteResponse(cliente);
     }
 
     @Transactional
-    public UsuarioResponse cadastrar(CadastroRequest request) {
+    public ClienteResponse cadastrar(CadastroRequest request) {
         String email = request.getEmail().trim().toLowerCase();
         String cpf = request.getCpf().trim();
 
-        if (usuarioRepository.existsByEmail(email)) {
+        if (clienteRepository.existsByEmail(email)) {
             throw new ApiException("Ja existe uma conta com esse e-mail", HttpStatus.CONFLICT);
         }
-        if (usuarioRepository.existsByCpf(cpf)) {
+        if (clienteRepository.existsByCpf(cpf)) {
             throw new ApiException("Ja existe uma conta com esse CPF", HttpStatus.CONFLICT);
         }
 
-        Usuario usuario = new Usuario();
-        usuario.setNome(request.getNome().trim());
-        usuario.setCpf(cpf);
-        usuario.setEmail(email);
-        usuario.setTelefone(request.getTelefone().trim());
-        usuario.setSenha(passwordEncoder.encode(request.getSenha()));
-        usuario.setStatusCadastro("ATIVO");
+        Cliente cliente = new Cliente();
+        cliente.setNome(request.getNome().trim());
+        cliente.setCpf(cpf);
+        cliente.setEmail(email);
+        cliente.setTelefone(request.getTelefone().trim());
+        cliente.setSenha(passwordEncoder.encode(request.getSenha()));
+        cliente.setDataCadastro(java.time.LocalDate.now());
+        cliente.setContaAprovada(false);
 
-        usuario = usuarioRepository.save(usuario);
+        cliente = clienteRepository.save(cliente);
+        return new ClienteResponse(cliente);
+    }
 
-        Endereco endereco = new Endereco();
-        endereco.setUsuario(usuario);
-        endereco.setDescricao(request.getEndereco().trim());
-        endereco.setPrincipal(true);
-        enderecoRepository.save(endereco);
+    private void autenticarNaSessao(Cliente cliente) {
+        String email = cliente.getEmail().toLowerCase();
+        String role = emailsAdministrativos().contains(email) ? "ROLE_ADMINISTRADOR"
+            : emails(pharmacistEmails).contains(email) ? "ROLE_FARMACEUTICO"
+            : emails(attendantEmails).contains(email) ? "ROLE_ATENDENTE"
+            : emails(stockEmails).contains(email) ? "ROLE_FUNCIONARIO_ESTOQUE_LOGISTICA"
+            : "ROLE_CLIENTE";
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            cliente.getEmail(), null, java.util.List.of(() -> role));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
 
-        return new UsuarioResponse(usuario);
+    private Set<String> emailsAdministrativos() {
+        return emails(adminEmails);
+    }
+
+    private Set<String> emails(String value) {
+        return Arrays.stream(value.split(","))
+            .map(String::trim)
+            .map(String::toLowerCase)
+            .filter(email -> !email.isBlank())
+            .collect(Collectors.toSet());
     }
 }

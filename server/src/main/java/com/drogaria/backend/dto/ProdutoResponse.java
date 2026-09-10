@@ -5,6 +5,7 @@ import com.drogaria.backend.entity.Produto;
 public class ProdutoResponse {
 
 	private Integer idCategoria;
+	private Integer idProduto;
 	private String nomeProduto;
 	private Double precoProduto;
 	private String imagemURL;
@@ -12,6 +13,7 @@ public class ProdutoResponse {
 	private Integer medicamentoControlado;
 	
 	public ProdutoResponse(Produto prod) {
+		this.idProduto = prod.getIdProduto();
 		this.idCategoria = prod.getIdCategoria();
 		this.nomeProduto = prod.getNomeProduto();
 		this.precoProduto = prod.getPrecoProduto();
@@ -24,6 +26,7 @@ public class ProdutoResponse {
 	public Integer getIdCategoria() {
 		return idCategoria;
 	}
+	public Integer getIdProduto() { return idProduto; }
 	public void setIdCategoria(Integer idCategoria) {
 		this.idCategoria = idCategoria;
 	}

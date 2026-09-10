@@ -1,0 +1,3 @@
+package com.drogaria.backend.dto;
+import jakarta.validation.constraints.NotBlank;
+public class LojaRequest { @NotBlank private String nome; private String telefone; private String horarioFuncionamento; private Float latitude; private Float longitude; public String getNome(){return nome;} public void setNome(String v){nome=v;} public String getTelefone(){return telefone;} public void setTelefone(String v){telefone=v;} public String getHorarioFuncionamento(){return horarioFuncionamento;} public void setHorarioFuncionamento(String v){horarioFuncionamento=v;} public Float getLatitude(){return latitude;} public void setLatitude(Float v){latitude=v;} public Float getLongitude(){return longitude;} public void setLongitude(Float v){longitude=v;} }

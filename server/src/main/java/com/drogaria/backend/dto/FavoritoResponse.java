@@ -1,0 +1,3 @@
+package com.drogaria.backend.dto;
+import com.drogaria.backend.entity.Favorito; import java.time.LocalDate;
+public class FavoritoResponse { private Integer id; private Integer idProduto; private LocalDate dataAdicionado; public FavoritoResponse(Favorito f){id=f.getId();idProduto=f.getProduto().getIdProduto();dataAdicionado=f.getDataAdicionado();} public Integer getId(){return id;} public Integer getIdProduto(){return idProduto;} public LocalDate getDataAdicionado(){return dataAdicionado;} }

@@ -1,0 +1,3 @@
+package com.drogaria.backend.controller;
+import com.drogaria.backend.dto.SolicitacaoCadastroResponse; import com.drogaria.backend.service.SolicitacaoCadastroService; import org.springframework.web.bind.annotation.*; import java.util.List;
+@RestController @RequestMapping("/api/solicitacao-cadastro") public class SolicitacaoCadastroController { private final SolicitacaoCadastroService s; public SolicitacaoCadastroController(SolicitacaoCadastroService s){this.s=s;} @GetMapping public List<SolicitacaoCadastroResponse> listar(){return s.listar();} @PutMapping("/{id}/analisar") public SolicitacaoCadastroResponse analisar(@PathVariable Integer id,@RequestParam String status,@RequestParam(required=false) Integer idFuncionario){return s.analisar(id,status,idFuncionario);} }

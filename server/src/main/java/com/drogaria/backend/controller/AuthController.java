@@ -2,7 +2,7 @@ package com.drogaria.backend.controller;
 
 import com.drogaria.backend.dto.CadastroRequest;
 import com.drogaria.backend.dto.LoginRequest;
-import com.drogaria.backend.dto.UsuarioResponse;
+import com.drogaria.backend.dto.ClienteResponse;
 import com.drogaria.backend.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -20,12 +20,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UsuarioResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<ClienteResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
     @PostMapping("/cadastro")
-    public ResponseEntity<UsuarioResponse> cadastro(@Valid @RequestBody CadastroRequest request) {
+    public ResponseEntity<ClienteResponse> cadastro(@Valid @RequestBody CadastroRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.cadastrar(request));
     }
-}
+}   

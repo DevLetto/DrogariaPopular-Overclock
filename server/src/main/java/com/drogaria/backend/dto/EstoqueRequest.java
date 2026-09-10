@@ -1,0 +1,3 @@
+package com.drogaria.backend.dto;
+import jakarta.validation.constraints.NotNull;
+public class EstoqueRequest { @NotNull private Integer quantidade; @NotNull private Integer estoqueMinimo; @NotNull private Integer idProduto; private Integer idLoja; public Integer getQuantidade(){return quantidade;} public void setQuantidade(Integer v){quantidade=v;} public Integer getEstoqueMinimo(){return estoqueMinimo;} public void setEstoqueMinimo(Integer v){estoqueMinimo=v;} public Integer getIdProduto(){return idProduto;} public void setIdProduto(Integer v){idProduto=v;} public Integer getIdLoja(){return idLoja;} public void setIdLoja(Integer v){idLoja=v;} }

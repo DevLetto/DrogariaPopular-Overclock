@@ -1,0 +1,3 @@
+package com.drogaria.backend.controller;
+import com.drogaria.backend.dto.LogAuditoriaRequest; import com.drogaria.backend.entity.LogAuditoria; import com.drogaria.backend.service.LogAuditoriaService; import jakarta.validation.Valid; import org.springframework.http.*; import org.springframework.web.bind.annotation.*; import java.util.List;
+@RestController @RequestMapping("/api/log-auditoria") public class LogAuditoriaController { private final LogAuditoriaService s; public LogAuditoriaController(LogAuditoriaService s){this.s=s;} @GetMapping public List<LogAuditoria> listar(){return s.listar();} @PostMapping public ResponseEntity<LogAuditoria> registrar(@Valid @RequestBody LogAuditoriaRequest r){return ResponseEntity.status(HttpStatus.CREATED).body(s.registrar(r));} }

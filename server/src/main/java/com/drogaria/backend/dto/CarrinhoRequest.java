@@ -3,7 +3,7 @@ package com.drogaria.backend.dto;
 public class CarrinhoRequest {
     
 
-    private Integer idUsuario;
+	private Integer idCliente;
     private Integer idProduto;
     private Integer quantidade;
     private Integer salvoParaDepois;
@@ -33,13 +33,16 @@ public class CarrinhoRequest {
 		this.quantidade = quantidade;
 	}
 
-	public Integer getIdUsuario() {
-        return idUsuario;
+	public Integer getIdCliente() {
+        return idCliente;
     }
 
-    public void setId(Integer idUsuario) {
-        this.idUsuario = idUsuario;
+	public void setIdCliente(Integer idCliente) {
+		this.idCliente = idCliente;
     }
+
+    public Integer getIdUsuario() { return idCliente; }
+    public void setIdUsuario(Integer idUsuario) { this.idCliente = idUsuario; }
 
     
 }

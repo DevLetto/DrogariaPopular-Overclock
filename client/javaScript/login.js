@@ -38,6 +38,7 @@ function apenasDigitos(valor) {
 async function chamarApi(caminho, corpo) {
   const resposta = await fetch(`${API_BASE}${caminho}`, {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(corpo),
   });
@@ -49,6 +50,10 @@ async function chamarApi(caminho, corpo) {
   }
 
   return dados;
+}
+
+async function prepararCsrf() {
+  await fetch("http://localhost:8080/api/auth/csrf", { credentials: "include" });
 }
 
 // ---------------- LOGIN ----------------
@@ -72,6 +77,7 @@ formLogin.addEventListener("submit", async (e) => {
   submitBtn.disabled = true;
 
   try {
+    await prepararCsrf();
     const usuario = await chamarApi("/login", { identificador, senha });
     localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
     // ajuste o destino conforme a pagina real do seu sistema
@@ -110,6 +116,7 @@ formCadastro.addEventListener("submit", async (e) => {
   submitBtn.disabled = true;
 
   try {
+    await prepararCsrf();
     const usuario = await chamarApi("/cadastro", {
       nome,
       cpf,
