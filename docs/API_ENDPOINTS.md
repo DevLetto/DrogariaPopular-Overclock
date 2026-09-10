@@ -39,11 +39,11 @@
 
 - POST /api/carrinho
   - Corpo esperado: CarrinhoRequest
-  - Campos recebidos: Integer idCliente, Integer idProduto, Integer quantidade, Integer salvoParaDepois
+  - Campos recebidos: Integer idCliente, Integer idProduto, Integer quantidade, 
 
 - PUT /api/carrinho/{idCliente}/{idProduto}
   - Corpo esperado: CarrinhoRequest
-  - Campos recebidos: Integer idCliente, Integer idProduto, Integer quantidade, Integer salvoParaDepois
+  - Campos recebidos: Integer idCliente, Integer idProduto, Integer quantidade, 
   - Parâmetros: path:idCliente, path:idProduto
 
 - DELETE /api/carrinho/{idCliente}/{idProduto}

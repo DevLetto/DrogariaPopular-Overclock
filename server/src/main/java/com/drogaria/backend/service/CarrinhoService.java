@@ -54,20 +54,22 @@ public class CarrinhoService {
     }
 
     @Transactional
-    public CarrinhoResponse adicionar(Integer idCliente, Integer idProduto, Integer quantidade,
-            Integer salvoParaDepois) {
+    public CarrinhoResponse adicionar(Integer idCliente, Integer idProduto, Integer quantidade) {
         if (quantidade == null || quantidade <= 0) {
             throw new ApiException("Quantidade deve ser maior que zero", HttpStatus.BAD_REQUEST);
         }
+
         Cliente cliente = clienteRepository.findById(idCliente)
                 .orElseThrow(() -> new ApiException("Cliente nao encontrado", HttpStatus.NOT_FOUND));
         Produto produto = produtoRepository.findById(idProduto)
                 .orElseThrow(() -> new ApiException("Produto nao encontrado", HttpStatus.NOT_FOUND));
+
         Carrinho carrinho = carrinhoRepository.findByClienteId(idCliente).orElseGet(() -> {
             Carrinho novo = new Carrinho();
             novo.setCliente(cliente);
             return carrinhoRepository.save(novo);
         });
+
         ItemCarrinho item = itemRepository.findByCarrinhoClienteIdAndProdutoIdProduto(idCliente, idProduto)
                 .orElseGet(() -> {
                     ItemCarrinho novo = new ItemCarrinho();
@@ -77,13 +79,13 @@ public class CarrinhoService {
                     novo.setPrecoUnitario(BigDecimal.valueOf(produto.getPrecoProduto()));
                     return novo;
                 });
+
         item.setQuantidade(item.getQuantidade() + quantidade);
         return new CarrinhoResponse(itemRepository.save(item));
     }
 
     @Transactional
-    public CarrinhoResponse editar(Integer idCliente, Integer idProduto, Integer quantidade,
-            Integer salvoParaDepois) {
+    public CarrinhoResponse editar(Integer idCliente, Integer idProduto, Integer quantidade) {
         ItemCarrinho item = itemRepository.findByCarrinhoClienteIdAndProdutoIdProduto(idCliente, idProduto)
                 .orElseThrow(() -> new ApiException("Item nao encontrado", HttpStatus.NOT_FOUND));
 
@@ -94,7 +96,7 @@ public class CarrinhoService {
         int novaQuantidade = item.getQuantidade() + quantidade;
         if (novaQuantidade <= 0) {
             itemRepository.delete(item);
-            return new CarrinhoResponse(item);
+            return null; // removido -> controller devolve 204
         }
 
         item.setQuantidade(novaQuantidade);
@@ -106,6 +108,6 @@ public class CarrinhoService {
         ItemCarrinho item = itemRepository.findByCarrinhoClienteIdAndProdutoIdProduto(idCliente, idProduto)
                 .orElseThrow(() -> new ApiException("Item nao encontrado", HttpStatus.NOT_FOUND));
         itemRepository.delete(item);
-        return new CarrinhoResponse(item);
+        return null; // removido -> controller devolve 204
     }
 }
