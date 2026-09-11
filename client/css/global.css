@@ -350,6 +350,98 @@ footer {
     width: 35px;
     height: 35px;
     filter: brightness(0) invert(1);
+
+}
+
+.user-menu-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+ 
+/* O botão com o nome do usuário reaproveita .action-item,
+   só ajustamos o cursor pra deixar claro que é clicável */
+.user-menu-wrapper .action-item {
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+ 
+/* Dropdown (hamburguer) */
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 14px);
+    right: 0;
+    min-width: 210px;
+    background-color: var(--cor-branca);
+    border: 1px solid var(--borda-suave);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(14, 20, 66, 0.18);
+    padding: 8px;
+    z-index: 200;
+}
+ 
+/* Setinha apontando pro botão do usuário, pra ficar claro
+   de onde o menu "nasceu" */
+.user-dropdown::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    right: 18px;
+    width: 12px;
+    height: 12px;
+    background-color: var(--cor-branca);
+    border-left: 1px solid var(--borda-suave);
+    border-top: 1px solid var(--borda-suave);
+    transform: rotate(45deg);
+}
+ 
+.user-dropdown ul {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+ 
+.user-dropdown li a,
+.user-dropdown li button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    background: none;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--cor-primaria);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+ 
+.user-dropdown li a:hover,
+.user-dropdown li button:hover {
+    background-color: var(--cor-fundo-destaque);
+    color: var(--cor-texto-hover);
+}
+ 
+/* Separa visualmente o "Sair" das outras opções */
+.user-dropdown li:last-child {
+    margin-top: 4px;
+    padding-top: 6px;
+    border-top: 1px solid var(--borda-suave);
+}
+ 
+.user-dropdown li:last-child .btn-logout {
+    color: var(--cor-secundaria);
+}
+ 
+.user-dropdown li:last-child .btn-logout:hover {
+    background-color: #fdeceb;
+    color: var(--cor-secundaria);
 }
 
 /* responsividade */
@@ -385,5 +477,12 @@ footer {
     .footer-bottom {
         justify-content: center;
         text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-dropdown {
+        right: -20px;
+        min-width: 180px;
     }
 }
