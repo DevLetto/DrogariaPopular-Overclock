@@ -1,5 +1,7 @@
 /* css global do projeto */
 
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Inter:wght@400;600;800&display=swap');
+
 /* variáveis de cor e fonte */
 :root {
     --cor-primaria: #0e1442;
@@ -18,7 +20,18 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Inter', sans-serif; 
+}
+
+.section-header h2, 
+section > h2, 
+.section-container > h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    color: var(--cor-primaria);
+    font-size: 1.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 0;
 }
 
 body {

@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finalizar Pedido - Drogaria Ponte Alta</title>
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/carrinho.css" />
+    <link rel="stylesheet" href="../css/checkout.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <header>
+      <div class="top-bar">
+        <span>📍 Entregamos em toda a Ponte Alta e região</span>
+        <span>📞 (61) 3333-4455 · Seg a Sáb, 7h-22h</span>
+      </div>
+
+      <!-- Header modificado para o Checkout (sem a barra de toggle e com selo de segurança) -->
+      <div class="main-header header-checkout">
+        <section class="logo-titulo-section">
+          <div class="symbols-square" onclick="history.back()">
+            <img src="../img/logo_drogaria_ponteAlta.png" alt="Icone com um P e +" />
+          </div>
+          <div class="logo-titulo-texto">
+            <p class="logo-titulo-texto-p1 p1">Drogaria Popular</p>
+            <p class="logo-titulo-texto-p2 p2">Ponte Alta</p>
+          </div>
+        </section>
+        
+        <div class="secure-badge">
+            <img src="../img/check_icon.png" alt="Seguro"> Compra 100% segura
+        </div>
+      </div>
+    </header>
+
+    <main class="mainCarrinho">
+        <nav class="progress-steps">
+            <div class="step completed"><div class="check-icon">✓</div>Carrinho</div>
+            <div class="step active"><div>2</div>Entrega e pagamento</div>
+            <div class="step"><div>3</div>Confirmação</div>
+        </nav>
+
+        <h1>FINALIZAR PEDIDO</h1>
+
+        <section class="separador-main">
+            <section class="checkout-sections">
+                
+                <div class="checkout-step-card">
+                    <div class="step-header">
+                        <span class="step-num">1</span>
+                        <h2>Como você quer receber?</h2>
+                    </div>
+                    
+                    <div class="options-grid-2">
+                        <label class="option-card">
+                            <input type="radio" name="delivery" checked class="hidden-radio">
+                            <div class="option-content">
+                                <div class="option-title"><img src="../img/localizacao_icon.png" alt=""> Retirar na loja</div>
+                                <div class="option-desc">Pronto em até 1h · sem frete</div>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="delivery" class="hidden-radio">
+                            <div class="option-content">
+                                <div class="option-title"><img src="../img/frete_icon.png" alt=""> Receber em casa</div>
+                                <div class="option-desc">Entrega em até 40min</div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="radio-list">
+                        <label class="radio-item">
+                            <input type="radio" name="store" checked>
+                            <div>
+                                <div class="radio-title">Ponte Alta Norte</div>
+                                <div class="radio-desc">QN 05, Conjunto 3 · aberta agora</div>
+                            </div>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="store">
+                            <div>
+                                <div class="radio-title">Ponte Alta Sul</div>
+                                <div class="radio-desc">Quadra 15, Lote 2 · aberta agora</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="checkout-step-card">
+                    <div class="step-header">
+                        <span class="step-num">2</span>
+                        <h2>Forma de pagamento</h2>
+                    </div>
+                    
+                    <div class="options-grid-4">
+                        <label class="option-card center-content">
+                            <input type="radio" name="payment" checked class="hidden-radio">
+                            <div class="option-content">
+                                <div class="payment-icon-box"><img src="../img/pix_icone.png" alt=""></div>
+                                <div class="option-title">Pix</div>
+                            </div>
+                        </label>
+                        <label class="option-card center-content">
+                            <input type="radio" name="payment" class="hidden-radio">
+                            <div class="option-content">
+                                <div class="payment-icon-box"><img src="../img/cartao_icon.png" alt=""></div>
+                                <div class="option-title">Crédito</div>
+                            </div>
+                        </label>
+                        <label class="option-card center-content">
+                            <input type="radio" name="payment" class="hidden-radio">
+                            <div class="option-content">
+                                <div class="payment-icon-box"><img src="../img/cartao_icon.png" alt=""></div>
+                                <div class="option-title">Débito</div>
+                            </div>
+                        </label>
+                        <label class="option-card center-content">
+                            <input type="radio" name="payment" class="hidden-radio">
+                            <div class="option-content">
+                                <div class="payment-icon-box"><img src="../img/codigo_barras_icon.png" alt=""></div>
+                                <div class="option-title">Boleto</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="checkout-step-card">
+                    <div class="step-header">
+                        <span class="step-num">3</span>
+                        <h2>Revisar pedido</h2>
+                    </div>
+                    
+                    <ul class="review-list">
+                        <li><span>2x Dipirona Sódica 500mg</span> <span>R$ 13,80</span></li>
+                        <li><span>1x Fralda infantil M</span> <span>R$ 32,50</span></li>
+                        <li><span>1x Protetor solar FPS 60</span> <span>R$ 39,90</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <aside class="resumo-pedido">
+                <div class="resumo-pedido-div">
+                    <div class="resumo-pedido-title">Total do pedido</div>
+                    <div class="subtotal resumo">
+                        <p>Subtotal</p>
+                        <p>R$ 86,20</p>
+                    </div>
+                    <div class="desconto resumo">
+                        <p>Desconto</p>
+                        <p>– R$ 6,00</p>
+                    </div>
+                    <div class="frete resumo">
+                        <p>Frete</p>
+                        <p style="color: var(--ink-soft);">Grátis (retirada)</p>
+                    </div>
+                </div>
+                <hr style="margin: 14px 0; border: none; border-top: 1px solid var(--paper-dim);">
+                <div class="total-txt-div resumo">
+                    <p>Total</p>
+                    <p>R$ 80,20</p>
+                </div>
+                <button>Confirmar pedido →</button>
+            </aside>
+        </section>
+    </main>
+  </body>
+</html>

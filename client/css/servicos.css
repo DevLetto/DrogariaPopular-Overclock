@@ -1,0 +1,177 @@
+.servicos-main {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.breadcrumb {
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: var(--cor-texto-claro);
+    margin-bottom: 30px;
+}
+
+.breadcrumb strong {
+    font-weight: 600;
+    color: var(--cor-primaria);
+}
+
+.page-header {
+    margin-bottom: 40px;
+}
+
+.page-header h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 2.8rem;
+    color: var(--cor-primaria);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.page-header p {
+    font-size: 1.05rem;
+    color: var(--cor-texto-claro);
+    line-height: 1.5;
+}
+
+.servicos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.servico-card {
+    background: var(--cor-branca);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--borda-suave);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.servico-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+.servico-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.bg-primaria { background-color: var(--cor-primaria); }
+.bg-secundaria { background-color: var(--cor-secundaria); } 
+
+.servico-icon img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: brightness(0) invert(1); 
+}
+
+.servico-card h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--cor-primaria);
+    margin-bottom: 12px;
+}
+
+.servico-card p {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400; 
+    font-size: 0.9rem;
+    color: var(--cor-texto-claro);
+    line-height: 1.5;
+    margin-bottom: 20px;
+    flex: 1;
+}
+
+.badge-agendamento {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    display: inline-block;
+    align-self: flex-start;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    margin-bottom: 25px;
+}
+
+.badge-agendamento.verde {
+    background-color: #E6F4EA;
+    color: #10B981;
+}
+
+.badge-agendamento.amarelo {
+    background-color: #FEF3C7;
+    color: #D97706;
+}
+
+.servico-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.preco {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem; 
+    color: var(--cor-primaria);
+}
+
+.preco.destaque-verde {
+    color: #10B981;
+}
+
+.tempo {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--cor-texto-claro);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tempo img {
+    width: 14px;
+    height: 14px;
+    opacity: 0.6;
+}
+
+.btn-detalhes {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    width: 100%;
+    background-color: var(--cor-primaria);
+    color: var(--cor-branca);
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-detalhes:hover {
+    background-color: var(--cor-texto-hover);
+}
+
+@media (max-width: 992px) {
+    .servicos-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .servicos-grid { grid-template-columns: 1fr; }
+}
