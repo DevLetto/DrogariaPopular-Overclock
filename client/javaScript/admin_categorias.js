@@ -4,49 +4,38 @@ const estado = {
     categorias: []
 };
 
-
 document.addEventListener("DOMContentLoaded", () => {
     inicializar();
 });
 
-
 async function inicializar() {
-
     configurarEventos();
-
     await carregarCategorias();
-
 }
-
 
 /* ================================
    EVENTOS
 ================================ */
 
 function configurarEventos() {
-
     const botaoNovaCategoria =
-        document.querySelector("#btnNovaCategoria");
-
+        document.querySelector(
+            "#btnNovaCategoria"
+        );
 
     if (botaoNovaCategoria) {
-
         botaoNovaCategoria.addEventListener(
             "click",
             () => abrirFormulario()
         );
-
     }
-
 }
-
 
 /* ================================
    REQUISIÇÃO
 ================================ */
 
 async function requisicao(endpoint, opcoes = {}) {
-
     const resposta = await fetch(
         `${API_BASE_URL}${endpoint}`,
         {
@@ -58,15 +47,11 @@ async function requisicao(endpoint, opcoes = {}) {
         }
     );
 
-
     if (!resposta.ok) {
-
         let mensagem =
             `Erro HTTP ${resposta.status}`;
 
-
         try {
-
             const erro =
                 await resposta.json();
 
@@ -78,56 +63,43 @@ async function requisicao(endpoint, opcoes = {}) {
 
         } catch (_) {}
 
-
         throw new Error(mensagem);
-
     }
-
 
     if (resposta.status === 204) {
         return null;
     }
 
-
     const texto =
         await resposta.text();
-
 
     if (!texto) {
         return null;
     }
 
-
     try {
-
         return JSON.parse(texto);
 
     } catch (_) {
-
         return texto;
-
     }
-
 }
-
 
 /* ================================
    CARREGAR CATEGORIAS
 ================================ */
 
 async function carregarCategorias() {
-
     try {
-
         const categorias =
-            await requisicao("/categoria");
-
+            await requisicao(
+                "/categoria"
+            );
 
         estado.categorias =
             Array.isArray(categorias)
                 ? categorias
                 : [];
-
 
         renderizarTabela();
 
@@ -138,36 +110,28 @@ async function carregarCategorias() {
             erro
         );
 
-
         mostrarToast(
             `Não foi possível carregar as categorias: ${erro.message}`,
             "erro"
         );
-
     }
-
 }
-
 
 /* ================================
    TABELA
 ================================ */
 
 function renderizarTabela() {
-
     const tabela =
         document.querySelector(
             "#tabelaCategorias"
         );
 
-
     if (!tabela) {
         return;
     }
 
-
     tabela.innerHTML = "";
-
 
     if (estado.categorias.length === 0) {
 
@@ -183,9 +147,7 @@ function renderizarTabela() {
         `;
 
         return;
-
     }
-
 
     estado.categorias.forEach(
         (categoria) => {
@@ -195,43 +157,32 @@ function renderizarTabela() {
                     categoria
                 );
 
-
             tabela.appendChild(linha);
-
         }
     );
 
-
     adicionarEventosTabela();
-
 }
-
 
 /* ================================
    LINHA DA TABELA
 ================================ */
 
 function criarLinhaCategoria(categoria) {
-
     const tr =
         document.createElement("tr");
 
-
     const id =
         categoria.id;
-
 
     const nome =
         categoria.nome ||
         "Categoria";
 
-
     const icone =
         obterIconeCategoria(nome);
 
-
     tr.innerHTML = `
-
         <td>
 
             <div class="categoria-nome-celula">
@@ -245,7 +196,6 @@ function criarLinhaCategoria(categoria) {
 
                 </div>
 
-
                 <strong>
                     ${escaparHTML(nome)}
                 </strong>
@@ -253,7 +203,6 @@ function criarLinhaCategoria(categoria) {
             </div>
 
         </td>
-
 
         <td class="action-cell">
 
@@ -263,14 +212,11 @@ function criarLinhaCategoria(categoria) {
                 title="Editar"
                 data-id="${id}"
             >
-
                 <img
                     src="../img/edicao_icon.png"
                     alt="Editar"
                 >
-
             </button>
-
 
             <button
                 type="button"
@@ -278,23 +224,17 @@ function criarLinhaCategoria(categoria) {
                 title="Excluir"
                 data-id="${id}"
             >
-
                 <img
                     src="../img/lixeira_icon.png"
                     alt="Excluir"
                 >
-
             </button>
 
         </td>
-
     `;
 
-
     return tr;
-
 }
-
 
 /* ================================
    EVENTOS DA TABELA
@@ -307,7 +247,6 @@ function adicionarEventosTabela() {
             ".btn-editar-categoria"
         );
 
-
     botoesEditar.forEach(
         (botao) => {
 
@@ -319,19 +258,15 @@ function adicionarEventosTabela() {
                         botao.dataset.id;
 
                     await editarCategoria(id);
-
                 }
             );
-
         }
     );
-
 
     const botoesExcluir =
         document.querySelectorAll(
             ".btn-excluir-categoria"
         );
-
 
     botoesExcluir.forEach(
         (botao) => {
@@ -344,15 +279,11 @@ function adicionarEventosTabela() {
                         botao.dataset.id;
 
                     await excluirCategoria(id);
-
                 }
             );
-
         }
     );
-
 }
-
 
 /* ================================
    NOVA / EDITAR
@@ -362,39 +293,34 @@ function abrirFormulario(categoria = null) {
 
     const modalExistente =
         document.querySelector(
-            ".modal-categoria"
+            ".modal-overlay"
         );
-
 
     if (modalExistente) {
         modalExistente.remove();
     }
 
-
     const editando =
         categoria !== null;
-
 
     const nomeAtual =
         categoria?.nome || "";
 
-
     const modal =
         document.createElement("div");
 
+    /*
+     * O elemento principal já é o overlay.
+     * Não existe outro .modal-overlay dentro dele.
+     */
 
     modal.className =
-        "modal-categoria";
-
+        "modal-overlay";
 
     modal.innerHTML = `
+        <div class="modal">
 
-        <div class="modal-overlay"></div>
-
-
-        <div class="modal-categoria-conteudo">
-
-            <div class="modal-categoria-header">
+            <div class="modal-header">
 
                 <div>
 
@@ -412,16 +338,14 @@ function abrirFormulario(categoria = null) {
 
                 </div>
 
-
                 <button
                     type="button"
-                    class="modal-categoria-fechar"
+                    class="modal-fechar"
                 >
                     ×
                 </button>
 
             </div>
-
 
             <form id="formCategoria">
 
@@ -442,16 +366,14 @@ function abrirFormulario(categoria = null) {
 
                 </div>
 
-
-                <div class="modal-categoria-acoes">
+                <div class="modal-acoes">
 
                     <button
                         type="button"
-                        class="btn-cancelar-categoria"
+                        class="btn-cancelar"
                     >
                         Cancelar
                     </button>
-
 
                     <button
                         type="submit"
@@ -469,54 +391,59 @@ function abrirFormulario(categoria = null) {
             </form>
 
         </div>
-
     `;
-
 
     document.body.appendChild(modal);
 
+    /* ================================
+       FECHAR MODAL
+    ================================= */
 
     const fechar =
         modal.querySelector(
-            ".modal-categoria-fechar"
+            ".modal-fechar"
         );
-
 
     const cancelar =
         modal.querySelector(
-            ".btn-cancelar-categoria"
+            ".btn-cancelar"
         );
-
-
-    const overlay =
-        modal.querySelector(
-            ".modal-overlay"
-        );
-
 
     fechar.addEventListener(
         "click",
         () => modal.remove()
     );
 
-
     cancelar.addEventListener(
         "click",
         () => modal.remove()
     );
 
+    /*
+     * Fecha somente quando clicar
+     * no fundo escuro.
+     */
 
-    overlay.addEventListener(
+    modal.addEventListener(
         "click",
-        () => modal.remove()
+        (event) => {
+
+            if (
+                event.target === modal
+            ) {
+                modal.remove();
+            }
+        }
     );
 
+    /* ================================
+       FORMULÁRIO
+    ================================= */
 
     const form =
         modal.querySelector(
             "#formCategoria"
         );
-
 
     form.addEventListener(
         "submit",
@@ -524,12 +451,10 @@ function abrirFormulario(categoria = null) {
 
             event.preventDefault();
 
-
             const nome =
-                document.querySelector(
+                form.querySelector(
                     "#categoriaNome"
                 ).value.trim();
-
 
             if (!nome) {
 
@@ -539,25 +464,20 @@ function abrirFormulario(categoria = null) {
                 );
 
                 return;
-
             }
-
 
             const dados = {
                 nome: nome
             };
 
+            const botao =
+                form.querySelector(
+                    "button[type='submit']"
+                );
 
             try {
 
-                const botao =
-                    form.querySelector(
-                        "button[type='submit']"
-                    );
-
-
                 botao.disabled = true;
-
 
                 if (editando) {
 
@@ -568,7 +488,6 @@ function abrirFormulario(categoria = null) {
                             body: JSON.stringify(dados)
                         }
                     );
-
 
                     mostrarToast(
                         "Categoria atualizada com sucesso!",
@@ -585,17 +504,13 @@ function abrirFormulario(categoria = null) {
                         }
                     );
 
-
                     mostrarToast(
                         "Categoria criada com sucesso!",
                         "sucesso"
                     );
-
                 }
 
-
                 modal.remove();
-
 
                 await carregarCategorias();
 
@@ -606,35 +521,20 @@ function abrirFormulario(categoria = null) {
                     erro
                 );
 
-
                 mostrarToast(
                     `Não foi possível salvar a categoria: ${erro.message}`,
                     "erro"
                 );
 
-
             } finally {
-
-                const botao =
-                    form.querySelector(
-                        "button[type='submit']"
-                    );
-
 
                 if (botao) {
                     botao.disabled = false;
                 }
-
             }
-
         }
     );
-
-
-    adicionarEstilosModal();
-
 }
-
 
 /* ================================
    EDITAR
@@ -649,7 +549,6 @@ async function editarCategoria(id) {
                 `/categoria/${id}`
             );
 
-
         abrirFormulario(categoria);
 
     } catch (erro) {
@@ -659,16 +558,12 @@ async function editarCategoria(id) {
             erro
         );
 
-
         mostrarToast(
             `Não foi possível carregar a categoria: ${erro.message}`,
             "erro"
         );
-
     }
-
 }
-
 
 /* ================================
    EXCLUIR
@@ -681,11 +576,9 @@ async function excluirCategoria(id) {
             "Tem certeza que deseja excluir esta categoria?"
         );
 
-
     if (!confirmar) {
         return;
     }
-
 
     try {
 
@@ -696,12 +589,10 @@ async function excluirCategoria(id) {
             }
         );
 
-
         mostrarToast(
             "Categoria excluída com sucesso!",
             "sucesso"
         );
-
 
         await carregarCategorias();
 
@@ -712,16 +603,12 @@ async function excluirCategoria(id) {
             erro
         );
 
-
         mostrarToast(
             `Não foi possível excluir a categoria: ${erro.message}`,
             "erro"
         );
-
     }
-
 }
-
 
 /* ================================
    ÍCONE DA CATEGORIA
@@ -733,7 +620,6 @@ function obterIconeCategoria(nome) {
         String(nome)
             .toLowerCase();
 
-
     if (
         texto.includes("medic") ||
         texto.includes("farm")
@@ -741,14 +627,12 @@ function obterIconeCategoria(nome) {
         return "../img/medicamentos_icon.png";
     }
 
-
     if (
         texto.includes("higiene") ||
         texto.includes("cuidado")
     ) {
         return "../img/higiene_icon.png";
     }
-
 
     if (
         texto.includes("infantil") ||
@@ -758,7 +642,6 @@ function obterIconeCategoria(nome) {
         return "../img/infantil_icon.png";
     }
 
-
     if (
         texto.includes("cabel") ||
         texto.includes("capilar")
@@ -766,18 +649,14 @@ function obterIconeCategoria(nome) {
         return "../img/cabelos_icon.png";
     }
 
-
     if (
         texto.includes("unha")
     ) {
         return "../img/unhas_icon.png";
     }
 
-
     return "../img/categorias_icon.png";
-
 }
-
 
 /* ================================
    UTILIDADES
@@ -788,15 +667,11 @@ function escaparHTML(valor) {
     const div =
         document.createElement("div");
 
-
     div.textContent =
         valor ?? "";
 
-
     return div.innerHTML;
-
 }
-
 
 /* ================================
    TOAST
@@ -812,250 +687,23 @@ function mostrarToast(
             ".toast-categoria"
         );
 
-
     if (toastExistente) {
         toastExistente.remove();
     }
 
-
     const toast =
         document.createElement("div");
-
 
     toast.className =
         `toast-categoria ${tipo}`;
 
-
     toast.textContent =
         mensagem;
 
-
     document.body.appendChild(toast);
-
-
-    adicionarEstilosToast();
-
 
     setTimeout(
         () => toast.remove(),
         3500
     );
-
-}
-
-
-/* ================================
-   ESTILOS DO MODAL
-================================ */
-
-function adicionarEstilosModal() {
-
-    if (
-        document.querySelector(
-            "#estilos-modal-categoria"
-        )
-    ) {
-        return;
-    }
-
-
-    const style =
-        document.createElement("style");
-
-
-    style.id =
-        "estilos-modal-categoria";
-
-
-    style.textContent = `
-
-        .modal-categoria {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-
-        .modal-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.55);
-        }
-
-
-        .modal-categoria-conteudo {
-            position: relative;
-            z-index: 1;
-            width: min(500px, 90%);
-            background: white;
-            border-radius: 14px;
-            padding: 25px;
-            box-shadow:
-                0 20px 50px
-                rgba(0, 0, 0, 0.25);
-        }
-
-
-        .modal-categoria-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 25px;
-        }
-
-
-        .modal-categoria-header h2 {
-            margin: 0 0 5px;
-        }
-
-
-        .modal-categoria-header span {
-            color: #777;
-        }
-
-
-        .modal-categoria-fechar {
-            border: none;
-            background: transparent;
-            font-size: 30px;
-            cursor: pointer;
-            line-height: 1;
-        }
-
-
-        .campo-formulario {
-            display: flex;
-            flex-direction: column;
-            gap: 7px;
-        }
-
-
-        .campo-formulario label {
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-
-        .campo-formulario input {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 11px 12px;
-            border: 1px solid #ddd;
-            border-radius: 7px;
-            font-size: 14px;
-        }
-
-
-        .modal-categoria-acoes {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 25px;
-        }
-
-
-        .btn-cancelar-categoria {
-            padding: 10px 18px;
-            border: 1px solid #ddd;
-            border-radius: 7px;
-            background: white;
-            cursor: pointer;
-        }
-
-
-        .btn-cancelar-categoria:hover {
-            background: #f5f5f5;
-        }
-
-
-        .modal-categoria-acoes .btn-primary {
-            border: none;
-            cursor: pointer;
-        }
-
-    `;
-
-
-    document.head.appendChild(style);
-
-}
-
-
-/* ================================
-   ESTILOS DO TOAST
-================================ */
-
-function adicionarEstilosToast() {
-
-    if (
-        document.querySelector(
-            "#estilos-toast-categoria"
-        )
-    ) {
-        return;
-    }
-
-
-    const style =
-        document.createElement("style");
-
-
-    style.id =
-        "estilos-toast-categoria";
-
-
-    style.textContent = `
-
-        .toast-categoria {
-            position: fixed;
-            right: 25px;
-            bottom: 25px;
-            z-index: 10000;
-            padding: 14px 20px;
-            border-radius: 8px;
-            background: #222;
-            color: white;
-            font-size: 14px;
-            box-shadow:
-                0 5px 20px
-                rgba(0, 0, 0, 0.2);
-
-            animation:
-                aparecerToastCategoria
-                0.2s ease;
-        }
-
-
-        .toast-categoria.erro {
-            background: #c62828;
-        }
-
-
-        .toast-categoria.sucesso {
-            background: #2e7d32;
-        }
-
-
-        @keyframes aparecerToastCategoria {
-
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-
-        }
-
-    `;
-
-
-    document.head.appendChild(style);
-
 }
