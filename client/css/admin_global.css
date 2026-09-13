@@ -531,3 +531,374 @@ td img:not(.admin-table .badge img) {
 .btn-primary img {
     filter: brightness(0) invert(1);
 }
+
+/* ==========================================
+   BOTÕES DE APROVAÇÃO DOS CLIENTES
+   ========================================== */
+
+.btn-status {
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 100px;
+    background: transparent;
+}
+
+/* APROVAR */
+
+.btn-aprovar {
+    color: #16803c;
+    background: #edf9f1;
+    border-color: #bce8ca;
+}
+
+.btn-aprovar:hover {
+    background: #16803c;
+    color: #ffffff;
+    border-color: #16803c;
+}
+
+
+/* DESAPROVAR */
+
+.btn-reprovar {
+    color: #c0392b;
+    background: #fdf0ef;
+    border-color: #f1c4bf;
+}
+
+.btn-reprovar:hover {
+    background: #c0392b;
+    color: #ffffff;
+    border-color: #c0392b;
+}
+
+
+/* EFEITO AO CLICAR */
+
+.btn-status:active {
+    transform: scale(0.97);
+}
+
+
+/* STATUS */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-aprovado {
+    color: #16803c;
+    background: #edf9f1;
+}
+
+.status-pendente {
+    color: #8a6500;
+    background: #fff8df;
+}
+
+/* ==========================================
+   MODAL DE LOJA
+   ========================================== */
+
+.modal-overlay {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+}
+
+
+/* CAIXA DO MODAL */
+
+.modal {
+    position: relative;
+
+    width: 100%;
+    max-width: 520px;
+
+    max-height: 90vh;
+    overflow-y: auto;
+
+    background: #ffffff;
+
+    border-radius: 14px;
+
+    padding: 28px;
+
+    box-sizing: border-box;
+
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+
+    animation: aparecerModal 0.2s ease-out;
+}
+
+
+/* ANIMAÇÃO */
+
+@keyframes aparecerModal {
+
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+}
+
+
+/* ==========================================
+   CABEÇALHO DO MODAL
+   ========================================== */
+
+.modal-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 24px;
+}
+
+
+.modal-header h2 {
+    margin: 0;
+
+    font-size: 22px;
+    font-weight: 700;
+
+    color: #222;
+}
+
+
+/* BOTÃO FECHAR */
+
+.modal-close {
+    width: 34px;
+    height: 34px;
+
+    border: none;
+
+    background: transparent;
+
+    border-radius: 8px;
+
+    font-size: 26px;
+    line-height: 1;
+
+    color: #777;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.2s ease;
+}
+
+
+.modal-close:hover {
+    background: #f1f1f1;
+    color: #222;
+}
+
+
+/* ==========================================
+   CAMPOS
+   ========================================== */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+
+    margin-bottom: 18px;
+}
+
+
+.form-group label {
+    margin-bottom: 7px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #333;
+}
+
+
+.form-group input {
+    width: 100%;
+
+    height: 42px;
+
+    padding: 0 12px;
+
+    border: 1px solid #d9d9d9;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    color: #222;
+
+    background: #fff;
+
+    outline: none;
+
+    box-sizing: border-box;
+
+    transition: 0.2s ease;
+}
+
+
+.form-group input:focus {
+    border-color: #014892;
+
+    box-shadow: 0 0 0 3px rgba(1, 72, 146, 0.10);
+}
+
+
+/* ==========================================
+   LATITUDE / LONGITUDE
+   ========================================== */
+
+.form-row {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 14px;
+}
+
+
+/* ==========================================
+   BOTÕES DO MODAL
+   ========================================== */
+
+.modal-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 26px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid #eeeeee;
+}
+
+
+.modal-actions button {
+    min-height: 40px;
+
+    padding: 0 18px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+/* CANCELAR */
+
+.btn-secondary {
+    background: #f3f3f3;
+
+    color: #444;
+
+    border: 1px solid #dddddd;
+}
+
+
+.btn-secondary:hover {
+    background: #e8e8e8;
+}
+
+
+/* SALVAR */
+
+.modal-actions .btn-primary {
+    border: none;
+
+    background: #014892;
+
+    color: white;
+}
+
+
+.modal-actions .btn-primary:hover {
+    filter: brightness(0.92);
+}
+
+
+/* ==========================================
+   RESPONSIVIDADE
+   ========================================== */
+
+@media (max-width: 600px) {
+
+    .modal {
+        max-width: 100%;
+
+        padding: 22px;
+
+        border-radius: 12px;
+    }
+
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+
+    .modal-actions {
+        flex-direction: column-reverse;
+    }
+
+
+    .modal-actions button {
+        width: 100%;
+    }
+
+}

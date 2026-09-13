@@ -1,11 +1,13 @@
 // header-auth.js
 // Controla o comportamento do header: login/usuário e carrinho.
 // Baseado no conteúdo salvo em localStorage na chave "usuarioLogado".
-// Formato esperado: {"idCliente":5,"nome":"doido","email":"...","cpf":"...","contaAprovada":true}
+// Formato esperado: {"idCliente":5,"nome":"doido","email":"...","cpf":"...",
+//                    "contaAprovada":true,"role":"ROLE_ADMINISTRADOR"}
 
 (function () {
   const API_BASE_URL = 'http://localhost:8080/api';
   const USER_STORAGE_KEY = 'usuarioLogado';
+  const ROLE_ADMIN = 'ROLE_ADMINISTRADOR';
 
   document.addEventListener('DOMContentLoaded', () => {
     const userActions = document.querySelector('.user-actions');
@@ -46,6 +48,8 @@
   }
 
   function montarMenuUsuario(loginLink, usuario) {
+    const ehAdmin = usuario.role === ROLE_ADMIN;
+
     // Transforma o link de login em botão com o nome do usuário
     loginLink.removeAttribute('href');
     loginLink.setAttribute('role', 'button');
@@ -58,6 +62,7 @@
     dropdown.hidden = true;
     dropdown.innerHTML = `
       <ul>
+        ${ehAdmin ? '<li><a href="admin_produtos.html">Gerenciamento</a></li>' : ''}
         <li><a href="carrinho.html">Meu carrinho</a></li>
         <li><a href="meus_pedidos.html">Meus pedidos</a></li>
         <li><button type="button" class="btn-logout">Sair</button></li>

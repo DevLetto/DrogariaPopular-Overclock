@@ -53,7 +53,7 @@
                     <h1>PRODUTOS</h1>
                     <p>Cadastre, edite e controle o estoque do catálogo.</p>
                 </div>
-                <button class="btn-primary">
+                <button class="btn-primary" id="btn-novo-produto">
                     <img src="../img/adicionar_icon.png" alt="" class="btn-icon-img"> Novo produto
                 </button>
             </div>
@@ -61,20 +61,20 @@
             <div class="summary-cards">
                 <div class="card">
                     <span class="card-title">TOTAL DE PRODUTOS</span>
-                    <h2 class="card-value">128</h2>
+                    <h2 class="card-value" id="total-produtos">0</h2>
                 </div>
                 <div class="card">
                     <span class="card-title">EM PROMOÇÃO</span>
-                    <h2 class="card-value">14</h2>
+                    <h2 class="card-value" id="total-promocoes">0</h2>
                 </div>
                 <div class="card">
                     <span class="card-title">ESTOQUE BAIXO</span>
-                    <h2 class="card-value">6</h2>
+                    <h2 class="card-value" id="estoque-baixo">0</h2>
                     <span class="card-subtitle text-warning">Revisar reposição</span>
                 </div>
                 <div class="card">
                     <span class="card-title">ESGOTADOS</span>
-                    <h2 class="card-value">3</h2>
+                    <h2 class="card-value" id="esgotados">0</h2>
                     <span class="card-subtitle text-warning">Marcar reposição</span>
                 </div>
             </div>
@@ -84,13 +84,13 @@
                 <div class="table-controls">
                     <div class="search-box">
                         <img src="../img/lupa_icon.png" alt="" class="search-icon">
-                        <input type="text" placeholder="Buscar produto...">
+                        <input type="text" id="input-busca" placeholder="Buscar produto...">
                     </div>
                     <div class="filter-pills">
-                        <button class="pill active">Todos</button>
-                        <button class="pill">Em estoque</button>
-                        <button class="pill">Baixo</button>
-                        <button class="pill">Esgotado</button>
+                        <button class="pill active" data-filtro="todos">Todos</button>
+                        <button class="pill" data-filtro="estoque">Em estoque</button>
+                        <button class="pill" data-filtro="baixo">Baixo</button>
+                        <button class="pill" data-filtro="esgotado">Esgotado</button>
                     </div>
                 </div>
 
@@ -106,87 +106,11 @@
                                 <th></th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td class="product-cell">
-                                    <div class="product-icon-box">
-                                        <img src="../img/medicamentos_icon.png" alt="">
-                                    </div>
-                                    <div class="product-info">
-                                        <strong>Dipirona Sódica 500mg</strong>
-                                        <span>20 comprimidos</span>
-                                    </div>
-                                </td>
-                                <td>Medicamentos</td>
-                                <td>R$ 6,90</td>
-                                <td><span class="badge-stock">42</span></td>
-                                <td><span class="status-badge status-ativo">Ativo</span></td>
-                                <td class="action-cell">
-                                    <button class="btn-icon" title="Editar"><img src="../img/edicao_icon.png" alt="Editar"></button>
-                                    <button class="btn-icon" title="Excluir"><img src="../img/lixeira_icon.png" alt="Excluir"></button>
-                                </td>
-                            </tr>
-                            
-                            <tr>
-                                <td class="product-cell">
-                                    <div class="product-icon-box">
-                                        <img src="../img/infantil_icon.png" alt="">
-                                    </div>
-                                    <div class="product-info">
-                                        <strong>Fralda infantil M</strong>
-                                        <span>Pacote 40un</span>
-                                    </div>
-                                </td>
-                                <td>Infantil</td>
-                                <td>R$ 32,50</td>
-                                <td><span class="badge-stock">4</span></td>
-                                <td><span class="status-badge status-baixo">Estoque baixo</span></td>
-                                <td class="action-cell">
-                                    <button class="btn-icon" title="Editar"><img src="../img/edicao_icon.png" alt="Editar"></button>
-                                    <button class="btn-icon" title="Excluir"><img src="../img/lixeira_icon.png" alt="Excluir"></button>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="product-cell">
-                                    <div class="product-icon-box">
-                                        <img src="../img/medicamentos_icon.png" alt="">
-                                    </div>
-                                    <div class="product-info">
-                                        <strong>Vitamina D3 2000UI</strong>
-                                        <span>60 cápsulas</span>
-                                    </div>
-                                </td>
-                                <td>Medicamentos</td>
-                                <td>R$ 32,90</td>
-                                <td><span class="badge-stock">0</span></td>
-                                <td><span class="status-badge status-esgotado">Esgotado</span></td>
-                                <td class="action-cell">
-                                    <button class="btn-icon" title="Editar"><img src="../img/edicao_icon.png" alt="Editar"></button>
-                                    <button class="btn-icon" title="Excluir"><img src="../img/lixeira_icon.png" alt="Excluir"></button>
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <td class="product-cell">
-                                    <div class="product-icon-box">
-                                        <img src="../img/higiene_icon.png" alt="">
-                                    </div>
-                                    <div class="product-info">
-                                        <strong>Protetor solar FPS 60</strong>
-                                        <span>120g</span>
-                                    </div>
-                                </td>
-                                <td>Higiene</td>
-                                <td>R$ 39,90</td>
-                                <td><span class="badge-stock">27</span></td>
-                                <td><span class="status-badge status-ativo">Ativo</span></td>
-                                <td class="action-cell">
-                                    <button class="btn-icon" title="Editar"><img src="../img/edicao_icon.png" alt="Editar"></button>
-                                    <button class="btn-icon" title="Excluir"><img src="../img/lixeira_icon.png" alt="Excluir"></button>
-                                </td>
-                            </tr>
-                        </tbody>
+                        <tbody id="produtos-tbody">
+                                <tr>
+                                    <td colspan="6" style="text-align:center;">Carregando produtos...</td>
+                                </tr>
+                            </tbody>
                     </table>
                 </div>
 
@@ -194,5 +118,5 @@
         </main>
     </div>
 
-</body>
+    <script src="../javascript/admin_produtos.js"></script>\n</body>
 </html>

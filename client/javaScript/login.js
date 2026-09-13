@@ -80,14 +80,16 @@ formLogin.addEventListener("submit", async (e) => {
     await prepararCsrf();
     const usuario = await chamarApi("/login", { identificador, senha });
     localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
-    // ajuste o destino conforme a pagina real do seu sistema
-    window.location.href = "index.html";
+
+    // Admin vai direto pro painel de produtos; o resto cai na home
+    window.location.href =
+      usuario.role === "ROLE_ADMINISTRADOR" ? "admin_produtos.html" : "index.html";
   } catch (err) {
     mostrarErro("loginError", err.message);
   } finally {
     submitBtn.disabled = false;
   }
-});
+}); 
 
 // ---------------- CADASTRO ----------------
 

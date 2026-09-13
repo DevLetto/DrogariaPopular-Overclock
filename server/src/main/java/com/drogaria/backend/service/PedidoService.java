@@ -1,17 +1,32 @@
 package com.drogaria.backend.service;
 
-import com.drogaria.backend.dto.PedidoRequest;
-import com.drogaria.backend.dto.PedidoResponse;
-import com.drogaria.backend.entity.*;
-import com.drogaria.backend.exception.ApiException;
-import com.drogaria.backend.repository.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.drogaria.backend.dto.PedidoRequest;
+import com.drogaria.backend.dto.PedidoResponse;
+import com.drogaria.backend.entity.Cliente;
+import com.drogaria.backend.entity.Cupom;
+import com.drogaria.backend.entity.Estoque;
+import com.drogaria.backend.entity.ItemCarrinho;
+import com.drogaria.backend.entity.ItemPedido;
+import com.drogaria.backend.entity.Pagamento;
+import com.drogaria.backend.entity.Pedido;
+import com.drogaria.backend.exception.ApiException;
+import com.drogaria.backend.repository.CarrinhoRepository;
+import com.drogaria.backend.repository.ClienteRepository;
+import com.drogaria.backend.repository.CupomRepository;
+import com.drogaria.backend.repository.EstoqueRepository;
+import com.drogaria.backend.repository.ItemCarrinhoRepository;
+import com.drogaria.backend.repository.LojaRepository;
+import com.drogaria.backend.repository.PagamentoRepository;
+import com.drogaria.backend.repository.PedidoRepository;
 
 @Service
 public class PedidoService {
@@ -68,6 +83,13 @@ public class PedidoService {
         pagamento.setValor(salvo.getValorTotal()); pagamento.setStatus("PENDENTE"); pagamentoRepository.save(pagamento);
         itemCarrinhoRepository.deleteAll(itens);
         return new PedidoResponse(salvo);
+    }
+
+    public List<PedidoResponse> listarTodos() {
+        return pedidoRepository.findAll()
+                .stream()
+                .map(PedidoResponse::new)
+                .toList();
     }
 
     public List<PedidoResponse> listarPorCliente(Integer idCliente) {

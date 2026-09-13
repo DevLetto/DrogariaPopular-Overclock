@@ -6,6 +6,7 @@
     <title>Drogaria Popular Ponte Alta</title>
     <link rel="stylesheet" href="../css/global.css" />
     <link rel="stylesheet" href="../css/index.css" />
+    <link rel="stylesheet" href="../css/header-auth.css" />
   </head>
   <body>
 
@@ -121,9 +122,9 @@
           </div>
           <div class="hero-stats">
             <div class="stat">
-              <strong>2</strong> <span>LOJAS NA<br />REGIÃO</span>
+              <strong data-stat="lojas">2</strong> <span>LOJAS NA<br />REGIÃO</span>
             </div>
-            <div class="stat"><strong>+2MIL</strong> <span>PRODUTOS</span></div>
+            <div class="stat"><strong data-stat="produtos">+2MIL</strong> <span>PRODUTOS</span></div>
             <div class="stat">
               <strong>40MIN</strong> <span>ENTREGA<br />MÉDIA</span>
             </div>
@@ -135,46 +136,8 @@
             <span>OFERTAS DE HOJE</span>
             <span class="status-green">● ATUALIZADO AGORA</span>
           </div>
-          <ul class="cart-preview">
-            <li>
-              <div class="item-info">
-                <img src="../img/medicamentos_icon.png" alt="Ícone" />
-                <div>
-                  <span>Dipirona 500mg - 20 cp</span>
-                  <small>Genérico</small>
-                </div>
-              </div>
-              <div class="item-price">
-                <strong>R$ 6,90</strong>
-                <del>R$ 9,90</del>
-              </div>
-            </li>
-            <li>
-              <div class="item-info">
-                <img src="../img/coracao_icon.png" alt="Ícone" />
-                <div>
-                  <span>Protetor solar FPS 60</span>
-                  <small>120g</small>
-                </div>
-              </div>
-              <div class="item-price">
-                <strong>R$ 39,90</strong>
-                <del>R$ 54,00</del>
-              </div>
-            </li>
-            <li>
-              <div class="item-info">
-                <img src="../img/relogio_icon.png" alt="Ícone" />
-                <div>
-                  <span>Fralda infantil M - pacote</span>
-                  <small>Retirada em loja</small>
-                </div>
-              </div>
-              <div class="item-price">
-                <strong>R$ 32,50</strong>
-                <del>R$ 41,00</del>
-              </div>
-            </li>
+          <ul class="cart-preview" data-ofertas-hero>
+            <li><span>Carregando ofertas...</span></li>
           </ul>
         </div>
       </section>
@@ -276,27 +239,8 @@
             </div>
             <a href="#">Ver todas as categorias →</a>
           </div>
-          <div class="category-cards">
-            <a href="#" class="card"
-              ><img src="../img/medicamentos_icon.png" alt="Farmácia" />
-              <strong>Farmácia</strong><br /><small>Medicamentos</small></a
-            >
-            <a href="#" class="card"
-              ><img src="../img/higiene_icon.png" alt="Higiene" />
-              <strong>Higiene</strong><br /><small>Cuidados pessoais</small></a
-            >
-            <a href="#" class="card"
-              ><img src="../img/infantil_icon.png" alt="Infantil" />
-              <strong>Infantil</strong><br /><small>Fraldas e leites</small></a
-            >
-            <a href="#" class="card"
-              ><img src="../img/cabelos_icon.png" alt="Capilares" />
-              <strong>Capilares</strong><br /><small>Shampoo e tintas</small></a
-            >
-            <a href="#" class="card"
-              ><img src="../img/unhas_icon.png" alt="Unhas" />
-              <strong>Unhas</strong><br /><small>Esmaltes e bases</small></a
-            >
+          <div class="category-cards" data-categorias>
+            <p class="sem-dados">Carregando categorias...</p>
           </div>
         </div>
       </section>
@@ -310,45 +254,8 @@
             </div>
             <a href="#">Ver todas as ofertas →</a>
           </div>
-          <div class="product-carousel">
-            <article class="product-card">
-              <div class="product-image-container">
-                <span class="discount-badge">-30%</span>
-                <img src="../img/medicamentos_icon.png" alt="Vitamina C" />
-              </div>
-              <div class="product-info">
-                <h3>Vitamina C 1g efervescente</h3>
-                <p class="price-container">
-                  <span class="price-red">R$ 14,90</span> <del>R$ 21,00</del>
-                </p>
-              </div>
-            </article>
-
-            <article class="product-card">
-              <div class="product-image-container">
-                <span class="discount-badge">-25%</span>
-                <img src="../img/cabelos_icon.png" alt="Shampoo" />
-              </div>
-              <div class="product-info">
-                <h3>Shampoo anticaspa 400ml</h3>
-                <p class="price-container">
-                  <span class="price-red">R$ 24,90</span> <del>R$ 32,90</del>
-                </p>
-              </div>
-            </article>
-
-            <article class="product-card">
-              <div class="product-image-container">
-                <span class="discount-badge">-15%</span>
-                <img src="../img/higiene_icon.png" alt="Sabonete" />
-              </div>
-              <div class="product-info">
-                <h3>Kit sabonete líquido família</h3>
-                <p class="price-container">
-                  <span class="price-red">R$ 27,90</span> <del>R$ 32,90</del>
-                </p>
-              </div>
-            </article>
+          <div class="product-carousel" data-promocoes>
+            <p class="sem-dados">Carregando promoções...</p>
           </div>
         </div>
       </section>
@@ -361,61 +268,8 @@
           </div>
           <a href="#">Ver mais →</a>
         </div>
-        <div class="product-carousel">
-          <article class="product-card">
-            <div class="product-image-container">
-              <img src="../img/medicamentos_icon.png" alt="Paracetamol" />
-            </div>
-            <div class="product-info">
-              <span class="stock-status status-green">● EM ESTOQUE</span>
-              <h3>Paracetamol 750mg - 20cp</h3>
-              <p class="price">R$ 8,50</p>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-image-container">
-              <img src="../img/infantil_icon.png" alt="Fralda" />
-            </div>
-            <div class="product-info">
-              <span class="stock-status status-orange">● ÚLTIMAS UNIDADES</span>
-              <h3>Fralda infantil P - pacote</h3>
-              <p class="price">R$ 28,90</p>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-image-container">
-              <img src="../img/higiene_icon.png" alt="Sabonete" />
-            </div>
-            <div class="product-info">
-              <span class="stock-status status-green">● EM ESTOQUE</span>
-              <h3>Sabonete líquido 250ml</h3>
-              <p class="price">R$ 11,90</p>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-image-container">
-              <img src="../img/unhas_icon.png" alt="Esmalte" />
-            </div>
-            <div class="product-info">
-              <span class="stock-status status-green">● EM ESTOQUE</span>
-              <h3>Esmalte cremoso 8ml</h3>
-              <p class="price">R$ 5,90</p>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-image-container">
-              <img src="../img/medicamentos_icon.png" alt="Antialérgico" />
-            </div>
-            <div class="product-info">
-              <span class="stock-status status-green">● SÓ RETIRADA</span>
-              <h3>Antialérgico 10mg - 12cp</h3>
-              <p class="price">R$ 13,40</p>
-            </div>
-          </article>
+        <div class="product-carousel" data-mais-vendidos>
+          <p class="sem-dados">Carregando produtos...</p>
         </div>
       </section>
 
@@ -456,37 +310,8 @@
         <div class="section-container">
           <span class="section-tag">ALÉM DA PRATELEIRA</span>
           <h2>NOSSOS SERVIÇOS</h2>
-          <div class="services-grid">
-            <article class="service-card">
-              <div class="service-icon">
-                <img src="../img/injecao_icon.png" alt="Injeção" />
-              </div>
-              <h3>Aplicação de injeções</h3>
-              <p>
-                Enfermeiro de plantão em todas as lojas, sem necessidade de
-                agendamento na maioria dos casos.
-              </p>
-            </article>
-            <article class="service-card">
-              <div class="service-icon">
-                <img src="../img/servicos_icon.png" alt="Orelha" />
-              </div>
-              <h3>Furação de orelha</h3>
-              <p>
-                Procedimento rápido e higienizado, com brincos de aço cirúrgico
-                incluídos.
-              </p>
-            </article>
-            <article class="service-card">
-              <div class="service-icon">
-                <img src="../img/estetoscopio_icon.png" alt="Cuidados" />
-              </div>
-              <h3>Outros cuidados</h3>
-              <p>
-                Aferição de pressão, teste de glicemia e orientação farmacêutica
-                gratuita.
-              </p>
-            </article>
+          <div class="services-grid" data-servicos>
+            <p class="sem-dados">Carregando serviços...</p>
           </div>
         </div>
       </section>
@@ -499,27 +324,8 @@
           </div>
           <a href="#">Ver no mapa →</a>
         </div>
-        <div class="stores-grid">
-          <article class="store-card">
-            <div class="store-icon">
-              <img src="../img/localizacao_icon.png" alt="Local" />
-            </div>
-            <div>
-              <h3>Ponte Alta Norte</h3>
-              <p>QN 05, Conjunto 3 · Ponte Alta Norte, Gama - DF</p>
-              <p class="store-status">🕒 Aberta agora · até 22h</p>
-            </div>
-          </article>
-          <article class="store-card">
-            <div class="store-icon">
-              <img src="../img/localizacao_icon.png" alt="Local" />
-            </div>
-            <div>
-              <h3>Ponte Alta Sul</h3>
-              <p>Quadra 15, Lote 2 · Ponte Alta Sul, Gama - DF</p>
-              <p class="store-status">🕒 Aberta agora · até 21h</p>
-            </div>
-          </article>
+        <div class="stores-grid" data-lojas>
+          <p class="sem-dados">Carregando lojas...</p>
         </div>
       </section>
 
@@ -594,7 +400,8 @@
         </button>
       </div>
     </footer>
-  </body>
 
     <script src="../javaScript/headerAuth.js"></script>
+    <script src="../javaScript/index.js"></script>
+  </body>
 </html>

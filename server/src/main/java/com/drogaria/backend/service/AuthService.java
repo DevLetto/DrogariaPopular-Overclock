@@ -67,8 +67,10 @@ public class AuthService {
             throw new ApiException("Cadastro ainda nao foi aprovado", HttpStatus.FORBIDDEN);
         }
 
-        autenticarNaSessao(cliente);
-        return new ClienteResponse(cliente);
+        String role = autenticarNaSessao(cliente);
+        ClienteResponse response = new ClienteResponse(cliente);
+        response.setRole(role);
+        return response;
     }
 
     @Transactional
@@ -96,7 +98,7 @@ public class AuthService {
         return new ClienteResponse(cliente);
     }
 
-    private void autenticarNaSessao(Cliente cliente) {
+    private String autenticarNaSessao(Cliente cliente) {
         String email = cliente.getEmail().toLowerCase();
         String role = emailsAdministrativos().contains(email) ? "ROLE_ADMINISTRADOR"
             : emails(pharmacistEmails).contains(email) ? "ROLE_FARMACEUTICO"
@@ -106,6 +108,7 @@ public class AuthService {
         Authentication authentication = new UsernamePasswordAuthenticationToken(
             cliente.getEmail(), null, java.util.List.of(() -> role));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        return role;
     }
 
     private Set<String> emailsAdministrativos() {
