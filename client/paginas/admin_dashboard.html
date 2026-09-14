@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Painel Admin Ponte Alta</title>
+    <link rel="stylesheet" href="../css/admin_global.css" />
+    <link rel="stylesheet" href="../css/admin_dashboard.css" />
+</head>
+<body class="admin-body">
+
+    <div class="admin-container">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <img src="../img/logo_drogaria_ponteAlta.png">
+                </div>
+                <div class="logo-text">
+                    <h2>PONTE ALTA</h2>
+                    <span>PAINEL ADMIN</span>
+                </div>
+            </div>
+
+            <div class="sidebar-menu">
+                <span class="menu-label">GERAL</span>
+                <ul>
+                    <li class="active"><a href="admin_dashboard.html"><img src="../img/dashboard_icon.png" alt="" class="sidebar-icon"> Dashboard</a></li>
+                </ul>
+
+                <span class="menu-label">VENDAS</span>
+                <ul>
+                    <li><a href="admin_produtos.html"><img src="../img/pedidos_icon.png" alt="" class="sidebar-icon"> Produtos</a></li>
+                    <li><a href="admin_pedidos.html"><img src="../img/carrinho_icon.png" alt="" class="sidebar-icon"> Pedidos</a></li>
+                    <li><a href="admin_promocoes.html"><img src="../img/coracao_icon.png" alt="" class="sidebar-icon"> Promoções</a></li>
+                    <li><a href="admin_categorias.html"><img src="../img/categorias_icon.png" alt="" class="sidebar-icon"> Categorias</a></li>
+                </ul>
+
+                <span class="menu-label">PESSOAS & LOJAS</span>
+                <ul>
+                    <li><a href="admin_clientes.html"><img src="../img/usuario_icon.png" alt="" class="sidebar-icon"> Clientes</a></li>
+                    <li><a href="admin_lojas.html"><img src="../img/localizacao_icon.png" alt="" class="sidebar-icon"> Lojas</a></li>
+                    <li><a href="admin_servicos.html"><img src="../img/servicos_icon.png" alt="" class="sidebar-icon"> Serviços</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-avatar">A</div>
+                <div class="user-info">
+                    <strong>Admin</strong>
+                    <span>Gerência</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <div class="content-header-container">
+                <div class="content-header">
+                    <h1>DASHBOARD</h1>
+                    <p>Visão geral da operação de hoje.</p>
+                </div>
+                <button class="btn-primary" id="btn-atualizar">
+                    <img src="../img/relogio_icon.png" alt="" class="btn-icon-img"> Atualizar
+                </button>
+            </div>
+
+            <div class="summary-cards">
+                <div class="card">
+                    <span class="card-title">VENDAS HOJE</span>
+                    <h2 class="card-value" id="kpi-vendas-hoje">R$ 0,00</h2>
+                    <span class="card-subtitle text-green" id="kpi-vendas-variacao">—</span>
+                </div>
+                <div class="card">
+                    <span class="card-title">PEDIDOS HOJE</span>
+                    <h2 class="card-value" id="kpi-pedidos-hoje">0</h2>
+                    <span class="card-subtitle" id="kpi-pedidos-preparo">—</span>
+                </div>
+                <div class="card">
+                    <span class="card-title">TICKET MÉDIO</span>
+                    <h2 class="card-value" id="kpi-ticket-medio">R$ 0,00</h2>
+                </div>
+                <div class="card">
+                    <span class="card-title">CLIENTES NOVOS</span>
+                    <h2 class="card-value" id="kpi-clientes-novos">0</h2>
+                    <span class="card-subtitle" id="kpi-clientes-sub">cadastros hoje</span>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+
+                <!-- Coluna principal -->
+                <div class="dashboard-col-main">
+
+                    <div class="content-box chart-card">
+                        <div class="chart-card-header">
+                            <h2>Vendas da semana</h2>
+                            <div class="filter-pills">
+                                <button class="pill active" data-periodo="7d">7 dias</button>
+                                <button class="pill" data-periodo="30d">30 dias</button>
+                            </div>
+                        </div>
+                        <div class="bar-chart" id="grafico-vendas">
+                            <div class="bar-chart-col"><div class="bar" style="height:38%"></div><span>Seg</span></div>
+                            <div class="bar-chart-col"><div class="bar" style="height:52%"></div><span>Ter</span></div>
+                            <div class="bar-chart-col"><div class="bar" style="height:44%"></div><span>Qua</span></div>
+                            <div class="bar-chart-col"><div class="bar" style="height:68%"></div><span>Qui</span></div>
+                            <div class="bar-chart-col"><div class="bar" style="height:60%"></div><span>Sex</span></div>
+                            <div class="bar-chart-col"><div class="bar" style="height:85%"></div><span>Sáb</span></div>
+                            <div class="bar-chart-col"><div class="bar bar-hoje" style="height:72%"></div><span>Hoje</span></div>
+                        </div>
+                    </div>
+
+                    <div class="content-box">
+                        <div class="table-controls">
+                            <h2>Pedidos recentes</h2>
+                            <a href="admin_pedidos.html" class="link-ver-todos">Ver todos →</a>
+                        </div>
+                        <div class="table-container" style="border: none;">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>PEDIDO</th>
+                                        <th>CLIENTE</th>
+                                        <th>ENTREGA</th>
+                                        <th>TOTAL</th>
+                                        <th>STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pedidos-recentes-tbody">
+                                    <tr>
+                                        <td colspan="5" style="text-align:center;">Carregando pedidos...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Coluna lateral -->
+                <div class="dashboard-col-side">
+
+                    <div class="content-box">
+                        <h2>Estoque baixo</h2>
+                        <ul class="stock-alert-list" id="estoque-alerta-lista">
+                            <li class="sem-dados">Carregando estoque...</li>
+                        </ul>
+                        <a href="admin_produtos.html" class="link-ver-todos">Ver todos os produtos →</a>
+                    </div>
+
+                    <div class="content-box">
+                        <h2>Ações rápidas</h2>
+                        <div class="quick-actions">
+                            <button class="quick-action-btn" id="acao-novo-produto">
+                                <img src="../img/adicionar_icon.png" alt="">
+                                Novo produto
+                            </button>
+                            <button class="quick-action-btn" id="acao-nova-promocao">
+                                <img src="../img/coracao_icon.png" alt="">
+                                Nova promoção
+                            </button>
+                            <button class="quick-action-btn" id="acao-ver-pedidos">
+                                <img src="../img/carrinho_icon.png" alt="">
+                                Ver pedidos
+                            </button>
+                            <button class="quick-action-btn" id="acao-ver-clientes">
+                                <img src="../img/usuario_icon.png" alt="">
+                                Ver clientes
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="../javaScript/admin_dashboard.js"></script>
+</body>
+</html>

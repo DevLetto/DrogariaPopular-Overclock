@@ -1,0 +1,432 @@
+/* css único da página de produto (produto.html) */
+/* reaproveita as variáveis definidas em global.css: --cor-primaria, --cor-secundaria,
+   --cor-fundo-site, --cor-fundo-destaque, --cor-texto, --cor-texto-claro, --cor-branca,
+   --borda-suave, --max-width-container */
+
+:root {
+    --cor-sucesso: #1c8a4b;
+    --cor-sucesso-bg: #e9f7ee;
+    --cor-alerta: #b5790a;
+    --cor-alerta-bg: #fdf2e3;
+}
+
+/* container padrão usado pelas seções desta página */
+.section-container {
+    max-width: var(--max-width-container);
+    margin: 0 auto;
+    padding: 0 5%;
+}
+
+/* breadcrumb */
+.breadcrumb {
+    padding: 18px 0 0;
+    font-size: 0.8rem;
+    color: var(--cor-texto-claro);
+}
+
+.breadcrumb a:hover {
+    color: var(--cor-texto-hover);
+}
+
+.breadcrumb .sep {
+    margin: 0 6px;
+    color: var(--borda-suave);
+}
+
+.breadcrumb .current {
+    color: var(--cor-texto);
+    font-weight: 600;
+}
+
+/* ---------- layout principal ---------- */
+.product-detail {
+    padding: 26px 0 10px;
+}
+
+.product-detail-grid {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 44px;
+}
+
+/* ---------- galeria ---------- */
+.gallery-main {
+    background-color: var(--cor-branca);
+    border: 1px solid var(--borda-suave);
+    border-radius: 18px;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 14px;
+    overflow: hidden;
+}
+
+.gallery-main img {
+    max-height: 80%;
+    object-fit: contain;
+}
+
+.badge-promo {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background-color: var(--cor-secundaria);
+    color: var(--cor-branca);
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+
+.gallery-thumbs {
+    display: flex;
+    gap: 10px;
+}
+
+.thumb {
+    width: 66px;
+    height: 66px;
+    border-radius: 10px;
+    background-color: var(--cor-branca);
+    border: 1.5px solid var(--borda-suave);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 6px;
+}
+
+.thumb img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.thumb.active {
+    border-color: var(--cor-primaria);
+}
+
+/* ---------- informações do produto ---------- */
+.cat-tag {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--cor-secundaria);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.product-info h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--cor-primaria);
+    line-height: 1.2;
+    margin-bottom: 6px;
+}
+
+.product-sku {
+    font-size: 0.8rem;
+    color: var(--cor-texto-claro);
+    margin-bottom: 18px;
+}
+
+.product-price {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.preco-atual {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 2.2rem;
+    color: var(--cor-secundaria);
+}
+
+.preco-antigo {
+    font-size: 1rem;
+    color: #b0b6da;
+    text-decoration: line-through;
+}
+
+.product-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+
+.badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 999px;
+}
+
+.badge img {
+    width: 13px;
+    height: 13px;
+}
+
+.badge-estoque {
+    background-color: var(--cor-sucesso-bg);
+    color: var(--cor-sucesso);
+}
+
+.badge-receita {
+    background-color: var(--cor-alerta-bg);
+    color: var(--cor-alerta);
+}
+
+.badge-retirada {
+    background-color: var(--cor-fundo-destaque);
+    color: var(--cor-primaria);
+}
+
+/* ---------- quantidade ---------- */
+.qty-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.qty-control {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid var(--borda-suave);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.qty-control button {
+    background-color: var(--cor-fundo-site);
+    border: none;
+    width: 38px;
+    height: 42px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--cor-texto);
+    cursor: pointer;
+}
+
+.qty-control input {
+    width: 46px;
+    text-align: center;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--cor-texto);
+    outline: none;
+}
+
+.qty-note {
+    font-size: 0.8rem;
+    color: var(--cor-texto-claro);
+}
+
+/* ---------- ações principais ---------- */
+.product-cta {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.btn-primary-dark {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    background-color: var(--cor-primaria);
+    color: var(--cor-branca);
+    border: none;
+    border-radius: 11px;
+    padding: 15px 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary-dark:hover {
+    background-color: var(--cor-secundaria);
+}
+
+.btn-primary-dark img {
+    width: 17px;
+    height: 17px;
+    filter: brightness(0) invert(1);
+}
+
+.btn-fav {
+    width: 54px;
+    height: 54px;
+    border-radius: 11px;
+    border: 1.5px solid var(--borda-suave);
+    background-color: var(--cor-branca);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-fav:hover {
+    border-color: var(--cor-secundaria);
+    background-color: #fdeceb;
+}
+
+.btn-fav img {
+    width: 20px;
+    height: 20px;
+}
+
+/* ---------- blocos de informação ---------- */
+.info-block {
+    background-color: var(--cor-branca);
+    border: 1px solid var(--borda-suave);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 16px;
+}
+
+.info-block h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--cor-primaria);
+    margin-bottom: 12px;
+}
+
+.info-block p {
+    font-size: 0.85rem;
+    color: var(--cor-texto-claro);
+    line-height: 1.65;
+}
+
+.info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+}
+
+.info-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.83rem;
+    color: var(--cor-texto-claro);
+    line-height: 1.5;
+}
+
+.info-list img {
+    width: 15px;
+    height: 15px;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+/* ---------- disponibilidade por loja ---------- */
+.store-avail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--borda-suave);
+    font-size: 0.85rem;
+}
+
+.store-avail-row:last-child {
+    border-bottom: none;
+}
+
+.store-avail-row .sn {
+    font-weight: 600;
+    color: var(--cor-texto);
+}
+
+.store-avail-row .sa {
+    color: var(--cor-texto-claro);
+    font-size: 0.78rem;
+}
+
+.avail-tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.avail-tag.yes {
+    color: var(--cor-sucesso);
+}
+
+/* ---------- dúvida via whatsapp ---------- */
+.whats-doubt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #f0fbf4;
+    border: 1px solid #cdefda;
+    padding: 13px 16px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: var(--cor-sucesso);
+    font-weight: 600;
+    flex-wrap: wrap;
+}
+
+.whats-doubt img {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-whats-inline {
+    margin-left: auto;
+    background-color: #25d366;
+    color: var(--cor-branca);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+/* ---------- produtos relacionados ---------- */
+.related-products {
+    padding: 40px 0 60px;
+}
+
+/* .product-carousel já é usado em outras páginas (promoções, mais vendidos);
+   os cards injetados via JS devem seguir a mesma estrutura .product-card
+   usada nessas seções, então não redefinimos o grid aqui. */
+
+/* ---------- responsivo ---------- */
+@media (max-width: 992px) {
+    .product-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .preco-atual {
+        font-size: 1.7rem;
+    }
+
+    .whats-doubt {
+        justify-content: flex-start;
+    }
+
+    .btn-whats-inline {
+        margin-left: 0;
+    }
+}

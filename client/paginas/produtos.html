@@ -1,363 +1,723 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Drogaria Popular Ponte Alta</title>
-    <link rel="stylesheet" href="../css/global.css" />
-    <link rel="stylesheet" href="../css/produtos.css" />
-    <link rel="stylesheet" href="../css/index.css" />
-    <link rel="stylesheet" href="../css/header-auth.css" />
-  </head>
-  <body>
 
-    <header>
-      <div class="top-bar">
-        <span>📍 Entregamos em toda a Ponte Alta e região</span>
-        <span>📞 (61) 3333-4455 · Seg a Sáb, 7h-22h</span>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-      <div class="main-header">
-        <div class="logo">
+  <title>Produtos · Drogaria Popular Ponte Alta</title>
+
+  <link rel="stylesheet" href="../css/global.css" />
+  <link rel="stylesheet" href="../css/produtos.css" />
+  <link rel="stylesheet" href="../css/header-auth.css" />
+</head>
+
+<body>
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <header>
+
+    <div class="top-bar">
+      <span>
+        📍 Entregamos em toda a Ponte Alta e região
+      </span>
+
+      <span>
+        📞 (61) 3333-4455 · Seg a Sáb, 7h-22h
+      </span>
+    </div>
+
+
+    <div class="main-header">
+
+      <div class="logo">
+
+        <a href="index.html">
+
           <img
             src="../img/logo_drogaria_popular_ponte_alta.jpeg"
             alt="DROGARIA POPULAR PONTE ALTA"
           />
-        </div>
 
-        <div class="search-bar">
-          <button type="button" aria-label="Buscar">
-            <img src="../img/lupa_icon.png" alt="Buscar" />
-          </button>
-          <input
-            type="text"
-            placeholder="Buscar remédio, marca ou produto..."
-          />
-        </div>
+        </a>
 
-        <div class="user-actions">
-          <a href="sobre_nos.html" class="action-item"
-            ><img src="../img/info_icon.png" alt="Sobre nós" /> Sobre nós</a
-          >
-          <a href="#" class="action-item"
-            ><img src="../img/coracao_icon.png" alt="Favoritos" /> Favoritos</a
-          >
-          <a href="login.html" class="action-item"
-            ><img src="../img/usuario_icon.png" alt="Entrar" /> Entrar</a
-          >
-          <a href="carrinho.html" class="action-item">
-            <img src="../img/carrinho_icon.png" alt="Carrinho" /> Carrinho
-          </a>
-          <button class="btn-whatsapp-header">
-            <img src="../img/whatsapp-circle.png" alt="WhatsApp" /> WhatsApp
-          </button>
-        </div>
       </div>
 
-      <nav class="main-nav">
-        <ul>
-          <li class="active">
-            <a href="produtos.html"
-              ><img src="../img/medicamentos_icon.png" alt="Medicamentos" />
-              Medicamentos</a
-            >
-          </li>
-          <li>
-            <a href="produtos.html"
-              ><img src="../img/higiene_icon.png" alt="Higiene" /> Higiene</a
-            >
-          </li>
-          <li>
-            <a href="produtos.html"
-              ><img src="../img/infantil_icon.png" alt="Infantil" /> Infantil</a
-            >
-          </li>
-          <li>
-            <a href="produtos.html"
-              ><img src="../img/cabelos_icon.png" alt="Capilares" />
-              Capilares</a
-            >
-          </li>
-          <li>
-            <a href="produtos.html"
-              ><img src="../img/unhas_icon.png" alt="Unhas" /> Unhas</a
-            >
-          </li>
-          <li>
-            <a href="produtos.html"
-              ><img src="../img/promocoes_icon.png" alt="Promoções" />
-              Promoções</a
-            >
-          </li>
-          <li>
-            <a href="servicos.html"
-              ><img src="../img/servicos_icon.png" alt="Serviços" /> Serviços</a
-            >
-          </li>
-          <li class="recompra-rapida">
-            <a href="#"
-              ><img src="../img/relogio_icon.png" alt="Recompra rápida" />
-              Recompra rápida</a
-            >
-          </li>
-        </ul>
-      </nav>
-    </header>
 
-    <main class="produtos-main">
-        
-        <div class="breadcrumb">
-            Início / Produtos / <strong>Farmácia / Medicamentos</strong>
-        </div>
+      <div class="search-bar">
 
-        <div class="page-header">
-            <div class="title-area">
-                <h1>FARMÁCIA / MEDICAMENTOS</h1>
-                <p></p>
-            </div>
-            <div class="sort-area">
-                <select class="sort-select">
-                    <option>Ordenar por: Relevância</option>
-                    <option>Menor Preço</option>
-                    <option>Maior Preço</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="layout-grid">
-            
-            <aside class="sidebar-filters">
-                <div class="filter-group">
-                    <h3>CATEGORIA</h3>
-                    <label class="checkbox-label">
-                        <input type="checkbox" checked> Medicamentos 
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox"> Higiene pessoal 
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox"> Infantil 
-                    </label>
-                </div>
-
-                <div class="filter-group">
-                    <h3>FAIXA DE PREÇO</h3>
-                    <div class="price-inputs">
-                        <input type="text" placeholder="Mín.">
-                        <span>até</span>
-                        <input type="text" placeholder="Máx.">
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <h3>DISPONIBILIDADE</h3>
-                    <label class="checkbox-label">
-                        <input type="checkbox" checked> Em estoque
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox"> Só retirada
-                    </label>
-                </div>
-
-                <button class="btn-clear-filters">Limpar filtros</button>
-            </aside>
-
-            <section class="products-section">
-                
-                <div class="active-filters-tags">
-                    <span class="filter-chip">Medicamentos</span>
-                </div>
-
-                <div class="products-grid">
-
-                    <div class="product-card">
-                        <div class="product-image-container">
-                            <span class="discount-badge">-30%</span>
-                            <button class="btn-fav"><img src="../img/coracao_icon.png" alt="Favoritar"></button>
-                            <img src="../img/medicamentos_icon.png" alt="Dipirona Sódica">
-                        </div>
-                        <div class="product-info">
-                            <span class="stock-status green"><span class="status-dot"></span> EM ESTOQUE</span>
-                            <h3>Dipirona Sódica 500mg · 20 comprimidos</h3>
-                            <div class="price-container">
-                                <span class="price">R$ 6,90</span>
-                                <del>R$ 9,90</del>
-                            </div>
-                            <button class="btn-add-cart">Adicionar <img src="../img/carrinho_icon.png" alt=""></button>
-                        </div>
-                    </div>
-
-                    <div class="product-card">
-                        <div class="product-image-container">
-                            <span class="badge-prescription">RECEITA</span>
-                            <button class="btn-fav"><img src="../img/coracao_icon.png" alt="Favoritar"></button>
-                            <img src="../img/medicamentos_icon.png" alt="Amoxilina">
-                        </div>
-                        <div class="product-info">
-                            <span class="stock-status green"><span class="status-dot"></span> EM ESTOQUE</span>
-                            <h3>Amoxilina 500mg · 21 cápsulas</h3>
-                            <div class="price-container">
-                                <span class="price">R$ 24,90</span>
-                            </div>
-                            <button class="btn-add-cart">Adicionar <img src="../img/carrinho_icon.png" alt=""></button>
-                        </div>
-                    </div>
-
-
-                    <div class="product-card">
-                        <div class="product-image-container">
-                            <span class="badge-pickup">SÓ RETIRADA</span>
-                            <button class="btn-fav"><img src="../img/coracao_icon.png" alt="Favoritar"></button>
-                            <img src="../img/relogio_icon.png" alt="Termômetro">
-                        </div>
-                        <div class="product-info">
-                            <span class="stock-status orange"><span class="status-dot"></span> ÚLTIMAS UNIDADES</span>
-                            <h3>Termômetro digital clínico</h3>
-                            <div class="price-container">
-                                <span class="price">R$ 18,90</span>
-                            </div>
-                            <button class="btn-add-cart">Adicionar <img src="../img/carrinho_icon.png" alt=""></button>
-                        </div>
-                    </div>
-
-                    <div class="product-card">
-                        <div class="product-image-container">
-                            <span class="badge-out">ESGOTADO</span>
-                            <img src="../img/medicamentos_icon.png" alt="Vitamina D3">
-                        </div>
-                        <div class="product-info">
-                            <span class="stock-status gray"><span class="status-dot"></span> ESGOTADO</span>
-                            <h3>Vitamina D3 2000UI · 60 cápsulas</h3>
-                            <div class="price-container">
-                                <span class="price">R$ 32,90</span>
-                            </div>
-                            <button class="btn-notify">Avisar quando chegar</button>
-                        </div>
-                    </div>
-
-                    <div class="product-card">
-                        <div class="product-image-container">
-                            <button class="btn-fav"><img src="../img/coracao_icon.png" alt="Favoritar"></button>
-                            <img src="../img/medicamentos_icon.png" alt="Paracetamol">
-                        </div>
-                        <div class="product-info">
-                            <span class="stock-status green"><span class="status-dot"></span> EM ESTOQUE</span>
-                            <h3>Paracetamol 750mg · 20 comprimidos</h3>
-                            <div class="price-container">
-                                <span class="price">R$ 8,90</span>
-                            </div>
-                            <button class="btn-add-cart">Adicionar <img src="../img/carrinho_icon.png" alt=""></button>
-                        </div>
-                    </div>
-
-                    <div class="product-card">
-                        <div class="product-image-container">
-                            <span class="discount-badge">-15%</span>
-                            <button class="btn-fav"><img src="../img/coracao_icon.png" alt="Favoritar"></button>
-                            <img src="../img/coracao_icon.png" alt="Soro Fisiológico">
-                        </div>
-                        <div class="product-info">
-                            <span class="stock-status green"><span class="status-dot"></span> EM ESTOQUE</span>
-                            <h3>Soro fisiológico 0,9% · 500ml</h3>
-                            <div class="price-container">
-                                <span class="price">R$ 11,90</span>
-                                <del>R$ 13,90</del>
-                            </div>
-                            <button class="btn-add-cart">Adicionar <img src="../img/carrinho_icon.png" alt=""></button>
-                        </div>
-                    </div>
-
-                    <div class="product-card">
-                        <div class="product-image-container">
-                            <button class="btn-fav"><img src="../img/coracao_icon.png" alt="Favoritar"></button>
-                            <img src="../img/medicamentos_icon.png" alt="Antialérgico">
-                        </div>
-                        <div class="product-info">
-                            <span class="stock-status green"><span class="status-dot"></span> EM ESTOQUE</span>
-                            <h3>Antialérgico 10mg · 12 comprimidos</h3>
-                            <div class="price-container">
-                                <span class="price">R$ 13,40</span>
-                            </div>
-                            <button class="btn-add-cart">Adicionar <img src="../img/carrinho_icon.png" alt=""></button>
-                        </div>
-                    </div>
-
-                    <div class="product-card">
-                        <div class="product-image-container">
-                            <span class="badge-prescription">-RECEITA</span>
-                            <button class="btn-fav"><img src="../img/coracao_icon.png" alt="Favoritar"></button>
-                            <img src="../img/medicamentos_icon.png" alt="Losartana">
-                        </div>
-                        <div class="product-info">
-                            <span class="stock-status green"><span class="status-dot"></span> EM ESTOQUE</span>
-                            <h3>Losartana Potássica 50mg · 30 comprimidos</h3>
-                            <div class="price-container">
-                                <span class="price">R$ 15,90</span>
-                            </div>
-                            <button class="btn-add-cart">Adicionar <img src="../img/carrinho_icon.png" alt=""></button>
-                        </div>
-                    </div>
-
-                </div>
-
-            </section>
-        </div>
-    </main>
-
-    <footer>
-      <div class="footer-container">
-        <div class="footer-column">
-          <h4>DROGARIA POPULAR PONTE ALTA</h4>
-          <p>
-            Sua farmácia de bairro em Ponte Alta,<br />Gama - DF. Cuidado de
-            verdade, sempre<br />por perto.
-          </p>
-        </div>
-        <div class="footer-column">
-          <h4>COMPRAR</h4>
-          <ul>
-            <li><a href="#">Categorias</a></li>
-            <li><a href="#">Promoções</a></li>
-            <li><a href="#">Mais vendidos</a></li>
-            <li><a href="#">Favoritos</a></li>
-          </ul>
-        </div>
-        <div class="footer-column">
-          <h4>ATENDIMENTO</h4>
-          <ul>
-            <li><a href="#">Meus pedidos</a></li>
-            <li><a href="#">Fale no WhatsApp</a></li>
-            <li><a href="#">Lojas e horários</a></li>
-          </ul>
-        </div>
-        <div class="footer-column">
-          <h4>INSTITUCIONAL</h4>
-          <ul>
-            <li><a href="#">Sobre nós</a></li>
-            <li><a href="#">Nossos serviços</a></li>
-            <li><a href="#">Trabalhe conosco</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <p>
-          &copy; 2026 Drogaria Popular Ponte Alta. Todos os direitos reservados.
-        </p>
-        <p>CNPJ 00.000.000/0001-00</p>
-      </div>
-
-      <div class="whatsapp-float">
         <button
-          aria-label="Falar no WhatsApp"
-          style="background: #25d366; border-radius: 50%"
+          type="button"
+          aria-label="Buscar"
+          id="btnBuscar"
         >
-          <img src="../img/whatsapp-circle.png" alt="WhatsApp" />
+          <img
+            src="../img/lupa_icon.png"
+            alt="Buscar"
+          />
         </button>
-      </div>
-    </footer>
 
-    <script src="../javaScript/headerAuth.js"></script>
-    <script src="../javaScript/index.js"></script>
-  </body>
+        <input
+          type="text"
+          id="campoBusca"
+          placeholder="Buscar remédio, marca ou produto..."
+        />
+
+      </div>
+
+
+      <div class="user-actions">
+
+        <a
+          href="sobre_nos.html"
+          class="action-item"
+        >
+          <img
+            src="../img/info_icon.png"
+            alt="Sobre nós"
+          />
+
+          Sobre nós
+        </a>
+
+
+        <a
+          href="#"
+          class="action-item"
+        >
+          <img
+            src="../img/coracao_icon.png"
+            alt="Favoritos"
+          />
+
+          Favoritos
+        </a>
+
+
+        <a
+          href="login.html"
+          class="action-item"
+        >
+          <img
+            src="../img/usuario_icon.png"
+            alt="Entrar"
+          />
+
+          Entrar
+        </a>
+
+
+        <a
+          href="carrinho.html"
+          class="action-item"
+        >
+          <img
+            src="../img/carrinho_icon.png"
+            alt="Carrinho"
+          />
+
+          Carrinho
+        </a>
+
+
+        <button
+          type="button"
+          class="btn-whatsapp-header"
+        >
+
+          <img
+            src="../img/whatsapp-circle.png"
+            alt="WhatsApp"
+          />
+
+          WhatsApp
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         NAVEGAÇÃO
+         ===================================================== -->
+
+    <nav class="main-nav">
+
+      <ul>
+
+        <li class="active">
+
+          <a href="produtos.html">
+
+            <img
+              src="../img/medicamentos_icon.png"
+              alt="Medicamentos"
+            />
+
+            Medicamentos
+
+          </a>
+
+        </li>
+
+
+        <li>
+
+          <a href="produtos.html">
+
+            <img
+              src="../img/higiene_icon.png"
+              alt="Higiene"
+            />
+
+            Higiene
+
+          </a>
+
+        </li>
+
+
+        <li>
+
+          <a href="produtos.html">
+
+            <img
+              src="../img/infantil_icon.png"
+              alt="Infantil"
+            />
+
+            Infantil
+
+          </a>
+
+        </li>
+
+
+        <li>
+
+          <a href="produtos.html">
+
+            <img
+              src="../img/cabelos_icon.png"
+              alt="Capilares"
+            />
+
+            Capilares
+
+          </a>
+
+        </li>
+
+
+        <li>
+
+          <a href="produtos.html">
+
+            <img
+              src="../img/unhas_icon.png"
+              alt="Unhas"
+            />
+
+            Unhas
+
+          </a>
+
+        </li>
+
+
+        <li>
+
+          <a href="produtos.html">
+
+            <img
+              src="../img/promocoes_icon.png"
+              alt="Promoções"
+            />
+
+            Promoções
+
+          </a>
+
+        </li>
+
+
+        <li>
+
+          <a href="servicos.html">
+
+            <img
+              src="../img/servicos_icon.png"
+              alt="Serviços"
+            />
+
+            Serviços
+
+          </a>
+
+        </li>
+
+
+        <li class="recompra-rapida">
+
+          <a href="#">
+
+            <img
+              src="../img/relogio_icon.png"
+              alt="Recompra rápida"
+            />
+
+            Recompra rápida
+
+          </a>
+
+        </li>
+
+      </ul>
+
+    </nav>
+
+  </header>
+
+
+
+  <!-- =====================================================
+       MAIN
+       ===================================================== -->
+
+  <main class="produtos-main">
+
+
+    <!-- =====================================================
+         BREADCRUMB
+         ===================================================== -->
+
+    <div class="breadcrumb">
+
+      <a href="index.html">
+        Início
+      </a>
+
+      <span>
+        /
+      </span>
+
+      <span>
+        Produtos
+      </span>
+
+      <span id="breadcrumbCategoria">
+        /
+      </span>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         CABEÇALHO DA PÁGINA
+         ===================================================== -->
+
+    <div class="page-header">
+
+      <div class="title-area">
+
+        <h1 id="tituloPagina">
+          PRODUTOS
+        </h1>
+
+        <p id="descricaoPagina">
+          Carregando produtos...
+        </p>
+
+      </div>
+
+
+      <div class="sort-area">
+
+        <select
+          class="sort-select"
+          id="selectOrdenacao"
+        >
+
+          <option value="relevancia">
+            Ordenar por: Relevância
+          </option>
+
+          <option value="menor-preco">
+            Menor Preço
+          </option>
+
+          <option value="maior-preco">
+            Maior Preço
+          </option>
+
+          <option value="nome">
+            Nome: A-Z
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         LAYOUT
+         ===================================================== -->
+
+    <div class="layout-grid">
+
+
+      <!-- ===================================================
+           SIDEBAR
+           =================================================== -->
+
+      <aside class="sidebar-filters">
+
+
+        <!-- CATEGORIAS -->
+
+        <div class="filter-group">
+
+          <h3>
+            CATEGORIA
+          </h3>
+
+
+          <div
+            id="filtrosCategorias"
+          >
+
+            <p class="sem-dados">
+              Carregando categorias...
+            </p>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- PREÇO -->
+
+        <div class="filter-group">
+
+          <h3>
+            FAIXA DE PREÇO
+          </h3>
+
+
+          <div class="price-inputs">
+
+            <input
+              type="number"
+              id="precoMin"
+              placeholder="Mín."
+              min="0"
+              step="0.01"
+            />
+
+
+            <span>
+              até
+            </span>
+
+
+            <input
+              type="number"
+              id="precoMax"
+              placeholder="Máx."
+              min="0"
+              step="0.01"
+            />
+
+          </div>
+
+        </div>
+
+
+
+        <!-- DISPONIBILIDADE -->
+
+        <div class="filter-group">
+
+          <h3>
+            DISPONIBILIDADE
+          </h3>
+
+
+          <label class="checkbox-label">
+
+            <input
+              type="checkbox"
+              id="filtroEstoque"
+            />
+
+            Em estoque
+
+          </label>
+
+
+          <label class="checkbox-label">
+
+            <input
+              type="checkbox"
+              id="filtroRetirada"
+            />
+
+            Só retirada
+
+          </label>
+
+        </div>
+
+
+
+        <!-- LIMPAR -->
+
+        <button
+          type="button"
+          class="btn-clear-filters"
+          id="btnLimparFiltros"
+        >
+          Limpar filtros
+        </button>
+
+      </aside>
+
+
+
+      <!-- ===================================================
+           PRODUTOS
+           =================================================== -->
+
+      <section class="products-section">
+
+
+        <!-- FILTROS ATIVOS -->
+
+        <div
+          class="active-filters-tags"
+          id="filtrosAtivos"
+        >
+        </div>
+
+
+
+        <!-- CONTADOR -->
+
+        <div
+          class="products-count"
+          id="contadorProdutos"
+        >
+          Carregando produtos...
+        </div>
+
+
+
+        <!-- GRID -->
+
+        <div
+          class="products-grid"
+          id="gridProdutos"
+        >
+
+          <p class="sem-dados">
+            Carregando produtos...
+          </p>
+
+        </div>
+
+
+      </section>
+
+    </div>
+
+  </main>
+
+
+
+  <!-- =====================================================
+       FOOTER
+       ===================================================== -->
+
+  <footer>
+
+    <div class="footer-container">
+
+
+      <div class="footer-column">
+
+        <h4>
+          DROGARIA POPULAR PONTE ALTA
+        </h4>
+
+        <p>
+          Sua farmácia de bairro em Ponte Alta,
+          <br />
+          Gama - DF. Cuidado de verdade, sempre
+          <br />
+          por perto.
+        </p>
+
+      </div>
+
+
+
+      <div class="footer-column">
+
+        <h4>
+          COMPRAR
+        </h4>
+
+        <ul>
+
+          <li>
+            <a href="produtos.html">
+              Categorias
+            </a>
+          </li>
+
+          <li>
+            <a href="produtos.html">
+              Promoções
+            </a>
+          </li>
+
+          <li>
+            <a href="produtos.html">
+              Mais vendidos
+            </a>
+          </li>
+
+          <li>
+            <a href="#">
+              Favoritos
+            </a>
+          </li>
+
+        </ul>
+
+      </div>
+
+
+
+      <div class="footer-column">
+
+        <h4>
+          ATENDIMENTO
+        </h4>
+
+        <ul>
+
+          <li>
+            <a href="#">
+              Meus pedidos
+            </a>
+          </li>
+
+          <li>
+            <a href="#">
+              Fale no WhatsApp
+            </a>
+          </li>
+
+          <li>
+            <a href="#">
+              Lojas e horários
+            </a>
+          </li>
+
+        </ul>
+
+      </div>
+
+
+
+      <div class="footer-column">
+
+        <h4>
+          INSTITUCIONAL
+        </h4>
+
+        <ul>
+
+          <li>
+            <a href="sobre_nos.html">
+              Sobre nós
+            </a>
+          </li>
+
+          <li>
+            <a href="servicos.html">
+              Nossos serviços
+            </a>
+          </li>
+
+          <li>
+            <a href="#">
+              Trabalhe conosco
+            </a>
+          </li>
+
+        </ul>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="footer-bottom">
+
+      <p>
+        &copy; 2026 Drogaria Popular Ponte Alta.
+        Todos os direitos reservados.
+      </p>
+
+      <p>
+        CNPJ 00.000.000/0001-00
+      </p>
+
+    </div>
+
+
+
+    <div class="whatsapp-float">
+
+      <button
+        type="button"
+        aria-label="Falar no WhatsApp"
+        style="background: #25d366; border-radius: 50%"
+      >
+
+        <img
+          src="../img/whatsapp-circle.png"
+          alt="WhatsApp"
+        />
+
+      </button>
+
+    </div>
+
+  </footer>
+
+
+
+  <!-- =====================================================
+       SCRIPTS
+       ===================================================== -->
+
+  <script src="../javaScript/headerAuth.js"></script>
+  <script src="../javaScript/produtos.js"></script>
+
+</body>
+
 </html>

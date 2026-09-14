@@ -86,10 +86,15 @@ public class PedidoService {
     }
 
     public List<PedidoResponse> listarTodos() {
-        return pedidoRepository.findAll()
-                .stream()
-                .map(PedidoResponse::new)
-                .toList();
+    System.out.println(">>> ENTROU NO listarTodos()");
+
+    List<Pedido> pedidos = pedidoRepository.findAll();
+
+    System.out.println(">>> QUANTIDADE DE PEDIDOS: " + pedidos.size());
+
+    return pedidos.stream()
+            .map(PedidoResponse::new)
+            .toList();
     }
 
     public List<PedidoResponse> listarPorCliente(Integer idCliente) {

@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Produto · Drogaria Popular Ponte Alta</title>
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/item.css" />
+    <link rel="stylesheet" href="../css/header-auth.css" />
+  </head>
+  <body>
+
+    <!-- =====================================================
+    HEADER — global, copiado do index.html
+    ===================================================== -->
+    <header>
+      <div class="top-bar">
+        <span>📍 Entregamos em toda a Ponte Alta e região</span>
+        <span>📞 (61) 3333-4455 · Seg a Sáb, 7h-22h</span>
+      </div>
+
+      <div class="main-header">
+        <div class="logo">
+          <img
+            src="../img/logo_drogaria_popular_ponte_alta.jpeg"
+            alt="DROGARIA POPULAR PONTE ALTA"
+          />
+        </div>
+
+        <div class="search-bar">
+          <button type="button" aria-label="Buscar">
+            <img src="../img/lupa_icon.png" alt="Buscar" />
+          </button>
+          <input
+            type="text"
+            placeholder="Buscar remédio, marca ou produto..."
+          />
+        </div>
+
+        <div class="user-actions">
+          <a href="sobre_nos.html" class="action-item"
+            ><img src="../img/info_icon.png" alt="Sobre nós" /> Sobre nós</a
+          >
+          <a href="#" class="action-item"
+            ><img src="../img/coracao_icon.png" alt="Favoritos" /> Favoritos</a
+          >
+          <a href="login.html" class="action-item"
+            ><img src="../img/usuario_icon.png" alt="Entrar" /> Entrar</a
+          >
+          <a href="carrinho.html" class="action-item">
+            <img src="../img/carrinho_icon.png" alt="Carrinho" /> Carrinho
+          </a>
+          <button class="btn-whatsapp-header">
+            <img src="../img/whatsapp-circle.png" alt="WhatsApp" /> WhatsApp
+          </button>
+        </div>
+      </div>
+
+      <nav class="main-nav">
+        <ul>
+          <li class="active">
+            <a href="produtos.html"
+              ><img src="../img/medicamentos_icon.png" alt="Medicamentos" />
+              Medicamentos</a
+            >
+          </li>
+          <li>
+            <a href="produtos.html"
+              ><img src="../img/higiene_icon.png" alt="Higiene" /> Higiene</a
+            >
+          </li>
+          <li>
+            <a href="produtos.html"
+              ><img src="../img/infantil_icon.png" alt="Infantil" /> Infantil</a
+            >
+          </li>
+          <li>
+            <a href="produtos.html"
+              ><img src="../img/cabelos_icon.png" alt="Capilares" />
+              Capilares</a
+            >
+          </li>
+          <li>
+            <a href="produtos.html"
+              ><img src="../img/unhas_icon.png" alt="Unhas" /> Unhas</a
+            >
+          </li>
+          <li>
+            <a href="produtos.html"
+              ><img src="../img/promocoes_icon.png" alt="Promoções" />
+              Promoções</a
+            >
+          </li>
+          <li>
+            <a href="servicos.html"
+              ><img src="../img/servicos_icon.png" alt="Serviços" /> Serviços</a
+            >
+          </li>
+          <li class="recompra-rapida">
+            <a href="#"
+              ><img src="../img/relogio_icon.png" alt="Recompra rápida" />
+              Recompra rápida</a
+            >
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+
+    <!-- =====================================================
+    MAIN — único desta página
+    ===================================================== -->
+    <main>
+
+      <div class="section-container">
+        <nav class="breadcrumb" data-breadcrumb aria-label="Caminho de navegação">
+          <a href="index.html">Início</a>
+          <span class="sep">/</span>
+          <a href="produtos.html">Medicamentos</a>
+          <span class="sep">/</span>
+          <span class="current" data-produto-nome-breadcrumb>Dipirona Sódica 500mg</span>
+        </nav>
+      </div>
+
+      <section class="product-detail">
+        <div class="section-container product-detail-grid">
+
+          <!-- Galeria -->
+          <div class="product-gallery">
+            <div class="gallery-main">
+             <span
+                class="badge-promo"
+                data-produto-badge-promo
+                hidden
+            ></span>
+              <img
+                data-produto-imagem-principal
+                src="../img/produto_placeholder.png"
+                alt="Foto do produto"
+              />
+            </div>
+            <div class="gallery-thumbs" data-produto-galeria>
+              <button class="thumb active" type="button">
+                <img src="../img/produto_placeholder.png" alt="Miniatura 1" />
+              </button>
+              <button class="thumb" type="button">
+                <img src="../img/produto_placeholder.png" alt="Miniatura 2" />
+              </button>
+              <button class="thumb" type="button">
+                <img src="../img/produto_placeholder.png" alt="Miniatura 3" />
+              </button>
+            </div>
+          </div>
+
+          <!-- Informações -->
+          <div class="product-info">
+            <span class="cat-tag" data-produto-categoria>Farmácia / Medicamentos</span>
+            <h1 data-produto-nome>Dipirona Sódica 500mg · Caixa com 20 comprimidos</h1>
+            <div class="product-sku">
+              <span data-produto-tipo>Genérico</span> · Referência
+              <span data-produto-sku>#DIP500-20</span>
+            </div>
+
+            <div class="product-price">
+              <span class="preco-atual" data-produto-preco-atual>R$ 6,90</span>
+              <span
+                class="preco-antigo"
+                data-produto-preco-antigo
+                hidden
+              ></span>
+            </div>
+
+            <div class="product-badges" data-produto-badges>
+              <span class="badge badge-estoque">
+                <img src="../img/check_icon.png" alt="" /> Em estoque
+              </span>
+            </div>
+
+            <div class="qty-row">
+              <div class="qty-control">
+                <button type="button" data-qty-menos aria-label="Diminuir quantidade">−</button>
+                <input type="text" data-qty-input value="1" inputmode="numeric" />
+                <button type="button" data-qty-mais aria-label="Aumentar quantidade">+</button>
+              </div>
+              <span class="qty-note">Disponível em ambas as lojas</span>
+            </div>
+
+            <div class="product-cta">
+              <button class="btn-primary-dark" data-btn-add-carrinho>
+                <img src="../img/carrinho_icon.png" alt="" /> Adicionar ao carrinho
+              </button>
+              <button class="btn-fav" data-btn-favoritar aria-label="Favoritar produto">
+                <img src="../img/coracao_icon.png" alt="" />
+              </button>
+            </div>
+
+            <div class="info-block">
+              <h3>Descrição</h3>
+              <p data-produto-descricao>
+                Analgésico e antitérmico indicado para o alívio de dores de intensidade
+                leve a moderada e redução de febre. Uso adulto e pediátrico conforme
+                orientação médica ou farmacêutica.
+              </p>
+            </div>
+
+            <div class="info-block">
+              <h3>Informações importantes</h3>
+              <ul class="info-list" data-produto-informacoes>
+                <li><img src="../img/info_icon.png" alt="" /> Não é necessária receita médica para este produto.</li>
+                <li><img src="../img/info_icon.png" alt="" /> Contém lactose na composição — atenção para intolerantes.</li>
+                <li><img src="../img/info_icon.png" alt="" /> Mantenha fora do alcance de crianças, em local seco e arejado.</li>
+              </ul>
+            </div>
+
+            <div class="info-block">
+              <h3>Disponibilidade por loja</h3>
+              <div class="store-avail-list" data-produto-disponibilidade>
+                <div class="store-avail-row">
+                  <div>
+                    <div class="sn">Ponte Alta Norte</div>
+                    <div class="sa">Retirada em até 1h</div>
+                  </div>
+                  <span class="avail-tag yes">● Disponível</span>
+                </div>
+                <div class="store-avail-row">
+                  <div>
+                    <div class="sn">Ponte Alta Sul</div>
+                    <div class="sa">Retirada em até 1h</div>
+                  </div>
+                  <span class="avail-tag yes">● Disponível</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="whats-doubt">
+              <img src="../img/whatsapp-circle.png" alt="" />
+              Dúvidas sobre esse remédio?
+              <a href="#" class="btn-whats-inline">Falar com farmacêutico</a>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="related-products">
+        <div class="section-container">
+          <div class="section-header">
+            <div>
+              <span class="section-tag">VOCÊ TAMBÉM PODE PRECISAR</span>
+              <h2>PRODUTOS RELACIONADOS</h2>
+            </div>
+          </div>
+          <div class="product-carousel" data-produtos-relacionados>
+            <p class="sem-dados">Carregando produtos...</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- =====================================================
+    FOOTER — global, copiado do index.html
+    ===================================================== -->
+    <footer>
+      <div class="footer-container">
+        <div class="footer-column">
+          <h4>DROGARIA POPULAR PONTE ALTA</h4>
+          <p>
+            Sua farmácia de bairro em Ponte Alta,<br />Gama - DF. Cuidado de
+            verdade, sempre<br />por perto.
+          </p>
+        </div>
+        <div class="footer-column">
+          <h4>COMPRAR</h4>
+          <ul>
+            <li><a href="#">Categorias</a></li>
+            <li><a href="#">Promoções</a></li>
+            <li><a href="#">Mais vendidos</a></li>
+            <li><a href="#">Favoritos</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>ATENDIMENTO</h4>
+          <ul>
+            <li><a href="#">Meus pedidos</a></li>
+            <li><a href="#">Fale no WhatsApp</a></li>
+            <li><a href="#">Lojas e horários</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>INSTITUCIONAL</h4>
+          <ul>
+            <li><a href="#">Sobre nós</a></li>
+            <li><a href="#">Nossos serviços</a></li>
+            <li><a href="#">Trabalhe conosco</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>
+          &copy; 2026 Drogaria Popular Ponte Alta. Todos os direitos reservados.
+        </p>
+        <p>CNPJ 00.000.000/0001-00</p>
+      </div>
+
+      <div class="whatsapp-float">
+        <button
+          aria-label="Falar no WhatsApp"
+          style="background: #25d366; border-radius: 50%"
+        >
+          <img src="../img/whatsapp-circle.png" alt="WhatsApp" />
+        </button>
+      </div>
+    </footer>
+
+    <script src="../javaScript/headerAuth.js"></script>
+    <script src="../javaScript/item.js"></script>
+  </body>
+</html>
