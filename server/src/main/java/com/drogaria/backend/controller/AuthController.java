@@ -4,7 +4,10 @@ import com.drogaria.backend.dto.CadastroRequest;
 import com.drogaria.backend.dto.LoginRequest;
 import com.drogaria.backend.dto.ClienteResponse;
 import com.drogaria.backend.service.AuthService;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +23,26 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ClienteResponse> login(@Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<ClienteResponse> login(
+            @Valid @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest) {
+
+        return ResponseEntity.ok(
+                authService.login(
+                        request,
+                        httpRequest
+                )
+        );
     }
 
     @PostMapping("/cadastro")
-    public ResponseEntity<ClienteResponse> cadastro(@Valid @RequestBody CadastroRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(authService.cadastrar(request));
+    public ResponseEntity<ClienteResponse> cadastro(
+            @Valid @RequestBody CadastroRequest request) {
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(
+                        authService.cadastrar(request)
+                );
     }
-}   
+}

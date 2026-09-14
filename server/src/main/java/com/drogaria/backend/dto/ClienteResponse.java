@@ -6,24 +6,68 @@ public class ClienteResponse {
 
     private Integer idCliente;
     private String nome;
-    private String email;
     private String cpf;
-    private boolean contaAprovada;
+    private String email;
+    private String telefone;
     private String role;
 
-    public ClienteResponse(Cliente cliente) {
-        this.idCliente = cliente.getId();
-        this.nome = cliente.getNome();
-        this.email = cliente.getEmail();
-        this.cpf = cliente.getCpf();
-        this.contaAprovada = cliente.isContaAprovada();
+    public ClienteResponse() {
     }
 
-    public Integer getIdCliente() { return idCliente; }
-    public String getNome() { return nome; }
-    public String getEmail() { return email; }
-    public String getCpf() { return cpf; }
-    public boolean isContaAprovada() { return contaAprovada; }
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+    public ClienteResponse(Cliente cliente) {
+
+        this.idCliente = cliente.getId();
+        this.nome = cliente.getNome();
+        this.cpf = cliente.getCpf();
+        this.email = cliente.getEmail();
+        this.telefone = cliente.getTelefone();
+    }
+
+    public Integer getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(Integer idCliente) {
+        this.idCliente = idCliente;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 }
