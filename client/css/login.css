@@ -80,11 +80,22 @@ header {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
+  
 }
 
 .symbols-square > img {
   object-fit: contain;
   width: 80%;
+}
+
+.site-logo-square{
+  transition: transform 0.3s ease ;
+}
+
+.site-logo-square:hover{
+  transform: scale(1.2);
+  background-color: rgba(255, 255, 255, 0.38);
+  cursor: pointer;
 }
 
 .texto-central-section {
@@ -147,6 +158,7 @@ main {
   flex-direction: column;
   align-items: center;
   padding-top: 100px;
+  padding-bottom: 15px;
   overflow-y: scroll  ;
 }
 
@@ -372,6 +384,10 @@ fieldset > label {
 .politica-privacidade > a {
   text-decoration: none;
   color: var(--ink);
+}
+
+.politica-privacidade > a:hover{
+  color: var(--red-dark);
 }
 
 button,
