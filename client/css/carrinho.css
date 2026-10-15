@@ -97,6 +97,12 @@ h1 {
   color: var(--paper-dim);
   background-color: var(--ink-soft);
   font-weight: 650;
+
+}
+
+.toggle-btn:hover{
+  cursor: pointer;
+  transform: scale(1.1);
 }
 
 .activeToggle {
