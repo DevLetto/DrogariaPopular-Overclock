@@ -1,4 +1,4 @@
-const backBtn = document.querySelector(`.logo-icon`)
+const backBtn = document.getElementById("btnVoltarALoja")
 
 backBtn.addEventListener("click", voltar)
 

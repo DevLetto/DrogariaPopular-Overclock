@@ -697,6 +697,41 @@ main > section:not(.hero-section):not(.features-bar):not(.promotions):not(.partn
     filter: brightness(0) invert(1);
 }
 
+/* -----------------------------------
+   MAPA DO SITE NO FOOTER
+   ----------------------------------- */
+
+.footer-sitemap {
+    width: 100%;
+    max-width: var(--max-width-container);
+    margin: 0 auto;
+    padding: 40px 5%;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.footer-sitemap h4 {
+    color: var(--cor-branca);
+    font-size: 0.9rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+}
+
+.footer-sitemap-image {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.footer-sitemap-image img {
+    display: block;
+    width: 100%;
+    max-width: 900px;
+    height: auto;
+    border-radius: 10px;
+}   
+
 /* responsividade */
 @media (max-width: 992px) {
     .hero-section {

@@ -178,6 +178,27 @@
     color: var(--sidebar-bg);
 }
 
+.backToStore{
+    width: 110px;
+    height: 30px;
+    background-color: transparent;
+    border: 0.1px solid var(--status-caminho-bg);
+    color: var(--bg-admin);
+    font-weight: bold;
+    border-radius: 20px;
+    transition: transform 0.3s ease;
+
+}
+
+.backToStore:hover{
+
+    background-color: var(--bg-admin);
+    color: var(--primary-blue);
+    cursor: pointer;
+    transform: scale(1.1);
+
+}
+
 .badge {
     background-color: #374151;
     color: var(--text-white);

@@ -97,6 +97,7 @@ h1 {
   color: var(--paper-dim);
   background-color: var(--ink-soft);
   font-weight: 650;
+  transition: transform 0.3s ease;
 
 }
 
@@ -116,6 +117,22 @@ h1 {
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px 20px 60px;
+}
+
+.goBack-btn{
+  width: 200px;
+  height: 40px;
+  background-color: var(--white);
+  border: none;
+  border-radius: 20px;
+  color: var(--ink);
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.goBack-btn:hover{
+  border: 1px solid var(--ink);
+  cursor: pointer;
 }
 
 .progress-steps {
@@ -373,4 +390,8 @@ h1 {
   color: var(--white);
   font-weight: 600;
   cursor: pointer;
+}
+
+.resumo-pedido button:last-child:hover{
+  background-color: var(--green);
 }

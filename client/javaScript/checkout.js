@@ -46,6 +46,10 @@ const btnVoltarParaCarrinhoTopo = document.getElementById(
   "voltarParaCarrinhoTopo",
 );
 
+const btnVoltarParaCarrinhoMain = document.getElementById(
+  "voltarParaCarrinhoMain",
+);
+
 // =========================================================
 // ESTADO
 // =========================================================
@@ -167,6 +171,10 @@ async function prepararCsrf() {
 
 if(btnVoltarParaCarrinhoTopo) {
   btnVoltarParaCarrinhoTopo.addEventListener("click", voltarParaCarrinho)
+}
+
+if(btnVoltarParaCarrinhoMain) {
+  btnVoltarParaCarrinhoMain.addEventListener("click", voltarParaCarrinho)
 }
 
 function voltarParaCarrinho(){

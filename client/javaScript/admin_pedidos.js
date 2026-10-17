@@ -779,7 +779,7 @@ function atualizarCardResumo(
 
     const numero =
         elemento.querySelector(
-            ".numero, .valor, .card-numero, strong, h2, h3"
+            ".numero, .valor, .card-numero, strong, h3"
         );
 
     if (numero) {

@@ -108,6 +108,8 @@ const btnIrCheckoutTopo =
     "btnIrCheckoutTopo"
   );
 
+  const btnContinuarComprando = document.getElementById("btnContinuarComprando");
+
 
 /*
  * =========================================================
@@ -418,6 +420,19 @@ function renderizarCarrinho() {
 
 }
 
+/*
+ * =========================================================
+ * CONTINUAR COMPRANDO
+ * =========================================================
+ */
+
+if(btnContinuarComprando){
+  btnContinuarComprando.addEventListener("click", voltarParaCompras)
+}
+
+function voltarParaCompras(){
+  window.location.href ="index.html"
+}
 
 /*
  * =========================================================
