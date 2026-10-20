@@ -9,7 +9,7 @@ public class ClienteResponse {
     private String cpf;
     private String email;
     private String telefone;
-    private String role;
+    private boolean contaAprovada;
 
     public ClienteResponse() {
     }
@@ -21,6 +21,7 @@ public class ClienteResponse {
         this.cpf = cliente.getCpf();
         this.email = cliente.getEmail();
         this.telefone = cliente.getTelefone();
+        this.contaAprovada = cliente.isContaAprovada();
     }
 
     public Integer getIdCliente() {
@@ -63,11 +64,11 @@ public class ClienteResponse {
         this.telefone = telefone;
     }
 
-    public String getRole() {
-        return role;
+    public boolean isContaAprovada() {
+        return contaAprovada; 
     }
-
-    public void setRole(String role) {
-        this.role = role;
+    
+    public void setContaAprovada(boolean contaAprovada) {
+        this.contaAprovada = contaAprovada; 
     }
 }
