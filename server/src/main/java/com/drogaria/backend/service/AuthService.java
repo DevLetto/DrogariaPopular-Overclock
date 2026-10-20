@@ -116,7 +116,7 @@ public class AuthService {
         ClienteResponse response =
                 new ClienteResponse(cliente);
 
-        response.setRole(role);
+        
 
         return response;
     }
