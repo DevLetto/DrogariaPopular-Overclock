@@ -373,15 +373,10 @@ function criarItemRevisao(item) {
 // RESUMO
 // =========================================================
 
+
 function atualizarResumo() {
-  const subtotal = carrinhoItens.reduce((acumulado, item) => {
-    return (
-      acumulado + Number(item.precoProduto || 0) * Number(item.quantidade || 0)
-    );
-  }, 0);
-
-  const frete = tipoEntrega === "entrega" ? VALOR_FRETE_ENTREGA : 0;
-
+  const subtotal = calcularSubtotal();
+  const frete = calcularFrete();
   const total = Math.max(0, subtotal - desconto + frete);
 
   if (subtotalEl) {
@@ -390,18 +385,26 @@ function atualizarResumo() {
 
   if (descontoEl) {
     descontoEl.textContent =
-      desconto > 0 ? `-${formatarPreco(desconto)}` : formatarPreco(0);
+      desconto > 0
+        ? `-${formatarPreco(desconto)}`
+        : formatarPreco(0);
   }
 
   if (freteEl) {
-    freteEl.textContent =
-      tipoEntrega === "retirada" ? "Grátis (retirada)" : formatarPreco(frete);
+    if (tipoEntrega === "retirada") {
+      freteEl.textContent = "Grátis (retirada)";
+    } else if (frete === 0) {
+      freteEl.textContent = "Grátis";
+    } else {
+      freteEl.textContent = formatarPreco(frete);
+    }
   }
 
   if (totalEl) {
     totalEl.textContent = formatarPreco(total);
   }
 }
+
 
 // =========================================================
 // ENTREGA
@@ -959,9 +962,17 @@ function calcularSubtotal() {
   }, 0);
 }
 
+
 function calcularFrete() {
-  return tipoEntrega === "entrega" ? VALOR_FRETE_ENTREGA : 0;
+  if (tipoEntrega !== "entrega") {
+    return 0;
+  }
+
+  const subtotal = calcularSubtotal();
+
+  return subtotal >= 80 ? 0 : VALOR_FRETE_ENTREGA;
 }
+
 
 function calcularTotal() {
   return Math.max(0, calcularSubtotal() - desconto + calcularFrete());

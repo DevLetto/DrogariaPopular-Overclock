@@ -712,6 +712,8 @@
       overlay
     );
 
+    document.body.style.overflow = "hidden";  
+
 
     // =======================================================
     // FECHAR
@@ -783,6 +785,8 @@
       modal.remove();
 
     }
+
+    document.body.style.overflow = "";
 
 
     document.removeEventListener(

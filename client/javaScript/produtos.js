@@ -1329,7 +1329,7 @@ async function adicionarProdutoAoCarrinho(
 
   }
 
-}
+} 
 
   // =========================================================
   // FILTROS ATIVOS

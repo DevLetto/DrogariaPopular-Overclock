@@ -55,10 +55,7 @@ const listaComprarEl =
   );
 
 
-const listaSalvoEl =
-  document.querySelector(
-    ".lista-salvo-depois"
-  );
+
 
 
 const qtdComprarEl =
@@ -67,10 +64,7 @@ const qtdComprarEl =
   );
 
 
-const qtdSalvoEl =
-  document.getElementById(
-    "quantidadeSalvoDepois"
-  );
+
 
 
 const subtotalEl =
@@ -174,12 +168,7 @@ async function carregarCarrinho() {
     }
 
 
-    if (qtdSalvoEl) {
-
-      qtdSalvoEl.textContent =
-        "Salvos para depois (0 itens)";
-
-    }
+    
 
 
     atualizarResumo([]);
@@ -285,11 +274,6 @@ async function carregarCarrinho() {
                   item.quantidade || 0
                 ),
 
-              salvoParaDepois:
-                Number(
-                  item.salvoParaDepois ?? 0
-                ),
-
               nomeProduto:
                 produto.nomeProduto ||
                 "Produto indisponível",
@@ -335,90 +319,27 @@ async function carregarCarrinho() {
  * =========================================================
  */
 
+
 function renderizarCarrinho() {
-
-  const comprarAgora =
-    carrinhoItens.filter(
-      (item) =>
-        !item.salvoParaDepois
-    );
-
-
-  const salvosDepois =
-    carrinhoItens.filter(
-      (item) =>
-        Boolean(item.salvoParaDepois)
-    );
-
-
-  /*
-   * QUANTIDADES
-   */
+  // Todos os produtos aparecem em "Para comprar agora".
+  const comprarAgora = carrinhoItens;
 
   if (qtdComprarEl) {
-
     qtdComprarEl.textContent =
       `Para comprar agora (${comprarAgora.length} ${
-        comprarAgora.length === 1
-          ? "item"
-          : "itens"
+        comprarAgora.length === 1 ? "item" : "itens"
       })`;
-
   }
-
-
-  if (qtdSalvoEl) {
-
-    qtdSalvoEl.textContent =
-      `Salvos para depois (${salvosDepois.length} ${
-        salvosDepois.length === 1
-          ? "item"
-          : "itens"
-      })`;
-
-  }
-
-
-  /*
-   * COMPRAR AGORA
-   */
 
   listaComprarEl.innerHTML =
-    comprarAgora
-      .map(criarItemHTML)
-      .join("") ||
+    comprarAgora.map(criarItemHTML).join("") ||
     '<p class="carrinho-vazio">Seu carrinho está vazio.</p>';
 
+  document.querySelectorAll(".item").forEach(bindItemEvents);
 
-  /*
-   * SALVOS
-   */
-
-  listaSalvoEl.innerHTML =
-    salvosDepois
-      .map(criarItemHTML)
-      .join("") ||
-    "";
-
-
-  /*
-   * EVENTOS
-   */
-
-  document
-    .querySelectorAll(".item")
-    .forEach(bindItemEvents);
-
-
-  /*
-   * RESUMO
-   */
-
-  atualizarResumo(
-    comprarAgora
-  );
-
+  atualizarResumo(comprarAgora);
 }
+
 
 /*
  * =========================================================
@@ -939,11 +860,7 @@ function atualizarResumo(
 
 function irParaCheckout() {
 
-  const comprarAgora =
-    carrinhoItens.filter(
-      (item) =>
-        !item.salvoParaDepois
-    );
+  const comprarAgora = carrinhoItens;
 
 
   if (
