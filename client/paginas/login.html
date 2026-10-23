@@ -125,7 +125,17 @@
                 <span class="material-symbols-outlined auth-symbols">
                   lock
                 </span>
-                <input type="password" id="loginSenha" name="senha" placeholder="Sua senha" required />
+                <input
+                  type="password"
+                  class="password-input"
+                  id="loginSenha"
+                  name="senha"
+                  placeholder="Sua senha"
+                  required
+                />
+                <button type="button" class="toggle-visibility" aria-label="Mostrar senha" aria-pressed="false">
+                  <span class="material-symbols-outlined" aria-hidden="true">visibility</span>
+                </button>
               </div>
             </fieldset>
 
@@ -229,12 +239,16 @@
                 </span>
                 <input
                   type="password"
+                  class="password-input"
                   name="criarSenha"
                   id="cadSenha"
                   placeholder="Mínimo 8 caracteres"
                   minlength="8"
                   required
                 />
+                <button type="button" class="toggle-visibility" aria-label="Mostrar senha" aria-pressed="false">
+                  <span class="material-symbols-outlined" aria-hidden="true">visibility</span>
+                </button>
               </div>
               <span class="dica-senha"
                 >Use letras, números e pelo menos 1 caractere especial</span

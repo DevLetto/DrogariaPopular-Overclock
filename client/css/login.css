@@ -267,6 +267,29 @@ fieldset > label {
   color: var(--navy-800);
 }
 
+.input-div > .password-input {
+  padding-right: 44px;
+}
+
+.toggle-visibility {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.toggle-visibility:hover {
+  color: var(--navy-800);
+}
+
 .input-div > input:focus {
   background-color: var(--white);
 

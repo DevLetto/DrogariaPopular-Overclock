@@ -14,8 +14,14 @@ function showTab(tab) {
 
 document.querySelectorAll(".toggle-visibility").forEach((btn) => {
   btn.addEventListener("click", () => {
-    const input = btn.previousElementSibling;
-    input.type = input.type === "password" ? "text" : "password";
+    const input = btn.parentElement.querySelector("input");
+    const mostrarSenha = input.type === "password";
+    input.type = mostrarSenha ? "text" : "password";
+    btn.setAttribute("aria-label", mostrarSenha ? "Ocultar senha" : "Mostrar senha");
+    btn.setAttribute("aria-pressed", String(mostrarSenha));
+    btn.querySelector(".material-symbols-outlined").textContent = mostrarSenha
+      ? "visibility_off"
+      : "visibility";
   });
 });
 
