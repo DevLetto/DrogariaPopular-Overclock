@@ -964,9 +964,11 @@
           </span>
 
 
-          <h3>
-            ${escaparHTML(nome)}
-          </h3>
+          <div class="name-container">
+            <h3>
+              ${escaparHTML(nome)}
+            </h3>
+          </div>
 
 
           <div class="price-container">

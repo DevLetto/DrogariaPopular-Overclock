@@ -323,3 +323,44 @@
     justify-content: center;
     cursor: pointer;
 }
+
+
+
+.name-container{
+      position: relative;
+      width: full ;
+      height: 40px;
+      position: relative;
+}
+
+
+.product-info h3 {
+
+
+    width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis ;
+
+    
+}
+
+.product-info h3:hover {
+    
+    z-index: 999;
+
+    width: max-content;
+    max-width: 350px;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+    position: absolute;
+    left: 0;
+    top: 0;
+     
+
+    background: var(--cor-branca);
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}

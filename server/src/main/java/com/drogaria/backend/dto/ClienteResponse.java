@@ -9,6 +9,7 @@ public class ClienteResponse {
     private String cpf;
     private String email;
     private String telefone;
+    private String role;
     private boolean contaAprovada;
 
     public ClienteResponse() {
@@ -63,6 +64,16 @@ public class ClienteResponse {
     public void setTelefone(String telefone) {
         this.telefone = telefone;
     }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+
+    }
+
 
     public boolean isContaAprovada() {
         return contaAprovada; 
