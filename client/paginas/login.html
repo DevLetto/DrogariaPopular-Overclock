@@ -17,7 +17,11 @@
   <body>
     <!-- LADO AZUL -->
     <header>
+      <div class="div-btn-voltar">
+          <button class="btn-voltar" onclick="history.back()">← Voltar à loja </button>
+      </div>
       <section class="logo-titulo-section ">
+        
         <div title="Voltar ao início" class="symbols-square site-logo-square"  onclick="history.back()">
           <img
             title="Voltar ao início"
@@ -81,14 +85,14 @@
             id="tabLogin"
             onclick="showTab('login')"
           >
-            Entrar
+            <span>Entrar</span>
           </button>
           <button
             class="autenticacao-btn"
             id="tabCadastro"
             onclick="showTab('cadastro')"
           >
-            Criar Conta
+            <span>Criar Conta</span>
           </button>
         </nav>
 

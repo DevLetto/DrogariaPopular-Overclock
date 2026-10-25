@@ -10,6 +10,9 @@ function showTab(tab) {
     : "flex";
   document.getElementById("tabLogin").classList.toggle("active", isLogin);
   document.getElementById("tabCadastro").classList.toggle("active", !isLogin);
+  document.getElementById("tabLogin").classList.toggle("activeLogin", isLogin)
+  document.getElementById("tabCadastro").classList.toggle("activeCadastro", !isLogin);
+
 }
 
 document.querySelectorAll(".toggle-visibility").forEach((btn) => {

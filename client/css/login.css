@@ -46,7 +46,7 @@ header {
   height: 100%;
   width: 50vw;
   color: var(--white);
-  padding: 35px 0px 10px 25px;
+  padding: 35px 35px 10px 25px;
 }
 
 .logo-titulo-section {
@@ -55,6 +55,40 @@ header {
   justify-content: center;
   align-items: center;
   gap: 10px;
+}
+
+.div-btn-voltar{
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.398) ;
+  padding: 5px;
+  height: 25px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding-bottom: 12px ;
+  margin-bottom: -60px;
+
+}
+
+.btn-voltar{
+  background-color: transparent;
+  color: var(--white);
+  border-radius: 10px;
+  border: none;
+  height: 25px;
+  width: max-content;
+  padding: 0px 10px ;
+   transition: transform 0.3s ease ;
+   text-align: center;
+   font-family: Arial, Helvetica, sans-serif;
+}
+
+
+.btn-voltar:hover{
+  transform: scale(1.1);
+  background-color: var(--white);
+  color: #161f7a;
+  cursor: pointer;
 }
 
 .logo-titulo-texto-p1 {
@@ -88,15 +122,7 @@ header {
   width: 80%;
 }
 
-.site-logo-square{
-  transition: transform 0.3s ease ;
-}
 
-.site-logo-square:hover{
-  transform: scale(1.2);
-  background-color: rgba(255, 255, 255, 0.38);
-  cursor: pointer;
-}
 
 .texto-central-section {
   display: flex;
@@ -199,6 +225,50 @@ main {
   background-color: var(--white);
   box-shadow: 0 4px 12px -6px rgba(11, 17, 87, 0.25);
 }
+
+/* .activeLogin{
+  animation: goLogin 0.3s ease 0s 1 normal forwards ;
+}
+
+@keyframes goLogin {
+  0%{
+    transform: translateX(200px); */
+    /* background-position: 50% 0%; */
+
+  /* }
+  100%{
+    transform: translateX(0px);
+    /* background-position: 0% 0%; */
+  /* }
+  
+} */
+
+/* .activeCadastro span{
+  position: fixed;
+  top: 50%;
+  left: 100%
+}
+
+.activeCadastro{
+  animation: goCadastro 0.3s ease 0s 1 normal forwards ;
+  position: relative;
+
+
+} */
+
+/* 
+@keyframes goCadastro {
+  0%{
+    transform: translateX(-200px); */
+    /* background-position: 50% 0%; */
+
+  /* }
+  100%{
+    transform: translateX(0px); */
+    /* background-position: 0% 0%; */
+  /* }
+  
+} */ 
 
 .form-section {
   display: flex;
