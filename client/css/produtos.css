@@ -43,6 +43,8 @@
     font-size: 0.95rem;
 }
 
+
+
 .sort-select {
     font-family: 'Inter', sans-serif;
     font-weight: 600;
@@ -65,6 +67,10 @@
 
 .sort-select:hover {
     background-color: var(--cor-fundo-destaque);
+}
+
+.sort-select option{
+    border-radius: 50px;
 }
 
 .layout-grid {
@@ -363,4 +369,126 @@
     background: var(--cor-branca);
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+/* ==============================
+   NOTIFICAÇÕES PERSONALIZADAS
+============================== */
+
+.toast-container {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    width: min(420px, calc(100% - 32px));
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 16px 18px;
+    background: var(--cor-branca, #fff);
+    color: var(--cor-primaria, #014892);
+
+    border: 1px solid var(--borda-suave, #e5e7eb);
+    border-left: 4px solid #10b981;
+    border-radius: 12px;
+
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+
+    animation: toast-entrar 0.3s ease forwards;
+    pointer-events: auto;
+}
+
+.toast.erro {
+    border-left-color: #ef4444;
+}
+
+.toast.aviso {
+    border-left-color: #f59e0b;
+}
+
+.toast-icone {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #d1fae5;
+    color: #059669;
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.toast.erro .toast-icone {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.toast.aviso .toast-icone {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.toast-mensagem {
+    flex: 1;
+    line-height: 1.4;
+}
+
+.toast-fechar {
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 2px;
+}
+
+.toast-saindo {
+    animation: toast-sair 0.25s ease forwards;
+}
+
+@keyframes toast-entrar {
+    from {
+        opacity: 0;
+        transform: translateY(-18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes toast-sair {
+    to {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .toast,
+    .toast-saindo {
+        animation: none;
+    }
 }

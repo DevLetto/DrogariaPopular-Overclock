@@ -412,8 +412,8 @@ formServico.addEventListener(
 
         if (!dados.nome) {
 
-            alert(
-                "Informe o nome do serviço."
+            mostrarNotificacao(
+                "Informe o nome do serviço.", "aviso"
             );
 
             nomeServico.focus();
@@ -427,8 +427,8 @@ formServico.addEventListener(
             dados.valor < 0
         ) {
 
-            alert(
-                "Informe um valor válido."
+            mostrarNotificacao(
+                "Informe um valor válido.", "aviso"
             );
 
             valorServico.focus();
@@ -442,8 +442,8 @@ formServico.addEventListener(
             dados.idLoja <= 0
         ) {
 
-            alert(
-                "Selecione uma loja."
+            mostrarNotificacao(
+                "Selecione uma loja.", "aviso"
             );
 
             lojaServico.focus();
@@ -530,7 +530,7 @@ formServico.addEventListener(
             await carregarServicos();
 
 
-            alert(
+            mostrarNotificacao(
                 servicoEditando !== null
                     ? "Serviço atualizado com sucesso!"
                     : "Serviço cadastrado com sucesso!"
@@ -544,8 +544,8 @@ formServico.addEventListener(
                 erro
             );
 
-            alert(
-                erro.message
+            mostrarNotificacao(
+                erro.message, "erro"
             );
         }
 
@@ -611,7 +611,7 @@ async function excluirServico(id) {
         await carregarServicos();
 
 
-        alert(
+        mostrarNotificacao(
             "Serviço excluído com sucesso!"
         );
 
@@ -623,8 +623,8 @@ async function excluirServico(id) {
             erro
         );
 
-        alert(
-            erro.message
+        mostrarNotificacao(
+            erro.message, "erro"
         );
     }
 }
@@ -679,6 +679,73 @@ async function inicializar() {
 
     await carregarServicos();
 
+}
+
+// =========================================================
+// NOTIFICAÇÕES PERSONALIZADAS
+// =========================================================
+
+function mostrarNotificacao(mensagem, tipo = "sucesso") {
+    let container = document.querySelector(".toast-container");
+
+    if (!container) {
+        container = document.createElement("div");
+        container.className = "toast-container";
+        container.setAttribute("aria-live", "polite");
+        container.setAttribute("aria-atomic", "false");
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement("div");
+    toast.className = `toast ${tipo}`;
+
+    const icones = {
+        sucesso: "✓",
+        erro: "!",
+        aviso: "!"
+    };
+
+    const icone = document.createElement("span");
+    icone.className = "toast-icone";
+    icone.textContent = icones[tipo] || "✓";
+    icone.setAttribute("aria-hidden", "true");
+
+    const texto = document.createElement("span");
+    texto.className = "toast-mensagem";
+    texto.textContent = mensagem;
+
+    const fechar = document.createElement("button");
+    fechar.className = "toast-fechar";
+    fechar.type = "button";
+    fechar.textContent = "×";
+    fechar.setAttribute("aria-label", "Fechar notificação");
+
+    toast.append(icone, texto, fechar);
+    container.appendChild(toast);
+
+    let removido = false;
+
+    function removerNotificacao() {
+        if (removido) return;
+        removido = true;
+
+        toast.classList.add("toast-saindo");
+
+        setTimeout(() => {
+            toast.remove();
+
+            if (container.children.length === 0) {
+                container.remove();
+            }
+        }, 250);
+    }
+
+    const temporizador = setTimeout(removerNotificacao, 3500);
+
+    fechar.addEventListener("click", () => {
+        clearTimeout(temporizador);
+        removerNotificacao();
+    });
 }
 
 

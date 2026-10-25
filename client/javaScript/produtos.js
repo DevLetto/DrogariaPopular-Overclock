@@ -1117,6 +1117,73 @@
 // CARRINHO
 // =========================================================
 
+// =========================================================
+// NOTIFICAÇÕES PERSONALIZADAS
+// =========================================================
+
+function mostrarNotificacao(mensagem, tipo = "sucesso") {
+    let container = document.querySelector(".toast-container");
+
+    if (!container) {
+        container = document.createElement("div");
+        container.className = "toast-container";
+        container.setAttribute("aria-live", "polite");
+        container.setAttribute("aria-atomic", "false");
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement("div");
+    toast.className = `toast ${tipo}`;
+
+    const icones = {
+        sucesso: "✓",
+        erro: "!",
+        aviso: "!"
+    };
+
+    const icone = document.createElement("span");
+    icone.className = "toast-icone";
+    icone.textContent = icones[tipo] || "✓";
+    icone.setAttribute("aria-hidden", "true");
+
+    const texto = document.createElement("span");
+    texto.className = "toast-mensagem";
+    texto.textContent = mensagem;
+
+    const fechar = document.createElement("button");
+    fechar.className = "toast-fechar";
+    fechar.type = "button";
+    fechar.textContent = "×";
+    fechar.setAttribute("aria-label", "Fechar notificação");
+
+    toast.append(icone, texto, fechar);
+    container.appendChild(toast);
+
+    let removido = false;
+
+    function removerNotificacao() {
+        if (removido) return;
+        removido = true;
+
+        toast.classList.add("toast-saindo");
+
+        setTimeout(() => {
+            toast.remove();
+
+            if (container.children.length === 0) {
+                container.remove();
+            }
+        }, 250);
+    }
+
+    const temporizador = setTimeout(removerNotificacao, 3500);
+
+    fechar.addEventListener("click", () => {
+        clearTimeout(temporizador);
+        removerNotificacao();
+    });
+}
+
 async function adicionarProdutoAoCarrinho(
   idProduto,
   botao
@@ -1133,8 +1200,8 @@ async function adicionarProdutoAoCarrinho(
 
   if (!usuarioSalvo) {
 
-    alert(
-      "Você precisa estar logado para adicionar produtos ao carrinho."
+    mostrarNotificacao(
+      "Você precisa estar logado para adicionar produtos ao carrinho.", "aviso"
     );
 
     window.location.href =
@@ -1168,9 +1235,9 @@ async function adicionarProdutoAoCarrinho(
       "usuarioLogado"
     );
 
-    alert(
+    mostrarNotificacao(
       "Sua sessão é inválida. Faça login novamente."
-    );
+    , "aviso");
 
     window.location.href =
       "login.html";
@@ -1188,8 +1255,8 @@ async function adicionarProdutoAoCarrinho(
 
   if (!idCliente) {
 
-    alert(
-      "Não foi possível identificar o usuário."
+    mostrarNotificacao(
+      "Não foi possível identificar o usuário.", "erro"
     );
 
     return;
@@ -1202,8 +1269,8 @@ async function adicionarProdutoAoCarrinho(
 
   if (!idProduto) {
 
-    alert(
-      "Não foi possível identificar o produto."
+    mostrarNotificacao(
+      "Não foi possível identificar o produto.", "erro"
     );
 
     return;
@@ -1304,7 +1371,7 @@ async function adicionarProdutoAoCarrinho(
     );
 
 
-    alert(
+    mostrarNotificacao(
       "Produto adicionado ao carrinho!"
     );
 
@@ -1316,8 +1383,8 @@ async function adicionarProdutoAoCarrinho(
       erro
     );
 
-    alert(
-      "Não foi possível adicionar o produto ao carrinho."
+    mostrarNotificacao(
+      "Não foi possível adicionar o produto ao carrinho.", "erro"
     );
 
 

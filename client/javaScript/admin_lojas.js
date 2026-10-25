@@ -318,8 +318,8 @@ formLoja.addEventListener(
 
         if (!dados.nome) {
 
-            alert(
-                "Informe o nome da loja."
+            mostrarNotificacao(
+                "Informe o nome da loja.", "aviso"
             );
 
             nomeLoja.focus();
@@ -400,7 +400,7 @@ formLoja.addEventListener(
             await carregarLojas();
 
 
-            alert(
+            mostrarNotificacao(
                 lojaEditando !== null
                     ? "Loja atualizada com sucesso!"
                     : "Loja cadastrada com sucesso!"
@@ -414,8 +414,8 @@ formLoja.addEventListener(
                 erro
             );
 
-            alert(
-                erro.message
+            mostrarNotificacao(
+                erro.message, "erro"
             );
         }
 
@@ -477,7 +477,7 @@ async function excluirLoja(id) {
         await carregarLojas();
 
 
-        alert(
+        mostrarNotificacao(
             "Loja excluída com sucesso!"
         );
 
@@ -489,8 +489,8 @@ async function excluirLoja(id) {
             erro
         );
 
-        alert(
-            erro.message
+        mostrarNotificacao(
+            erro.message, "erro"
         );
     }
 }
@@ -509,6 +509,73 @@ function escaparHTML(texto) {
     return div.innerHTML;
 }
 
+
+// =========================================================
+// NOTIFICAÇÕES PERSONALIZADAS
+// =========================================================
+
+function mostrarNotificacao(mensagem, tipo = "sucesso") {
+    let container = document.querySelector(".toast-container");
+
+    if (!container) {
+        container = document.createElement("div");
+        container.className = "toast-container";
+        container.setAttribute("aria-live", "polite");
+        container.setAttribute("aria-atomic", "false");
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement("div");
+    toast.className = `toast ${tipo}`;
+
+    const icones = {
+        sucesso: "✓",
+        erro: "!",
+        aviso: "!"
+    };
+
+    const icone = document.createElement("span");
+    icone.className = "toast-icone";
+    icone.textContent = icones[tipo] || "✓";
+    icone.setAttribute("aria-hidden", "true");
+
+    const texto = document.createElement("span");
+    texto.className = "toast-mensagem";
+    texto.textContent = mensagem;
+
+    const fechar = document.createElement("button");
+    fechar.className = "toast-fechar";
+    fechar.type = "button";
+    fechar.textContent = "×";
+    fechar.setAttribute("aria-label", "Fechar notificação");
+
+    toast.append(icone, texto, fechar);
+    container.appendChild(toast);
+
+    let removido = false;
+
+    function removerNotificacao() {
+        if (removido) return;
+        removido = true;
+
+        toast.classList.add("toast-saindo");
+
+        setTimeout(() => {
+            toast.remove();
+
+            if (container.children.length === 0) {
+                container.remove();
+            }
+        }, 250);
+    }
+
+    const temporizador = setTimeout(removerNotificacao, 3500);
+
+    fechar.addEventListener("click", () => {
+        clearTimeout(temporizador);
+        removerNotificacao();
+    });
+}
 
 // ==========================================
 // INICIALIZAÇÃO
