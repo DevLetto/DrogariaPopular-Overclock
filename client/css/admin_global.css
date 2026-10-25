@@ -733,7 +733,7 @@ td img:not(.admin-table .badge img) {
 
     padding: 24px;
 
-    z-index: 9999;
+    z-index: 0;
 
     box-sizing: border-box;
 
