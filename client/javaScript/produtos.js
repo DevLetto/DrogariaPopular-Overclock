@@ -1,1144 +1,588 @@
 (function () {
-
   const API_BASE_URL = "http://localhost:8080/api";
-
   const ICONE_PADRAO = "../img/medicamentos_icon.png";
 
   let todosProdutos = [];
   let produtosExibidos = [];
   let categorias = [];
-
+  let promocoesAtivas = [];
   let categoriaSelecionada = null;
+  let somentePromocoes = false;
 
-
-  // =========================================================
-  // INICIALIZAÇÃO
-  // =========================================================
-
-  document.addEventListener("DOMContentLoaded", () => {
-
-    inicializar();
-
-  });
-
+  document.addEventListener("DOMContentLoaded", inicializar);
 
   async function inicializar() {
-
     categoriaSelecionada = obterCategoriaDaURL();
+    somentePromocoes = obterModoPromocoesDaURL();
+
+    if (
+      ["promocao", "promocoes", "promoção", "promoções"].includes(
+        normalizar(categoriaSelecionada),
+      )
+    ) {
+      somentePromocoes = true;
+      categoriaSelecionada = null;
+    }
 
     configurarEventos();
-
     mostrarCarregando();
-
     await carregarDados();
-
   }
 
-
-  // =========================================================
-  // URL
-  // =========================================================
+  // ---------------------------------------------------------
+  // URL E NORMALIZAÇÃO
+  // ---------------------------------------------------------
 
   function obterCategoriaDaURL() {
-
-    const params = new URLSearchParams(
-      window.location.search
-    );
-
-    return params.get("categoria");
-
+    return new URLSearchParams(window.location.search).get("categoria");
   }
-
 
   function obterBuscaDaURL() {
-
-    const params = new URLSearchParams(
-      window.location.search
-    );
-
-    return (
-      params.get("busca") ||
-      params.get("q") ||
-      ""
-    );
-
+    const params = new URLSearchParams(window.location.search);
+    return params.get("busca") || params.get("q") || "";
   }
 
+  function obterModoPromocoesDaURL() {
+    const params = new URLSearchParams(window.location.search);
+    const valor = normalizar(
+      params.get("promocao") || params.get("promocoes") || "",
+    );
 
-  // =========================================================
-  // API
-  // =========================================================
+    return ["true", "1", "sim", "ativo", "promocao", "promocoes"].includes(
+      valor,
+    );
+  }
+
+  function normalizar(valor) {
+    return String(valor ?? "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+  }
 
   async function fetchJson(url) {
-
     const resposta = await fetch(url);
 
     if (!resposta.ok) {
-
-      throw new Error(
-        `Erro ${resposta.status} ao acessar ${url}`
-      );
-
+      throw new Error(`Erro ${resposta.status} ao acessar ${url}`);
     }
 
     return resposta.json();
-
   }
 
-
-  // =========================================================
-  // CARREGAR DADOS
-  // =========================================================
+  // ---------------------------------------------------------
+  // CARREGAMENTO
+  // ---------------------------------------------------------
 
   async function carregarDados() {
-
     try {
+      const [produtosApi, categoriasApi, promocoesApi] = await Promise.all([
+        fetchJson(`${API_BASE_URL}/produto`),
+        fetchJson(`${API_BASE_URL}/categoria`),
+        fetchJson(`${API_BASE_URL}/promocao`).catch((erro) => {
+          console.warn("Não foi possível carregar promoções:", erro);
+          return [];
+        }),
+      ]);
 
-      const [produtosApi, categoriasApi] =
-        await Promise.all([
+      todosProdutos = Array.isArray(produtosApi) ? produtosApi : [];
+      categorias = Array.isArray(categoriasApi) ? categoriasApi : [];
 
-          fetchJson(
-            `${API_BASE_URL}/produto`
-          ),
-
-          fetchJson(
-            `${API_BASE_URL}/categoria`
-          )
-
-        ]);
-
-
-      todosProdutos =
-        Array.isArray(produtosApi)
-          ? produtosApi
-          : [];
-
-
-      categorias =
-        Array.isArray(categoriasApi)
-          ? categoriasApi
-          : [];
-
-
-      console.log(
-        "Produtos carregados:",
-        todosProdutos
-      );
-
-      console.log(
-        "Categorias carregadas:",
-        categorias
-      );
-
+      promocoesAtivas = (
+        Array.isArray(promocoesApi) ? promocoesApi : []
+      ).filter(promocaoEstaAtiva);
 
       renderizarCategorias();
-
       definirCategoriaAtual();
-
       preencherBuscaInicial();
-
       aplicarFiltros();
-
     } catch (erro) {
-
-      console.error(
-        "Erro ao carregar produtos:",
-        erro
-      );
-
-      mostrarErro(
-        "Não foi possível carregar os produtos."
-      );
-
+      console.error("Erro ao carregar produtos:", erro);
+      mostrarErro("Não foi possível carregar os produtos.");
     }
-
   }
-
-
-  // =========================================================
-  // CARREGANDO
-  // =========================================================
 
   function mostrarCarregando() {
-
-    const grid =
-      document.querySelector(".products-grid");
+    const grid = document.querySelector(".products-grid");
 
     if (grid) {
-
       grid.innerHTML = `
-        <div
-          class="sem-dados"
-          style="
-            grid-column: 1 / -1;
-            padding: 50px;
-            text-align: center;
-          "
-        >
+        <div class="sem-dados" style="grid-column:1/-1;padding:50px;text-align:center">
           <p>Carregando produtos...</p>
-        </div>
-      `;
-
+        </div>`;
     }
 
+    const contador = document.querySelector(".products-count");
+    if (contador) contador.textContent = "Carregando produtos...";
 
-    const contador =
-      document.querySelector(".products-count");
-
-    if (contador) {
-
-      contador.textContent =
-        "Carregando produtos...";
-
-    }
-
-
-    const descricao =
-      document.querySelector(".title-area p");
-
-    if (descricao) {
-
-      descricao.textContent =
-        "Carregando produtos...";
-
-    }
-
+    const descricao = document.querySelector(".title-area p");
+    if (descricao) descricao.textContent = "Carregando produtos...";
   }
 
-
-  // =========================================================
+  // ---------------------------------------------------------
   // CATEGORIAS
-  // =========================================================
-
-  function renderizarCategorias() {
-
-    const container =
-      document.querySelector(
-        "#filtrosCategorias"
-      );
-
-    if (!container) {
-
-      console.warn(
-        "Container #filtrosCategorias não encontrado."
-      );
-
-      return;
-
-    }
-
-
-    if (
-      !Array.isArray(categorias) ||
-      categorias.length === 0
-    ) {
-
-      container.innerHTML = `
-        <p class="sem-dados">
-          Nenhuma categoria encontrada.
-        </p>
-      `;
-
-      return;
-
-    }
-
-
-    container.innerHTML =
-      categorias
-        .map((categoria) => {
-
-          const id =
-            categoria.id ??
-            categoria.idCategoria;
-
-          const nome =
-            categoria.nome ??
-            "Categoria";
-
-          const marcada =
-            categoriaSelecionada &&
-            String(id) ===
-            String(categoriaSelecionada);
-
-
-          return `
-            <label class="checkbox-label">
-
-              <input
-                type="checkbox"
-                class="filtro-categoria"
-                data-categoria-id="${id}"
-                ${marcada ? "checked" : ""}
-              >
-
-              <span>
-                ${escaparHTML(nome)}
-              </span>
-
-            </label>
-          `;
-
-        })
-        .join("");
-
-
-    // =======================================================
-    // EVENTOS DAS CATEGORIAS
-    // =======================================================
-
-    container
-      .querySelectorAll(
-        ".filtro-categoria"
-      )
-      .forEach((checkbox) => {
-
-        checkbox.addEventListener(
-          "change",
-          () => {
-
-            const id =
-              checkbox.dataset.categoriaId;
-
-
-            if (checkbox.checked) {
-
-              // Apenas uma categoria por vez
-              container
-                .querySelectorAll(
-                  ".filtro-categoria"
-                )
-                .forEach((outro) => {
-
-                  if (outro !== checkbox) {
-
-                    outro.checked = false;
-
-                  }
-
-                });
-
-
-              categoriaSelecionada = id;
-
-            } else {
-
-              categoriaSelecionada = null;
-
-            }
-
-
-            atualizarURL();
-
-            definirCategoriaAtual();
-
-            aplicarFiltros();
-
-          }
-        );
-
-      });
-
-  }
-
-
-  // =========================================================
-  // CATEGORIA ATUAL
-  // =========================================================
-
-  function definirCategoriaAtual() {
-
-    const titulo =
-      document.querySelector(
-        ".page-header h1"
-      );
-
-    const descricao =
-      document.querySelector(
-        ".title-area p"
-      );
-
-    const breadcrumbCategoria =
-      document.querySelector(
-        "#breadcrumbCategoria"
-      );
-
-
-    // =======================================================
-    // TODOS OS PRODUTOS
-    // =======================================================
-
-    if (!categoriaSelecionada) {
-
-      if (titulo) {
-
-        titulo.textContent =
-          "TODOS OS PRODUTOS";
-
-      }
-
-      if (breadcrumbCategoria) {
-
-        breadcrumbCategoria.textContent =
-          "";
-
-      }
-
-      return;
-
-    }
-
-
-    // =======================================================
-    // ENCONTRAR CATEGORIA
-    // =======================================================
-
-    const categoria =
-      categorias.find((item) => {
-
-        const id =
-          item.id ??
-          item.idCategoria;
-
-        return (
-          String(id) ===
-          String(categoriaSelecionada)
-        );
-
-      });
-
-
-    if (!categoria) {
-
-      if (titulo) {
-
-        titulo.textContent =
-          "PRODUTOS";
-
-      }
-
-      if (breadcrumbCategoria) {
-
-        breadcrumbCategoria.textContent =
-          "";
-
-      }
-
-      return;
-
-    }
-
-
-    const nome =
-      categoria.nome ??
-      "Categoria";
-
-
-    if (titulo) {
-
-      titulo.textContent =
-        nome.toUpperCase();
-
-    }
-
-
-    if (breadcrumbCategoria) {
-
-      breadcrumbCategoria.textContent =
-        `/ ${nome}`;
-
-    }
-
-  }
-
-
-  // =========================================================
-  // BUSCA INICIAL
-  // =========================================================
-
-  function preencherBuscaInicial() {
-
-    const busca =
-      obterBuscaDaURL();
-
-    if (!busca) {
-      return;
-    }
-
-
-    const campoBusca =
-      document.querySelector(
-        ".search-bar input"
-      );
-
-
-    if (campoBusca) {
-
-      campoBusca.value = busca;
-
-    }
-
-  }
-
-
-  // =========================================================
-  // FILTROS
-  // =========================================================
-
-  function aplicarFiltros() {
-
-    let produtos =
-      [...todosProdutos];
-
-
-    // =======================================================
-    // CATEGORIA
-    // =======================================================
-
-    if (categoriaSelecionada) {
-
-      produtos =
-        produtos.filter((produto) => {
-
-          const idCategoria =
-            obterIdCategoria(produto);
-
-          return (
-            String(idCategoria) ===
-            String(categoriaSelecionada)
-          );
-
-        });
-
-    }
-
-
-    // =======================================================
-    // PREÇO MÍNIMO
-    // =======================================================
-
-    const campoMin =
-      document.querySelector(
-        "#precoMin"
-      );
-
-
-    const campoMax =
-      document.querySelector(
-        "#precoMax"
-      );
-
-
-    const minimo =
-      obterValorPreco(campoMin);
-
-
-    const maximo =
-      obterValorPreco(campoMax);
-
-
-    if (minimo !== null) {
-
-      produtos =
-        produtos.filter((produto) => {
-
-          return (
-            Number(
-              produto.precoProduto || 0
-            ) >= minimo
-          );
-
-        });
-
-    }
-
-
-    if (maximo !== null) {
-
-      produtos =
-        produtos.filter((produto) => {
-
-          return (
-            Number(
-              produto.precoProduto || 0
-            ) <= maximo
-          );
-
-        });
-
-    }
-
-
-    // =======================================================
-    // EM ESTOQUE
-    // =======================================================
-
-    const checkboxEstoque =
-      document.querySelector(
-        "#filtroEstoque"
-      );
-
-
-    if (
-      checkboxEstoque &&
-      checkboxEstoque.checked
-    ) {
-
-      produtos =
-        produtos.filter((produto) => {
-
-          return (
-            produto.esgotado !== true &&
-            produto.disponivel !== false
-          );
-
-        });
-
-    }
-
-
-    // =======================================================
-    // SÓ RETIRADA
-    // =======================================================
-
-    const checkboxRetirada =
-      document.querySelector(
-        "#filtroRetirada"
-      );
-
-
-    if (
-      checkboxRetirada &&
-      checkboxRetirada.checked
-    ) {
-
-      produtos =
-        produtos.filter((produto) => {
-
-          return (
-            produto.retiradaSomente === true ||
-            produto.retirada === true
-          );
-
-        });
-
-    }
-
-
-    // =======================================================
-    // BUSCA
-    // =======================================================
-
-    const campoBusca =
-      document.querySelector(
-        ".search-bar input"
-      );
-
-
-    const termo =
-      campoBusca?.value
-        ?.trim()
-        ?.toLowerCase() || "";
-
-
-    if (termo) {
-
-      produtos =
-        produtos.filter((produto) => {
-
-          const nome =
-            String(
-              produto.nomeProduto || ""
-            ).toLowerCase();
-
-
-          const descricao =
-            String(
-              produto.descricao || ""
-            ).toLowerCase();
-
-
-          return (
-            nome.includes(termo) ||
-            descricao.includes(termo)
-          );
-
-        });
-
-    }
-
-
-    // =======================================================
-    // ORDENAÇÃO
-    // =======================================================
-
-    const selectOrdenacao =
-      document.querySelector(
-        ".sort-select"
-      );
-
-
-    const ordenacao =
-      selectOrdenacao?.value ||
-      "relevancia";
-
-
-    if (
-      ordenacao ===
-      "menor-preco"
-    ) {
-
-      produtos.sort((a, b) => {
-
-        return (
-          Number(a.precoProduto || 0) -
-          Number(b.precoProduto || 0)
-        );
-
-      });
-
-    }
-
-
-    else if (
-      ordenacao ===
-      "maior-preco"
-    ) {
-
-      produtos.sort((a, b) => {
-
-        return (
-          Number(b.precoProduto || 0) -
-          Number(a.precoProduto || 0)
-        );
-
-      });
-
-    }
-
-
-    else if (
-      ordenacao ===
-      "nome"
-    ) {
-
-      produtos.sort((a, b) => {
-
-        const nomeA =
-          String(
-            a.nomeProduto || ""
-          );
-
-        const nomeB =
-          String(
-            b.nomeProduto || ""
-          );
-
-
-        return nomeA.localeCompare(
-          nomeB,
-          "pt-BR"
-        );
-
-      });
-
-    }
-
-
-    produtosExibidos =
-      produtos;
-
-
-    atualizarQuantidade(
-      produtos.length
+  // ---------------------------------------------------------
+
+  function obterIdCategoriaObjeto(categoria) {
+    return (
+      categoria?.id ?? categoria?.idCategoria ?? categoria?.categoriaId ?? null
     );
-
-
-    renderizarProdutos(
-      produtos
-    );
-
-
-    renderizarFiltrosAtivos();
-
   }
 
+  function obterCategoriaSelecionada() {
+    if (!categoriaSelecionada) return null;
 
-  // =========================================================
-  // ID DA CATEGORIA DO PRODUTO
-  // =========================================================
-
-  function obterIdCategoria(
-    produto
-  ) {
+    const selecionada = normalizar(categoriaSelecionada);
 
     return (
-      produto.idCategoria ??
-      produto.categoria?.id ??
-      produto.categoria?.idCategoria ??
-      produto.categoriaId ??
+      categorias.find((categoria) => {
+        const id = obterIdCategoriaObjeto(categoria);
+        const nome = normalizar(
+          categoria.nome ?? categoria.nomeCategoria ?? "",
+        );
+
+        return (
+          String(id) === String(categoriaSelecionada) ||
+          nome === selecionada ||
+          (selecionada === "medicamentos" &&
+            ["remedio", "medicamentos"].includes(nome))
+        );
+      }) || null
+    );
+  }
+
+  function renderizarCategorias() {
+    const container = document.querySelector("#filtrosCategorias");
+    if (!container) return;
+
+    if (!categorias.length) {
+      container.innerHTML = `<p class="sem-dados">Nenhuma categoria encontrada.</p>`;
+      return;
+    }
+
+    const categoriaAtual = obterCategoriaSelecionada();
+    const idAtual = categoriaAtual
+      ? obterIdCategoriaObjeto(categoriaAtual)
+      : null;
+
+    container.innerHTML = categorias
+      .map((categoria) => {
+        const id = obterIdCategoriaObjeto(categoria);
+        const nome = categoria.nome ?? categoria.nomeCategoria ?? "Categoria";
+
+        const marcada =
+          !somentePromocoes &&
+          idAtual !== null &&
+          String(idAtual) === String(id);
+
+        return `
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            class="filtro-categoria"
+            data-categoria-id="${escaparAtributo(id)}"
+            ${marcada ? "checked" : ""}
+          >
+          <span>${escaparHTML(nome)}</span>
+        </label>`;
+      })
+      .join("");
+
+    container.querySelectorAll(".filtro-categoria").forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          container.querySelectorAll(".filtro-categoria").forEach((outro) => {
+            if (outro !== checkbox) outro.checked = false;
+          });
+
+          categoriaSelecionada = checkbox.dataset.categoriaId;
+          somentePromocoes = false;
+        } else {
+          categoriaSelecionada = null;
+        }
+
+        atualizarURL();
+        definirCategoriaAtual();
+        aplicarFiltros();
+      });
+    });
+  }
+
+  function definirCategoriaAtual() {
+    const titulo = document.querySelector(".page-header h1");
+    const breadcrumbCategoria = document.querySelector("#breadcrumbCategoria");
+
+    if (somentePromocoes) {
+      if (titulo) titulo.textContent = "PROMOÇÕES";
+      if (breadcrumbCategoria) {
+        breadcrumbCategoria.textContent = "/ Promoções";
+      }
+      return;
+    }
+
+    if (!categoriaSelecionada) {
+      if (titulo) titulo.textContent = "TODOS OS PRODUTOS";
+      if (breadcrumbCategoria) breadcrumbCategoria.textContent = "";
+      return;
+    }
+
+    const categoria = obterCategoriaSelecionada();
+
+    if (!categoria) {
+      if (titulo) titulo.textContent = "PRODUTOS";
+      if (breadcrumbCategoria) breadcrumbCategoria.textContent = "";
+      return;
+    }
+
+    const nome = categoria.nome ?? categoria.nomeCategoria ?? "Categoria";
+
+    if (titulo) titulo.textContent = nome.toUpperCase();
+    if (breadcrumbCategoria) {
+      breadcrumbCategoria.textContent = `/ ${nome}`;
+    }
+  }
+
+  // ---------------------------------------------------------
+  // PROMOÇÕES
+  // ---------------------------------------------------------
+
+  function dataLocalISO() {
+    const agora = new Date();
+    const ano = agora.getFullYear();
+    const mes = String(agora.getMonth() + 1).padStart(2, "0");
+    const dia = String(agora.getDate()).padStart(2, "0");
+
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  function promocaoEstaAtiva(promocao) {
+    const hoje = dataLocalISO();
+    const inicio = String(promocao?.dataInicio ?? "").slice(0, 10);
+    const fim = String(promocao?.dataFim ?? "").slice(0, 10);
+
+    return Boolean(
+      inicio &&
+      fim &&
+      inicio <= hoje &&
+      fim >= hoje &&
+      obterIdProdutoPromocao(promocao) != null,
+    );
+  }
+
+  function obterIdProdutoPromocao(promocao) {
+    return (
+      promocao?.idProduto ??
+      promocao?.produto?.idProduto ??
+      promocao?.produto?.id ??
+      promocao?.produtoId ??
       null
     );
-
   }
 
+  function obterPromocaoProduto(produto) {
+    const idProduto = obterIdProduto(produto);
 
-  // =========================================================
-  // PRODUTOS
-  // =========================================================
+    if (idProduto == null) return null;
 
-  function renderizarProdutos(
-    produtos
-  ) {
+    return (
+      promocoesAtivas.find(
+        (promocao) =>
+          String(obterIdProdutoPromocao(promocao)) === String(idProduto),
+      ) || null
+    );
+  }
 
-    const container =
-      document.querySelector(
-        ".products-grid"
-      );
-
-
-    if (!container) {
-
-      console.warn(
-        "Container .products-grid não encontrado."
-      );
-
-      return;
-
-    }
-
+  function obterPrecoEfetivo(produto) {
+    const promocao = obterPromocaoProduto(produto);
+    const precoPromocional = Number(promocao?.precoPromocional);
 
     if (
-      !Array.isArray(produtos) ||
-      produtos.length === 0
+      promocao &&
+      Number.isFinite(precoPromocional) &&
+      precoPromocional >= 0
     ) {
-
-      container.innerHTML = `
-        <div
-          class="sem-dados"
-          style="
-            grid-column: 1 / -1;
-            padding: 50px;
-            text-align: center;
-          "
-        >
-
-          <h3>
-            Nenhum produto encontrado
-          </h3>
-
-          <p>
-            Tente alterar os filtros ou pesquisar outro produto.
-          </p>
-
-        </div>
-      `;
-
-      return;
-
+      return precoPromocional;
     }
 
-
-    container.innerHTML =
-      produtos
-        .map(
-          criarCardProduto
-        )
-        .join("");
-
-
-    adicionarEventosProdutos(
-      container
-    );
-
+    return Number(produto.precoProduto ?? produto.preco ?? 0);
   }
 
+  // ---------------------------------------------------------
+  // BUSCA E FILTROS
+  // ---------------------------------------------------------
 
-  // =========================================================
-  // CARD
-  // =========================================================
+  function preencherBuscaInicial() {
+    const busca = obterBuscaDaURL();
+    const campoBusca = document.querySelector(".search-bar input");
 
-  function criarCardProduto(
-    produto
-  ) {
+    if (campoBusca && busca) {
+      campoBusca.value = busca;
+    }
+  }
 
-    const id =
-      produto.idProduto ??
-      produto.id;
+  function obterIdProduto(produto) {
+    return produto?.idProduto ?? produto?.id ?? null;
+  }
 
+  function obterIdCategoriaProduto(produto) {
+    return (
+      produto?.idCategoria ??
+      produto?.categoria?.id ??
+      produto?.categoria?.idCategoria ??
+      produto?.categoriaId ??
+      null
+    );
+  }
 
-    const nome =
-      produto.nomeProduto ??
-      "Produto";
+  function aplicarFiltros() {
+    let produtos = [...todosProdutos];
 
-
-    const preco =
-      Number(
-        produto.precoProduto || 0
+    if (somentePromocoes) {
+      const idsPromocao = new Set(
+        promocoesAtivas
+          .map(obterIdProdutoPromocao)
+          .filter((id) => id != null)
+          .map(String),
       );
 
+      produtos = produtos.filter((produto) =>
+        idsPromocao.has(String(obterIdProduto(produto))),
+      );
+    } else if (categoriaSelecionada) {
+      const categoria = obterCategoriaSelecionada();
 
-    const imagem =
-      produto.imagemURL ||
-      ICONE_PADRAO;
+      if (categoria) {
+        const idCategoria = obterIdCategoriaObjeto(categoria);
 
+        produtos = produtos.filter(
+          (produto) =>
+            String(obterIdCategoriaProduto(produto)) === String(idCategoria),
+        );
+      } else {
+        produtos = [];
+      }
+    }
 
-    const esgotado =
-      produto.esgotado === true;
+    const minimo = obterValorPreco(document.querySelector("#precoMin"));
+    const maximo = obterValorPreco(document.querySelector("#precoMax"));
 
+    if (minimo !== null) {
+      produtos = produtos.filter(
+        (produto) => obterPrecoEfetivo(produto) >= minimo,
+      );
+    }
 
-    const disponivel =
-      produto.disponivel !== false;
+    if (maximo !== null) {
+      produtos = produtos.filter(
+        (produto) => obterPrecoEfetivo(produto) <= maximo,
+      );
+    }
 
+    const checkboxEstoque = document.querySelector("#filtroEstoque");
 
-    const foraEstoque =
-      esgotado ||
-      !disponivel;
+    if (checkboxEstoque?.checked) {
+      produtos = produtos.filter(
+        (produto) => produto.esgotado !== true && produto.disponivel !== false,
+      );
+    }
 
+    const checkboxRetirada = document.querySelector("#filtroRetirada");
+
+    if (checkboxRetirada?.checked) {
+      produtos = produtos.filter(
+        (produto) =>
+          produto.retiradaSomenteLoja === true ||
+          produto.retiradaSomenteLoja === 1 ||
+          produto.retiradaSomente === true ||
+          produto.retirada === true,
+      );
+    }
+
+    const campoBusca = document.querySelector(".search-bar input");
+    const termo = normalizar(campoBusca?.value ?? "");
+
+    if (termo) {
+      produtos = produtos.filter(
+        (produto) =>
+          normalizar(produto.nomeProduto ?? produto.nome).includes(termo) ||
+          normalizar(produto.descricao).includes(termo),
+      );
+    }
+
+    const selectOrdenacao = document.querySelector(".sort-select");
+    const ordenacao = selectOrdenacao?.value || "relevancia";
+
+    if (ordenacao === "menor-preco") {
+      produtos.sort((a, b) => obterPrecoEfetivo(a) - obterPrecoEfetivo(b));
+    } else if (ordenacao === "maior-preco") {
+      produtos.sort((a, b) => obterPrecoEfetivo(b) - obterPrecoEfetivo(a));
+    } else if (ordenacao === "nome") {
+      produtos.sort((a, b) =>
+        String(a.nomeProduto ?? a.nome ?? "").localeCompare(
+          String(b.nomeProduto ?? b.nome ?? ""),
+          "pt-BR",
+        ),
+      );
+    }
+
+    produtosExibidos = produtos;
+
+    atualizarQuantidade(produtos.length);
+    renderizarProdutos(produtos);
+    renderizarFiltrosAtivos();
+  }
+
+  // ---------------------------------------------------------
+  // RENDERIZAÇÃO DOS PRODUTOS
+  // ---------------------------------------------------------
+
+  function renderizarProdutos(produtos) {
+    const container = document.querySelector(".products-grid");
+    if (!container) return;
+
+    if (!Array.isArray(produtos) || produtos.length === 0) {
+      container.innerHTML = `
+        <div class="sem-dados" style="grid-column:1/-1;padding:50px;text-align:center">
+          <h3>Nenhum produto encontrado</h3>
+          <p>Tente alterar os filtros ou pesquisar outro produto.</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = produtos.map(criarCardProduto).join("");
+    adicionarEventosProdutos(container);
+  }
+
+  function criarCardProduto(produto) {
+    const id = obterIdProduto(produto);
+    const nome = produto.nomeProduto ?? produto.nome ?? "Produto";
+    const precoOriginal = Number(produto.precoProduto ?? produto.preco ?? 0);
+    const promocao = obterPromocaoProduto(produto);
+    const precoEfetivo = obterPrecoEfetivo(produto);
+
+    const temPromocao = Boolean(promocao && precoEfetivo < precoOriginal);
+
+    const imagem = produto.imagemURL || produto.fotos || ICONE_PADRAO;
+
+    const esgotado = produto.esgotado === true || produto.esgotado === 1;
+
+    const disponivel = produto.disponivel !== false && produto.disponivel !== 0;
+
+    const foraEstoque = esgotado || !disponivel;
 
     const receita =
-      produto.necessitaReceita === true;
-
+      produto.necessitaReceita === true || produto.necessitaReceita === 1;
 
     return `
       <article
         class="product-card"
-        data-produto-id="${id}"
-        style="cursor: pointer;"
+        data-produto-id="${escaparAtributo(id)}"
+        style="cursor:pointer"
       >
-
         <div class="product-image-container">
+          ${receita ? `<span class="badge-prescription">RECEITA</span>` : ""}
 
-          ${
-            receita
-              ? `
-                <span class="badge-prescription">
-                  RECEITA
-                </span>
-              `
-              : ""
-          }
-
+          ${temPromocao ? `<span class="badge-promocao">PROMOÇÃO</span>` : ""}
 
           <button
             type="button"
             class="btn-fav"
             data-favoritar
+            aria-label="Favoritar produto"
           >
-
-            <img
-              src="../img/coracao_icon.png"
-              alt="Favoritar"
-            >
-
+            <img src="../img/coracao_icon.png" alt="Favoritar">
           </button>
-
 
           <img
             src="${escaparAtributo(imagem)}"
             alt="${escaparAtributo(nome)}"
-            onerror="this.src='${ICONE_PADRAO}'"
-          />
-
+            onerror="this.onerror=null;this.src='${ICONE_PADRAO}'"
+          >
         </div>
 
-
         <div class="product-info">
-
-          <span
-            class="stock-status ${
-              foraEstoque
-                ? "gray"
-                : "green"
-            }"
-          >
-
+          <span class="stock-status ${foraEstoque ? "gray" : "green"}">
             <span class="status-dot"></span>
-
-            ${
-              foraEstoque
-                ? "ESGOTADO"
-                : "EM ESTOQUE"
-            }
-
+            ${foraEstoque ? "ESGOTADO" : "EM ESTOQUE"}
           </span>
 
-
           <div class="name-container">
-            <h3>
-              ${escaparHTML(nome)}
-            </h3>
+            <h3>${escaparHTML(nome)}</h3>
           </div>
-
 
           <div class="price-container">
+            ${
+              temPromocao
+                ? `<span class="price-original" style="text-decoration:line-through;opacity:.65;margin-right:8px">${formatarPreco(precoOriginal)}</span>`
+                : ""
+            }
 
-            <span class="price">
-              ${formatarPreco(preco)}
-            </span>
-
+            <span class="price">${formatarPreco(precoEfetivo)}</span>
           </div>
-
 
           ${
             foraEstoque
-
-              ? `
-
-                <button
-                  type="button"
-                  class="btn-notify"
-                >
-                  Avisar quando chegar
-                </button>
-
-              `
-
-              : `
-
-                <button
-                  type="button"
-                  class="btn-add-cart"
-                >
-
-                  Adicionar
-
-                  <img
-                    src="../img/carrinho_icon.png"
-                    alt=""
-                  />
-
-                </button>
-
-              `
-
+              ? `<button type="button" class="btn-notify">Avisar quando chegar</button>`
+              : `<button type="button" class="btn-add-cart">Adicionar <img src="../img/carrinho_icon.png" alt=""></button>`
           }
-
         </div>
-
-      </article>
-    `;
-
+      </article>`;
   }
 
+  function adicionarEventosProdutos(container) {
+    container.querySelectorAll("[data-produto-id]").forEach((card) => {
+      const botaoCarrinho = card.querySelector(".btn-add-cart");
 
-  // =========================================================
-  // CLIQUE NOS PRODUTOS
-  // =========================================================
-
-  function adicionarEventosProdutos(
-  container
-) {
-
-  const cards =
-    container.querySelectorAll(
-      "[data-produto-id]"
-    );
-
-  cards.forEach((card) => {
-
-    // =======================================================
-    // ADICIONAR AO CARRINHO
-    // =======================================================
-
-    const botaoCarrinho =
-      card.querySelector(
-        ".btn-add-cart"
-      );
-
-    if (botaoCarrinho) {
-
-      botaoCarrinho.addEventListener(
-        "click",
-        async (event) => {
-
+      if (botaoCarrinho) {
+        botaoCarrinho.addEventListener("click", async (event) => {
           event.preventDefault();
           event.stopPropagation();
 
-          const idProduto =
-            card.dataset.produtoId;
-
           await adicionarProdutoAoCarrinho(
-            idProduto,
-            botaoCarrinho
+            card.dataset.produtoId,
+            botaoCarrinho,
           );
+        });
+      }
 
-        }
-      );
-
-    }
-
-
-    // =======================================================
-    // CLIQUE NO CARD
-    // =======================================================
-
-    card.addEventListener(
-      "click",
-      (event) => {
-
-        if (
-          event.target.closest(
-            ".btn-fav"
-          ) ||
-          event.target.closest(
-            ".btn-add-cart"
-          ) ||
-          event.target.closest(
-            ".btn-notify"
-          )
-        ) {
+      card.addEventListener("click", (event) => {
+        if (event.target.closest(".btn-fav, .btn-add-cart, .btn-notify")) {
           event.stopPropagation();
           return;
         }
 
-        const id =
-          card.dataset.produtoId;
+        const id = card.dataset.produtoId;
 
-        if (!id) {
-          console.warn(
-            "Produto sem ID:",
-            card
-          );
-          return;
+        if (id) {
+          window.location.href = `item.html?id=${encodeURIComponent(id)}`;
         }
+      });
+    });
+  }
 
-        window.location.href =
-          `item.html?id=${encodeURIComponent(id)}`;
+  // ---------------------------------------------------------
+  // CARRINHO E NOTIFICAÇÕES
+  // ---------------------------------------------------------
 
-      }
-    );
-
-  });
-
-}
-
-// =========================================================
-// CARRINHO
-// =========================================================
-
-// =========================================================
-// NOTIFICAÇÕES PERSONALIZADAS
-// =========================================================
-
-function mostrarNotificacao(mensagem, tipo = "sucesso") {
+  function mostrarNotificacao(mensagem, tipo = "sucesso") {
     let container = document.querySelector(".toast-container");
 
     if (!container) {
-        container = document.createElement("div");
-        container.className = "toast-container";
-        container.setAttribute("aria-live", "polite");
-        container.setAttribute("aria-atomic", "false");
-        document.body.appendChild(container);
+      container = document.createElement("div");
+      container.className = "toast-container";
+      container.setAttribute("aria-live", "polite");
+      container.setAttribute("aria-atomic", "false");
+      document.body.appendChild(container);
     }
 
     const toast = document.createElement("div");
     toast.className = `toast ${tipo}`;
 
     const icones = {
-        sucesso: "✓",
-        erro: "!",
-        aviso: "!"
+      sucesso: "✓",
+      erro: "!",
+      aviso: "!",
     };
 
     const icone = document.createElement("span");
@@ -1162,961 +606,339 @@ function mostrarNotificacao(mensagem, tipo = "sucesso") {
     let removido = false;
 
     function removerNotificacao() {
-        if (removido) return;
-        removido = true;
+      if (removido) return;
 
-        toast.classList.add("toast-saindo");
+      removido = true;
+      toast.classList.add("toast-saindo");
 
-        setTimeout(() => {
-            toast.remove();
+      setTimeout(() => {
+        toast.remove();
 
-            if (container.children.length === 0) {
-                container.remove();
-            }
-        }, 250);
+        if (container.children.length === 0) {
+          container.remove();
+        }
+      }, 250);
     }
 
     const temporizador = setTimeout(removerNotificacao, 3500);
 
     fechar.addEventListener("click", () => {
-        clearTimeout(temporizador);
-        removerNotificacao();
+      clearTimeout(temporizador);
+      removerNotificacao();
     });
-}
-
-async function adicionarProdutoAoCarrinho(
-  idProduto,
-  botao
-) {
-
-  const usuarioSalvo =
-    localStorage.getItem(
-      "usuarioLogado"
-    );
-
-  // =======================================================
-  // VERIFICAR LOGIN
-  // =======================================================
-
-  if (!usuarioSalvo) {
-
-    mostrarNotificacao(
-      "Você precisa estar logado para adicionar produtos ao carrinho.", "aviso"
-    );
-
-    window.location.href =
-      "login.html";
-
-    return;
   }
 
+  async function adicionarProdutoAoCarrinho(idProduto, botao) {
+    const usuarioSalvo = localStorage.getItem("usuarioLogado");
 
-  // =======================================================
-  // LER USUÁRIO
-  // =======================================================
-
-  let usuario;
-
-  try {
-
-    usuario =
-      JSON.parse(
-        usuarioSalvo
+    if (!usuarioSalvo) {
+      mostrarNotificacao(
+        "Você precisa estar logado para adicionar produtos ao carrinho.",
+        "aviso",
       );
 
-  } catch (erro) {
-
-    console.error(
-      "Erro ao ler usuarioLogado:",
-      erro
-    );
-
-    localStorage.removeItem(
-      "usuarioLogado"
-    );
-
-    mostrarNotificacao(
-      "Sua sessão é inválida. Faça login novamente."
-    , "aviso");
-
-    window.location.href =
-      "login.html";
-
-    return;
-  }
-
-
-  // =======================================================
-  // ID DO CLIENTE
-  // =======================================================
-
-  const idCliente =
-    usuario.idCliente;
-
-  if (!idCliente) {
-
-    mostrarNotificacao(
-      "Não foi possível identificar o usuário.", "erro"
-    );
-
-    return;
-  }
-
-
-  // =======================================================
-  // ID DO PRODUTO
-  // =======================================================
-
-  if (!idProduto) {
-
-    mostrarNotificacao(
-      "Não foi possível identificar o produto.", "erro"
-    );
-
-    return;
-  }
-
-
-  // =======================================================
-  // ADICIONAR
-  // =======================================================
-
-  const textoOriginal =
-    botao.innerHTML;
-
-  try {
-
-    botao.disabled = true;
-
-    botao.innerHTML =
-      "Adicionando...";
-
-
-    const resposta =
-      await fetch(
-        `${API_BASE_URL}/carrinho`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          credentials: "include",
-
-          body: JSON.stringify({
-
-            idCliente:
-              Number(idCliente),
-
-            idProduto:
-              Number(idProduto),
-
-            quantidade:
-              1
-
-          })
-        }
-      );
-
-
-    // =====================================================
-    // ERRO DO BACKEND
-    // =====================================================
-
-    if (!resposta.ok) {
-
-      const texto =
-        await resposta.text();
-
-      console.error(
-        "Erro retornado pelo backend:",
-        texto
-      );
-
-      throw new Error(
-        `Erro ${resposta.status}`
-      );
-    }
-
-
-    // =====================================================
-    // RESPOSTA
-    // =====================================================
-
-    let resultado = null;
-
-    const contentType =
-      resposta.headers.get(
-        "content-type"
-      );
-
-    if (
-      contentType &&
-      contentType.includes(
-        "application/json"
-      )
-    ) {
-
-      resultado =
-        await resposta.json();
-
-    }
-
-
-    console.log(
-      "Produto adicionado ao carrinho:",
-      resultado
-    );
-
-
-    mostrarNotificacao(
-      "Produto adicionado ao carrinho!"
-    );
-
-
-  } catch (erro) {
-
-    console.error(
-      "Erro ao adicionar ao carrinho:",
-      erro
-    );
-
-    mostrarNotificacao(
-      "Não foi possível adicionar o produto ao carrinho.", "erro"
-    );
-
-
-  } finally {
-
-    botao.disabled =
-      false;
-
-    botao.innerHTML =
-      textoOriginal;
-
-  }
-
-} 
-
-  // =========================================================
-  // FILTROS ATIVOS
-  // =========================================================
-
-  function renderizarFiltrosAtivos() {
-
-    const container =
-      document.querySelector(
-        "#filtrosAtivos"
-      );
-
-
-    if (!container) {
+      window.location.href = "login.html";
       return;
     }
 
+    let usuario;
+
+    try {
+      usuario = JSON.parse(usuarioSalvo);
+    } catch (erro) {
+      console.error("Erro ao ler usuarioLogado:", erro);
+
+      localStorage.removeItem("usuarioLogado");
+
+      mostrarNotificacao(
+        "Sua sessão é inválida. Faça login novamente.",
+        "aviso",
+      );
+
+      window.location.href = "login.html";
+      return;
+    }
+
+    const idCliente = usuario.idCliente;
+
+    if (!idCliente) {
+      mostrarNotificacao("Não foi possível identificar o usuário.", "erro");
+      return;
+    }
+
+    if (!idProduto) {
+      mostrarNotificacao("Não foi possível identificar o produto.", "erro");
+      return;
+    }
+
+    const textoOriginal = botao.innerHTML;
+
+    try {
+      botao.disabled = true;
+      botao.textContent = "Adicionando...";
+
+      const resposta = await fetch(`${API_BASE_URL}/carrinho`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          idCliente: Number(idCliente),
+          idProduto: Number(idProduto),
+          quantidade: 1,
+        }),
+      });
+
+      if (!resposta.ok) {
+        const texto = await resposta.text();
+
+        console.error("Erro retornado pelo backend:", texto);
+
+        throw new Error(`Erro ${resposta.status}`);
+      }
+
+      mostrarNotificacao("Produto adicionado ao carrinho!");
+    } catch (erro) {
+      console.error("Erro ao adicionar ao carrinho:", erro);
+
+      mostrarNotificacao(
+        "Não foi possível adicionar o produto ao carrinho.",
+        "erro",
+      );
+    } finally {
+      botao.disabled = false;
+      botao.innerHTML = textoOriginal;
+    }
+  }
+
+  // ---------------------------------------------------------
+  // FILTROS ATIVOS
+  // ---------------------------------------------------------
+
+  function renderizarFiltrosAtivos() {
+    const container = document.querySelector("#filtrosAtivos");
+    if (!container) return;
 
     const filtros = [];
 
-
-    // Categoria
-    if (categoriaSelecionada) {
-
-      const categoria =
-        categorias.find((item) => {
-
-          const id =
-            item.id ??
-            item.idCategoria;
-
-          return (
-            String(id) ===
-            String(categoriaSelecionada)
-          );
-
-        });
-
+    if (somentePromocoes) {
+      filtros.push("Promoções");
+    } else if (categoriaSelecionada) {
+      const categoria = obterCategoriaSelecionada();
 
       if (categoria) {
-
         filtros.push(
-          `Categoria: ${categoria.nome}`
+          `Categoria: ${categoria.nome ?? categoria.nomeCategoria ?? "Categoria"}`,
         );
-
       }
-
     }
 
-
-    // Busca
-    const campoBusca =
-      document.querySelector(
-        ".search-bar input"
-      );
-
-
-    const termo =
-      campoBusca?.value?.trim();
-
+    const termo = document.querySelector(".search-bar input")?.value?.trim();
 
     if (termo) {
-
-      filtros.push(
-        `Busca: ${termo}`
-      );
-
+      filtros.push(`Busca: ${termo}`);
     }
 
-
-    // Preço mínimo
-    const minimo =
-      obterValorPreco(
-        document.querySelector(
-          "#precoMin"
-        )
-      );
-
+    const minimo = obterValorPreco(document.querySelector("#precoMin"));
 
     if (minimo !== null) {
-
-      filtros.push(
-        `A partir de ${formatarPreco(minimo)}`
-      );
-
+      filtros.push(`A partir de ${formatarPreco(minimo)}`);
     }
 
-
-    // Preço máximo
-    const maximo =
-      obterValorPreco(
-        document.querySelector(
-          "#precoMax"
-        )
-      );
-
+    const maximo = obterValorPreco(document.querySelector("#precoMax"));
 
     if (maximo !== null) {
-
-      filtros.push(
-        `Até ${formatarPreco(maximo)}`
-      );
-
+      filtros.push(`Até ${formatarPreco(maximo)}`);
     }
 
-
-    // Estoque
-    const estoque =
-      document.querySelector(
-        "#filtroEstoque"
-      );
-
-
-    if (
-      estoque &&
-      estoque.checked
-    ) {
-
-      filtros.push(
-        "Em estoque"
-      );
-
+    if (document.querySelector("#filtroEstoque")?.checked) {
+      filtros.push("Em estoque");
     }
 
-
-    if (filtros.length === 0) {
-
-      container.innerHTML = "";
-
-      return;
-
+    if (document.querySelector("#filtroRetirada")?.checked) {
+      filtros.push("Só retirada na loja");
     }
 
-
-    container.innerHTML =
-      filtros
-        .map(
-          (filtro) => `
-            <span class="filter-chip">
-              ${escaparHTML(filtro)}
-            </span>
-          `
-        )
-        .join("");
-
+    container.innerHTML = filtros
+      .map(
+        (filtro) => `<span class="filter-chip">${escaparHTML(filtro)}</span>`,
+      )
+      .join("");
   }
 
-
-  // =========================================================
-  // EVENTOS
-  // =========================================================
+  // ---------------------------------------------------------
+  // EVENTOS, BUSCA, URL E LIMPEZA
+  // ---------------------------------------------------------
 
   function configurarEventos() {
+    document
+      .querySelector(".sort-select")
+      ?.addEventListener("change", aplicarFiltros);
 
-    // =======================================================
-    // ORDENAÇÃO
-    // =======================================================
-
-    const select =
-      document.querySelector(
-        ".sort-select"
-      );
-
-
-    if (select) {
-
-      select.addEventListener(
-        "change",
-        () => {
-
-          aplicarFiltros();
-
-        }
-      );
-
-    }
-
-
-    // =======================================================
-    // BUSCA
-    // =======================================================
-
-    const campoBusca =
-      document.querySelector(
-        ".search-bar input"
-      );
-
+    const campoBusca = document.querySelector(".search-bar input");
 
     if (campoBusca) {
+      campoBusca.addEventListener("input", aplicarFiltros);
 
-      campoBusca.addEventListener(
-        "input",
-        () => {
-
-          aplicarFiltros();
-
-        }
-      );
-
-
-      campoBusca.addEventListener(
-        "keydown",
-        (event) => {
-
-          if (
-            event.key === "Enter"
-          ) {
-
-            event.preventDefault();
-
-            executarBusca();
-
-          }
-
-        }
-      );
-
-    }
-
-
-    // =======================================================
-    // BOTÃO BUSCAR
-    // =======================================================
-
-    const botaoBusca =
-      document.querySelector(
-        "#btnBuscar"
-      );
-
-
-    if (botaoBusca) {
-
-      botaoBusca.addEventListener(
-        "click",
-        () => {
-
+      campoBusca.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
           executarBusca();
-
         }
-      );
-
+      });
     }
 
+    document
+      .querySelector("#btnBuscar")
+      ?.addEventListener("click", executarBusca);
 
-    // =======================================================
-    // PREÇO
-    // =======================================================
+    document
+      .querySelectorAll(".price-inputs input")
+      .forEach((input) => input.addEventListener("input", aplicarFiltros));
 
-    const inputsPreco =
-      document.querySelectorAll(
-        ".price-inputs input"
-      );
+    document
+      .querySelector("#filtroEstoque")
+      ?.addEventListener("change", aplicarFiltros);
 
+    document
+      .querySelector("#filtroRetirada")
+      ?.addEventListener("change", aplicarFiltros);
 
-    inputsPreco.forEach((input) => {
-
-      input.addEventListener(
-        "input",
-        () => {
-
-          aplicarFiltros();
-
-        }
-      );
-
-    });
-
-
-    // =======================================================
-    // ESTOQUE
-    // =======================================================
-
-    const estoque =
-      document.querySelector(
-        "#filtroEstoque"
-      );
-
-
-    if (estoque) {
-
-      estoque.addEventListener(
-        "change",
-        () => {
-
-          aplicarFiltros();
-
-        }
-      );
-
-    }
-
-
-    // =======================================================
-    // RETIRADA
-    // =======================================================
-
-    const retirada =
-      document.querySelector(
-        "#filtroRetirada"
-      );
-
-
-    if (retirada) {
-
-      retirada.addEventListener(
-        "change",
-        () => {
-
-          aplicarFiltros();
-
-        }
-      );
-
-    }
-
-
-    // =======================================================
-    // LIMPAR FILTROS
-    // =======================================================
-
-    const limpar =
-      document.querySelector(
-        "#btnLimparFiltros"
-      );
-
-
-    if (limpar) {
-
-      limpar.addEventListener(
-        "click",
-        limparFiltros
-      );
-
-    }
-
+    document
+      .querySelector("#btnLimparFiltros")
+      ?.addEventListener("click", limparFiltros);
   }
-
-
-  // =========================================================
-  // BUSCA
-  // =========================================================
 
   function executarBusca() {
-
-    const campoBusca =
-      document.querySelector(
-        ".search-bar input"
-      );
-
-
     const termo =
-      campoBusca?.value?.trim() || "";
+      document.querySelector(".search-bar input")?.value?.trim() || "";
 
-
-    const url =
-      new URL(
-        window.location.href
-      );
-
+    const url = new URL(window.location.href);
 
     if (termo) {
-
-      url.searchParams.set(
-        "busca",
-        termo
-      );
-
+      url.searchParams.set("busca", termo);
     } else {
-
-      url.searchParams.delete(
-        "busca"
-      );
-
+      url.searchParams.delete("busca");
+      url.searchParams.delete("q");
     }
 
-
-    window.history.replaceState(
-      {},
-      "",
-      url
-    );
-
-
+    window.history.replaceState({}, "", url);
     aplicarFiltros();
-
   }
-
-
-  // =========================================================
-  // ATUALIZAR URL
-  // =========================================================
 
   function atualizarURL() {
+    const url = new URL(window.location.href);
 
-    const url =
-      new URL(
-        window.location.href
-      );
-
-
-    if (categoriaSelecionada) {
-
-      url.searchParams.set(
-        "categoria",
-        categoriaSelecionada
-      );
-
+    if (somentePromocoes) {
+      url.searchParams.delete("categoria");
+      url.searchParams.set("promocao", "true");
+      url.searchParams.delete("promocoes");
     } else {
+      url.searchParams.delete("promocao");
+      url.searchParams.delete("promocoes");
 
-      url.searchParams.delete(
-        "categoria"
-      );
-
+      if (categoriaSelecionada) {
+        url.searchParams.set("categoria", categoriaSelecionada);
+      } else {
+        url.searchParams.delete("categoria");
+      }
     }
 
-
-    window.history.replaceState(
-      {},
-      "",
-      url
-    );
-
+    window.history.replaceState({}, "", url);
   }
-
-
-  // =========================================================
-  // LIMPAR FILTROS
-  // =========================================================
 
   function limparFiltros() {
-
     categoriaSelecionada = null;
+    somentePromocoes = false;
 
-
-    // Checkboxes
     document
-      .querySelectorAll(
-        ".sidebar-filters input[type='checkbox']"
-      )
+      .querySelectorAll(".sidebar-filters input[type='checkbox']")
       .forEach((checkbox) => {
-
         checkbox.checked = false;
-
       });
 
+    document.querySelectorAll(".price-inputs input").forEach((input) => {
+      input.value = "";
+    });
 
-    // Preços
-    document
-      .querySelectorAll(
-        ".price-inputs input"
-      )
-      .forEach((input) => {
-
-        input.value = "";
-
-      });
-
-
-    // Busca
-    const busca =
-      document.querySelector(
-        ".search-bar input"
-      );
-
+    const busca = document.querySelector(".search-bar input");
 
     if (busca) {
-
       busca.value = "";
-
     }
 
+    const url = new URL(window.location.href);
 
-    // URL
-    const url =
-      new URL(
-        window.location.href
-      );
-
-
-    url.searchParams.delete(
-      "categoria"
+    ["categoria", "promocao", "promocoes", "busca", "q"].forEach((param) =>
+      url.searchParams.delete(param),
     );
 
+    window.history.replaceState({}, "", url);
 
-    url.searchParams.delete(
-      "busca"
-    );
-
-
-    url.searchParams.delete(
-      "q"
-    );
-
-
-    window.history.replaceState(
-      {},
-      "",
-      url
-    );
-
-
+    renderizarCategorias();
     definirCategoriaAtual();
-
     aplicarFiltros();
-
   }
 
+  // ---------------------------------------------------------
+  // UTILITÁRIOS
+  // ---------------------------------------------------------
 
-  // =========================================================
-  // QUANTIDADE
-  // =========================================================
+  function atualizarQuantidade(quantidade) {
+    const texto = `${quantidade} produto(s) encontrado(s)`;
 
-  function atualizarQuantidade(
-    quantidade
-  ) {
+    const descricao = document.querySelector(".title-area p");
+    if (descricao) descricao.textContent = texto;
 
-    const texto =
-      `${quantidade} produto(s) encontrado(s)`;
-
-
-    const descricao =
-      document.querySelector(
-        ".title-area p"
-      );
-
-
-    if (descricao) {
-
-      descricao.textContent =
-        texto;
-
-    }
-
-
-    const contador =
-      document.querySelector(
-        ".products-count"
-      );
-
-
-    if (contador) {
-
-      contador.textContent =
-        texto;
-
-    }
-
+    const contador = document.querySelector(".products-count");
+    if (contador) contador.textContent = texto;
   }
 
+  function obterValorPreco(input) {
+    if (!input || !input.value.trim()) return null;
 
-  // =========================================================
-  // PREÇO
-  // =========================================================
+    const valor = Number(input.value.replace(",", ".").replace(/[^\d.]/g, ""));
 
-  function obterValorPreco(
-    input
-  ) {
-
-    if (
-      !input ||
-      !input.value.trim()
-    ) {
-
-      return null;
-
-    }
-
-
-    const valor =
-      Number(
-        input.value
-          .replace(",", ".")
-          .replace(/[^\d.]/g, "")
-      );
-
-
-    if (
-      Number.isNaN(valor)
-    ) {
-
-      return null;
-
-    }
-
-
-    return valor;
-
+    return Number.isNaN(valor) ? null : valor;
   }
 
-
-  // =========================================================
-  // MOEDA
-  // =========================================================
-
-  function formatarPreco(
-    valor
-  ) {
-
-    return Number(valor || 0)
-      .toLocaleString(
-        "pt-BR",
-        {
-          style: "currency",
-          currency: "BRL"
-        }
-      );
-
+  function formatarPreco(valor) {
+    return Number(valor || 0).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
   }
 
-
-  // =========================================================
-  // ESCAPAR HTML
-  // =========================================================
-
-  function escaparHTML(
-    valor
-  ) {
-
-    const div =
-      document.createElement(
-        "div"
-      );
-
-
-    div.textContent =
-      valor ?? "";
-
-
+  function escaparHTML(valor) {
+    const div = document.createElement("div");
+    div.textContent = valor ?? "";
     return div.innerHTML;
-
   }
 
-
-  // =========================================================
-  // ESCAPAR ATRIBUTO
-  // =========================================================
-
-  function escaparAtributo(
-    valor
-  ) {
-
-    return String(
-      valor ?? ""
-    )
+  function escaparAtributo(valor) {
+    return String(valor ?? "")
       .replace(/&/g, "&amp;")
       .replace(/"/g, "&quot;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
-
   }
 
-
-  // =========================================================
-  // ERRO
-  // =========================================================
-
-  function mostrarErro(
-    mensagem
-  ) {
-
-    const container =
-      document.querySelector(
-        ".products-grid"
-      );
-
+  function mostrarErro(mensagem) {
+    const container = document.querySelector(".products-grid");
 
     if (container) {
-
       container.innerHTML = `
-        <div
-          style="
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 60px;
-          "
-        >
-
-          <h3>
-            Erro ao carregar produtos
-          </h3>
-
-          <p>
-            ${escaparHTML(mensagem)}
-          </p>
-
-        </div>
-      `;
-
+        <div style="grid-column:1/-1;text-align:center;padding:60px">
+          <h3>Erro ao carregar produtos</h3>
+          <p>${escaparHTML(mensagem)}</p>
+        </div>`;
     }
 
+    const descricao = document.querySelector(".title-area p");
+    if (descricao) descricao.textContent = "Erro ao carregar produtos.";
 
-    const descricao =
-      document.querySelector(
-        ".title-area p"
-      );
-
-
-    if (descricao) {
-
-      descricao.textContent =
-        "Erro ao carregar produtos.";
-
-    }
-
-
-    const contador =
-      document.querySelector(
-        ".products-count"
-      );
-
-
-    if (contador) {
-
-      contador.textContent =
-        "Erro ao carregar produtos.";
-
-    }
-
+    const contador = document.querySelector(".products-count");
+    if (contador) contador.textContent = "Erro ao carregar produtos.";
   }
-
 })();
