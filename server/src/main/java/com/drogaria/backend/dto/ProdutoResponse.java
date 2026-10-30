@@ -1,65 +1,105 @@
+
 package com.drogaria.backend.dto;
 
+import com.drogaria.backend.entity.MedicamentoControlado;
 import com.drogaria.backend.entity.Produto;
 
 public class ProdutoResponse {
 
-	private Integer idCategoria;
-	private Integer idProduto;
-	private String nomeProduto;
-	private Double precoProduto;
-	private String imagemURL;
-	private Integer necessitaReceita;
-	private Integer medicamentoControlado;
-	
-	public ProdutoResponse(Produto prod) {
-		this.idProduto = prod.getIdProduto();
-		this.idCategoria = prod.getIdCategoria();
-		this.nomeProduto = prod.getNomeProduto();
-		this.precoProduto = prod.getPrecoProduto();
-		this.imagemURL = prod.getImagemURL();
-		this.necessitaReceita = prod.getNecessitaReceita();
-		this.medicamentoControlado = prod.getMedicamentoContolado();
-	}
-	
-	
-	public Integer getIdCategoria() {
-		return idCategoria;
-	}
-	public Integer getIdProduto() { return idProduto; }
-	public void setIdCategoria(Integer idCategoria) {
-		this.idCategoria = idCategoria;
-	}
-	public String getNomeProduto() {
-		return nomeProduto;
-	}
-	public void setNomeProduto(String nomeProduto) {
-		this.nomeProduto = nomeProduto;
-	}
-	public Double getPrecoProduto() {
-		return precoProduto;
-	}
-	public void setPrecoProduto(Double precoProduto) {
-		this.precoProduto = precoProduto;
-	}
-	public String getImagemURL() {
-		return imagemURL;
-	}
-	public void setImagemURL(String imagemURL) {
-		this.imagemURL = imagemURL;
-	}
-	public Integer getNecessitaReceita() {
-		return necessitaReceita;
-	}
-	public void setNecessitaReceita(Integer necessitaReceita) {
-		this.necessitaReceita = necessitaReceita;
-	}
-	public Integer getMedicamentoControlado() {
-		return medicamentoControlado;
-	}
-	public void setMedicamentoControlado(Integer medicamentoControlado) {
-		this.medicamentoControlado = medicamentoControlado;
-	}
-	
-	
+    private Integer idCategoria;
+    private Integer idProduto;
+    private String nomeProduto;
+    private Double precoProduto;
+    private String imagemURL;
+    private String descricao;
+
+    private boolean medicamentoControlado;
+    private boolean necessitaReceita;
+
+    private String categoriaControle;
+    private Integer limiteQuantidadePorCliente;
+
+    private boolean disponivel;
+    private boolean esgotado;
+    private boolean retiradaSomenteLoja;
+
+    public ProdutoResponse(Produto produto) {
+
+        this.idProduto = produto.getIdProduto();
+        this.idCategoria = produto.getIdCategoria();
+        this.nomeProduto = produto.getNomeProduto();
+        this.precoProduto = produto.getPrecoProduto();
+        this.imagemURL = produto.getImagemURL();
+        this.descricao = produto.getDescricao();
+
+        this.disponivel = produto.isDisponivel();
+        this.esgotado = produto.isEsgotado();
+        this.retiradaSomenteLoja = produto.isRetiradaSomenteLoja();
+
+        this.necessitaReceita = produto.isNecessitaReceita();
+
+        MedicamentoControlado controlado =
+                produto.getMedicamentoControlado();
+
+        this.medicamentoControlado = controlado != null;
+
+        if (controlado != null) {
+            this.categoriaControle = controlado.getCategoriaControle();
+
+            this.limiteQuantidadePorCliente =
+                    controlado.getLimiteQuantidadePorCliente();
+        }
+    }
+
+    public Integer getIdCategoria() {
+        return idCategoria;
+    }
+
+    public Integer getIdProduto() {
+        return idProduto;
+    }
+
+    public String getNomeProduto() {
+        return nomeProduto;
+    }
+
+    public Double getPrecoProduto() {
+        return precoProduto;
+    }
+
+    public String getImagemURL() {
+        return imagemURL;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public boolean getMedicamentoControlado() {
+        return medicamentoControlado;
+    }
+
+    public boolean getNecessitaReceita() {
+        return necessitaReceita;
+    }
+
+    public String getCategoriaControle() {
+        return categoriaControle;
+    }
+
+    public Integer getLimiteQuantidadePorCliente() {
+        return limiteQuantidadePorCliente;
+    }
+
+    public boolean isDisponivel() {
+        return disponivel;
+    }
+
+    public boolean isEsgotado() {
+        return esgotado;
+    }
+
+    public boolean isRetiradaSomenteLoja() {
+        return retiradaSomenteLoja;
+    }
 }

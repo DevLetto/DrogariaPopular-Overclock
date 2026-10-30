@@ -1,70 +1,106 @@
+
 package com.drogaria.backend.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 public class ProdutoRequest {
 
-	private Integer idProduto;
-	private Integer idCategoria;
-	private String nomeProduto;
-	private Double precoProduto;
-	private String imagemURL;
-	private Integer necessitaReceita;
+    @NotNull
+    private Integer idCategoria;
 
-	public String getNomeProduto() {
-		return nomeProduto;
-	}
+    @NotBlank
+    private String nomeProduto;
 
-	public void setNomeProduto(String nomeProduto) {
-		this.nomeProduto = nomeProduto;
-	}
+    private String descricao;
 
-	public Double getPrecoProduto() {
-		return precoProduto;
-	}
+    @NotNull
+    @PositiveOrZero
+    private Double precoProduto;
 
-	public void setPrecoProduto(Double precoProduto) {
-		this.precoProduto = precoProduto;
-	}
+    private String imagemURL;
 
-	public String getImagemURL() {
-		return imagemURL;
-	}
+    private Boolean medicamentoControlado;
 
-	public void setImagemURL(String imagemURL) {
-		this.imagemURL = imagemURL;
-	}
+    private String categoriaControle;
 
-	public Integer getNecessitaReceita() {
-		return necessitaReceita;
-	}
+    @Positive
+    private Integer limiteQuantidadePorCliente;
 
-	public void setNecessitaReceita(Integer necessitaReceita) {
-		this.necessitaReceita = necessitaReceita;
-	}
+    private Boolean necessitaReceita;
 
-	public Integer getMedicamentoControlado() {
-		return medicamentoControlado;
-	}
+    public Integer getIdCategoria() {
+        return idCategoria;
+    }
 
-	public void setMedicamentoControlado(Integer medicamentoControlado) {
-		this.medicamentoControlado = medicamentoControlado;
-	}
+    public void setIdCategoria(Integer idCategoria) {
+        this.idCategoria = idCategoria;
+    }
 
-	private Integer medicamentoControlado;
+    public String getNomeProduto() {
+        return nomeProduto;
+    }
 
-	public Integer getIdProduto() {
-		return idProduto;
-	}
+    public void setNomeProduto(String nomeProduto) {
+        this.nomeProduto = nomeProduto;
+    }
 
-	public void setIdProduto(Integer idProduto) {
-		this.idProduto = idProduto;
-	}
+    public String getDescricao() {
+        return descricao;
+    }
 
-	public Integer getIdCategoria() {
-		return idCategoria;
-	}
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
 
-	public void setIdCategoria(Integer idCategoria) {
-		this.idCategoria = idCategoria;
-	}
+    public Double getPrecoProduto() {
+        return precoProduto;
+    }
 
+    public void setPrecoProduto(Double precoProduto) {
+        this.precoProduto = precoProduto;
+    }
+
+    public String getImagemURL() {
+        return imagemURL;
+    }
+
+    public void setImagemURL(String imagemURL) {
+        this.imagemURL = imagemURL;
+    }
+
+    public Boolean getMedicamentoControlado() {
+        return medicamentoControlado;
+    }
+
+    public void setMedicamentoControlado(Boolean medicamentoControlado) {
+        this.medicamentoControlado = medicamentoControlado;
+    }
+
+    public String getCategoriaControle() {
+        return categoriaControle;
+    }
+
+    public void setCategoriaControle(String categoriaControle) {
+        this.categoriaControle = categoriaControle;
+    }
+
+    public Integer getLimiteQuantidadePorCliente() {
+        return limiteQuantidadePorCliente;
+    }
+
+    public void setLimiteQuantidadePorCliente(
+            Integer limiteQuantidadePorCliente) {
+        this.limiteQuantidadePorCliente = limiteQuantidadePorCliente;
+    }
+
+    public Boolean getNecessitaReceita() {
+        return necessitaReceita;
+    }
+
+    public void setNecessitaReceita(Boolean necessitaReceita) {
+        this.necessitaReceita = necessitaReceita;
+    }
 }
