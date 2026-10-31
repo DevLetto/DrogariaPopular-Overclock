@@ -912,6 +912,43 @@ async function abrirModalProduto(
 
                         </div>
 
+                        <div class="form-group" id="grupo-categoria-controle"
+                            style="display: none;">
+
+                         <label for="produto-categoria-controle">
+                            Categoria de controle
+                         </label>
+
+                            <input
+                             id="produto-categoria-controle"
+                            name="categoriaControle"
+                            type="text"
+                            placeholder="Ex.: B1 - Psicotrópico"
+                            value="${escaparAtributo(
+                                produto?.categoriaControle ?? ""
+                            )}"
+                            >
+
+                    </div>
+
+                    <div class="form-group" id="grupo-limite-quantidade"
+                        style="display: none;">
+
+                        <label for="produto-limite-quantidade">
+                            Limite por cliente
+                        </label>
+
+                        <input
+                            id="produto-limite-quantidade"
+                            name="limiteQuantidadePorCliente"
+                            type="number"
+                            min="1"
+                            placeholder="Deixe vazio se não houver limite"
+                            value="${produto?.limiteQuantidadePorCliente ?? ""}"
+                        >
+
+                    </div>
+
                     </div>
 
                     <div class="modal-footer">
@@ -949,6 +986,35 @@ async function abrirModalProduto(
     document.body.appendChild(modal);
 
     adicionarEstiloModalSeNecessario();
+
+    const selectControlado = document.getElementById(
+    "produto-controlado"
+);
+
+const grupoCategoriaControle = document.getElementById(
+    "grupo-categoria-controle"
+);
+
+const grupoLimiteQuantidade = document.getElementById(
+    "grupo-limite-quantidade"
+);
+
+function atualizarCamposControlado() {
+    const controlado = selectControlado.value === "1";
+
+    grupoCategoriaControle.style.display =
+        controlado ? "flex" : "none";
+
+    grupoLimiteQuantidade.style.display =
+        controlado ? "flex" : "none";
+}
+
+selectControlado.addEventListener(
+    "change",
+    atualizarCamposControlado
+);
+
+atualizarCamposControlado();
 
     const fechar = () =>
         modal.remove();
@@ -1023,59 +1089,73 @@ async function abrirModalProduto(
 
 async function salvarProduto(idProduto) {
 
-    const form =
-        document.getElementById(
-            "form-produto"
-        );
+    const form = document.getElementById("form-produto");
 
-    const nomeProduto =
-        form.nomeProduto.value.trim();
+    const nomeProduto = form.nomeProduto.value.trim();
 
-    const precoProduto =
-        Number(
-            form.precoProduto.value
-        );
+    const precoProduto = Number(form.precoProduto.value);
 
-    const imagemURL =
-        form.imagemURL.value.trim() ||
-        null;
+    const imagemURL = form.imagemURL.value.trim() || null;
 
-    const idCategoria =
-        form.idCategoria.value
-            ? Number(form.idCategoria.value)
+    const idCategoria = form.idCategoria.value
+        ? Number(form.idCategoria.value)
+        : null;
+
+    const necessitaReceita = Number(
+        form.necessitaReceita.value
+    ) === 1;
+
+    const medicamentoControlado = Number(
+        form.medicamentoControlado.value
+    ) === 1;
+
+    const categoriaControle = medicamentoControlado
+        ? form.categoriaControle.value.trim()
+        : null;
+
+    const limiteInformado =
+        form.limiteQuantidadePorCliente.value.trim();
+
+    const limiteQuantidadePorCliente =
+        medicamentoControlado && limiteInformado !== ""
+            ? Number(limiteInformado)
             : null;
 
-    const necessitaReceita =
-        Number(
-            form.necessitaReceita.value
-        );
-
-    const medicamentoControlado =
-        Number(
-            form.medicamentoControlado.value
-        );
-
     if (!nomeProduto) {
-
-        throw new Error(
-            "Informe o nome do produto."
-        );
+        throw new Error("Informe o nome do produto.");
     }
 
     if (
         !Number.isFinite(precoProduto) ||
         precoProduto < 0
     ) {
+        throw new Error("Informe um preço válido.");
+    }
 
+    if (
+        medicamentoControlado &&
+        !categoriaControle
+    ) {
         throw new Error(
-            "Informe um preço válido."
+            "Informe a categoria de controle do medicamento."
+        );
+    }
+
+    if (
+        limiteQuantidadePorCliente !== null &&
+        (
+            !Number.isInteger(limiteQuantidadePorCliente) ||
+            limiteQuantidadePorCliente <= 0
+        )
+    ) {
+        throw new Error(
+            "Informe um limite de quantidade válido."
         );
     }
 
     const produtoBody = {
 
-        idProduto:
-            idProduto ?? null,
+        idProduto: idProduto ?? null,
 
         idCategoria,
 
@@ -1087,40 +1167,36 @@ async function salvarProduto(idProduto) {
 
         necessitaReceita,
 
-        medicamentoControlado
+        medicamentoControlado,
+
+        categoriaControle,
+
+        limiteQuantidadePorCliente
+
     };
 
     let produtoSalvo;
 
     if (idProduto) {
 
-        produtoSalvo =
-            await requisicao(
-                `/produto/${idProduto}`,
-                {
-                    method: "PUT",
-
-                    body:
-                        JSON.stringify(
-                            produtoBody
-                        )
-                }
-            );
+        produtoSalvo = await requisicao(
+            `/produto/${idProduto}`,
+            {
+                method: "PUT",
+                body: JSON.stringify(produtoBody)
+            }
+        );
 
     } else {
 
-        produtoSalvo =
-            await requisicao(
-                "/produto",
-                {
-                    method: "POST",
+        produtoSalvo = await requisicao(
+            "/produto",
+            {
+                method: "POST",
+                body: JSON.stringify(produtoBody)
+            }
+        );
 
-                    body:
-                        JSON.stringify(
-                            produtoBody
-                        )
-                }
-            );
     }
 
     const produtoId =
@@ -1129,18 +1205,14 @@ async function salvarProduto(idProduto) {
         idProduto;
 
     if (!produtoId) {
-
         throw new Error(
             "A API não retornou o ID do produto."
         );
     }
 
     await salvarEstoque(
-
         produtoId,
-
         Number(form.quantidade.value),
-
         Number(form.estoqueMinimo.value)
     );
 

@@ -97,6 +97,57 @@
     margin-bottom: 20px;
 }
 
+/* Filtros específicos de medicamentos */
+.filter-medicamentos {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--borda-suave);
+}
+
+.filter-medicamentos .checkbox-label {
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.filter-medicamentos .checkbox-label span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+/* Lista de categorias com rolagem independente */
+#filtrosCategorias {
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: #b8b8b8 transparent;
+}
+
+#filtrosCategorias::-webkit-scrollbar {
+    width: 6px;
+}
+
+#filtrosCategorias::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#filtrosCategorias::-webkit-scrollbar-thumb {
+    background: #b8b8b8;
+    border-radius: 10px;
+}
+
+#filtrosCategorias .checkbox-label {
+    align-items: flex-start;
+    gap: 8px;
+    padding: 7px 0;
+}
+
+#filtrosCategorias .checkbox-label span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
 .checkbox-label {
     display: flex;
     align-items: center;
@@ -194,6 +245,23 @@
     gap: 20px;
 }
 
+/* Referência para posicionar os selos dentro do card */
+.product-image-container {
+    position: relative;
+}
+
+/* Selo de receita */
+.badge-prescription {
+    top: 15px;
+    left: 15px;
+}
+
+/* Selo de medicamento controlado */
+.badge-controlado {
+    top: 42px;
+    left: 15px;
+}
+
 .product-image-container > img:not(.btn-fav img) {
     width: 80px !important;
     height: 80px !important;
@@ -221,17 +289,49 @@
     height: 16px !important;
 }
 
-.discount-badge, .badge-prescription, .badge-pickup, .badge-out {
+.discount-badge,
+.badge-prescription,
+.badge-controlado,
+.badge-pickup,
+.badge-out {
     position: absolute;
-    top: 15px;
-    left: 15px;
+    left: 8px;
     padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.7rem;
-    font-weight: bold;
+    border-radius: 5px;
+    font-size: 0.6rem;
+    font-weight: 700;
     color: var(--cor-branca);
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
     text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.badge-prescription {
+    top: 10px;
+    left: 12px;
+    z-index: 3;
+    transform: translateX(62px);
+    background: #B5790A;
+}
+
+.badge-controlado {
+    top: 37px;
+    left: 12px;
+    z-index: 3;
+    transform: translateX(62px);
+    background: #a61b1b;
+}
+
+.badge-pickup {
+    top: 10px;
+    background: var(--cor-primaria);
+}
+
+.badge-out {
+    top: 10px;
+    background: var(--cor-branca);
+    color: var(--cor-texto-claro);
+    border: 1px solid var(--borda-suave);
 }
 
 .badge-prescription { background: #B5790A; }
