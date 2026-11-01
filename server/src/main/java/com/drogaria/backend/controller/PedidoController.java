@@ -38,15 +38,28 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoService.listarTodos());
     }
     
-    @GetMapping("/{id}") public ResponseEntity<PedidoResponse> buscar(@PathVariable Integer id) { return ResponseEntity.ok(pedidoService.buscar(id)); }
+    @GetMapping("/{id}")
+    public ResponseEntity<PedidoResponse> buscar(
+        @PathVariable Integer id,
+        Authentication auth) {
+
+    return ResponseEntity.ok(
+        pedidoService.buscar(id, auth)
+    );
+    }
+    
     @GetMapping("/cliente/{idCliente}") public ResponseEntity<List<PedidoResponse>> listar(@PathVariable Integer idCliente, Authentication auth) {
         carrinhoService.validarAcesso(idCliente, auth); return ResponseEntity.ok(pedidoService.listarPorCliente(idCliente));
     }
     @PutMapping("/{id}/status") public PedidoResponse status(@PathVariable Integer id, @RequestParam String valor) {
         return pedidoService.atualizarStatus(id, valor);
     }
-    @PutMapping("/{id}/cancelar") public PedidoResponse cancelar(@PathVariable Integer id) {
-        return pedidoService.cancelar(id);
+    @PutMapping("/{id}/cancelar")
+    public PedidoResponse cancelar(
+        @PathVariable Integer id,
+        Authentication auth) {
+
+        return pedidoService.cancelar(id, auth);
     }
 
     

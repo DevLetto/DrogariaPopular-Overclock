@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ import com.drogaria.backend.repository.ItemCarrinhoRepository;
 import com.drogaria.backend.repository.LojaRepository;
 import com.drogaria.backend.repository.PagamentoRepository;
 import com.drogaria.backend.repository.PedidoRepository;
+
 
 @Service
 public class PedidoService {
@@ -97,6 +99,41 @@ public class PedidoService {
             .toList();
     }
 
+    public PedidoResponse buscar(Integer id, Authentication auth) {
+
+    if (auth == null || !auth.isAuthenticated()) {
+        throw new ApiException(
+            "Autenticacao necessaria",
+            HttpStatus.UNAUTHORIZED
+        );
+    }
+
+    boolean funcionarioAutorizado = auth.getAuthorities().stream()
+        .anyMatch(a ->
+            a.getAuthority().equals("ROLE_ADMINISTRADOR") ||
+            a.getAuthority().equals("ROLE_ATENDENTE")
+        );
+
+    Pedido pedido;
+
+    if (funcionarioAutorizado) {
+        pedido = pedidoRepository.findById(id)
+            .orElseThrow(() -> new ApiException(
+                "Pedido nao encontrado",
+                HttpStatus.NOT_FOUND
+            ));
+    } else {
+        pedido = pedidoRepository
+            .findByIdAndClienteEmailIgnoreCase(id, auth.getName())
+            .orElseThrow(() -> new ApiException(
+                "Pedido nao encontrado",
+                HttpStatus.NOT_FOUND
+            ));
+    }
+
+    return new PedidoResponse(pedido);
+    }
+
     public List<PedidoResponse> listarPorCliente(Integer idCliente) {
         return pedidoRepository.findByClienteIdOrderByDataPedidoDesc(idCliente).stream().map(PedidoResponse::new).toList();
     }
@@ -114,7 +151,25 @@ public class PedidoService {
         return new PedidoResponse(pedidoRepository.save(pedido));
     }
 
-    public PedidoResponse cancelar(Integer id) {
-        return atualizarStatus(id, "CANCELADO");
+    @Transactional
+    public PedidoResponse cancelar(Integer id, Authentication auth) {
+
+    Pedido pedido = pedidoRepository
+        .findByIdAndClienteEmailIgnoreCase(id, auth.getName())
+        .orElseThrow(() -> new ApiException(
+            "Pedido nao encontrado",
+            HttpStatus.NOT_FOUND
+        ));
+
+    if (!"PENDENTE".equalsIgnoreCase(pedido.getStatus())) {
+        throw new ApiException(
+            "Somente pedidos pendentes podem ser cancelados",
+            HttpStatus.CONFLICT
+        );
+    }
+
+    pedido.setStatus("CANCELADO");
+
+    return new PedidoResponse(pedidoRepository.save(pedido));
     }
 }

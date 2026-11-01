@@ -1,26 +1,31 @@
+
 package com.drogaria.backend.service;
 
-import java.util.Arrays;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.drogaria.backend.dto.AuthResponse;
 import com.drogaria.backend.dto.CadastroRequest;
-import com.drogaria.backend.dto.ClienteResponse;
 import com.drogaria.backend.dto.LoginRequest;
+import com.drogaria.backend.entity.Administrador;
+import com.drogaria.backend.entity.Atendente;
 import com.drogaria.backend.entity.Cliente;
+import com.drogaria.backend.entity.Farmaceutico;
+import com.drogaria.backend.entity.Funcionario;
+import com.drogaria.backend.entity.FuncionarioEstoqueLogistica;
 import com.drogaria.backend.exception.ApiException;
 import com.drogaria.backend.repository.ClienteRepository;
 import com.drogaria.backend.repository.EnderecoRepository;
+import com.drogaria.backend.repository.FuncionarioRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -29,238 +34,223 @@ import jakarta.servlet.http.HttpSession;
 public class AuthService {
 
     private final ClienteRepository clienteRepository;
+    private final FuncionarioRepository funcionarioRepository;
     private final EnderecoRepository enderecoRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    @Value("${app.security.admin-emails:}")
-    private String adminEmails;
-
-    @Value("${app.security.pharmacist-emails:}")
-    private String pharmacistEmails;
-
-    @Value("${app.security.attendant-emails:}")
-    private String attendantEmails;
-
-    @Value("${app.security.stock-emails:}")
-    private String stockEmails;
-
     public AuthService(
             ClienteRepository clienteRepository,
+            FuncionarioRepository funcionarioRepository,
             EnderecoRepository enderecoRepository,
             BCryptPasswordEncoder passwordEncoder) {
 
         this.clienteRepository = clienteRepository;
+        this.funcionarioRepository = funcionarioRepository;
         this.enderecoRepository = enderecoRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ClienteResponse login(
+    public AuthResponse login(
             LoginRequest request,
             HttpServletRequest httpRequest) {
 
-        String identificador =
-                request.getIdentificador().trim();
-
-        String cpfLimpo =
-                identificador.replaceAll("\\D", "");
-
-        Optional<Cliente> clienteOpt;
+        String identificador = request.getIdentificador().trim();
+        String senha = request.getSenha();
 
         if (identificador.contains("@")) {
 
-            clienteOpt =
-                    clienteRepository.findByEmail(
-                        identificador.toLowerCase()
-                    );
+            String email = identificador.toLowerCase();
 
-        } else {
+            Optional<Funcionario> funcionarioOpt =
+                    funcionarioRepository.findByEmail(email);
 
-            clienteOpt =
-                    clienteRepository.findByCpf(
-                        cpfLimpo
-                    );
-        }
+            if (funcionarioOpt.isPresent()) {
 
-        Cliente cliente =
-                clienteOpt.orElseThrow(
-                    () -> new ApiException(
-                        "E-mail/CPF ou senha invalidos",
-                        HttpStatus.UNAUTHORIZED
-                    )
+                Funcionario funcionario = funcionarioOpt.get();
+
+                validarSenha(senha, funcionario.getSenha());
+
+                String role = identificarRole(funcionario);
+
+                autenticarNaSessao(
+                        funcionario.getEmail(),
+                        role,
+                        httpRequest
                 );
 
-        if (!passwordEncoder.matches(
-                request.getSenha(),
-                cliente.getSenha())) {
+                return new AuthResponse(funcionario, role);
+            }
 
-            throw new ApiException(
-                "E-mail/CPF ou senha invalidos",
-                HttpStatus.UNAUTHORIZED
+            Cliente cliente = clienteRepository.findByEmail(email)
+                    .orElseThrow(() -> credenciaisInvalidas());
+
+            validarSenha(senha, cliente.getSenha());
+
+            if (!cliente.isContaAprovada()) {
+                throw new ApiException(
+                        "Cadastro ainda nao foi aprovado",
+                        HttpStatus.FORBIDDEN
+                );
+            }
+
+            String role = "ROLE_CLIENTE";
+
+            autenticarNaSessao(
+                    cliente.getEmail(),
+                    role,
+                    httpRequest
             );
+
+            return new AuthResponse(cliente, role);
         }
+
+        String cpf = identificador.replaceAll("\\D", "");
+
+        Cliente cliente = clienteRepository.findByCpf(cpf)
+                .orElseThrow(() -> credenciaisInvalidas());
+
+        validarSenha(senha, cliente.getSenha());
 
         if (!cliente.isContaAprovada()) {
-
             throw new ApiException(
-                "Cadastro ainda nao foi aprovado",
-                HttpStatus.FORBIDDEN
+                    "Cadastro ainda nao foi aprovado",
+                    HttpStatus.FORBIDDEN
             );
         }
 
-        String role =
-                autenticarNaSessao(
-                    cliente,
-                    httpRequest
-                );
+        String role = "ROLE_CLIENTE";
 
-        ClienteResponse response =
-                new ClienteResponse(cliente);
+        autenticarNaSessao(
+                cliente.getEmail(),
+                role,
+                httpRequest
+        );
 
-                response.setRole(role);
-
-        return response;
+        return new AuthResponse(cliente, role);
     }
 
     @Transactional
-    public ClienteResponse cadastrar(
-            CadastroRequest request) {
+    public AuthResponse cadastrar(CadastroRequest request) {
 
-        String email =
-                request.getEmail()
-                        .trim()
-                        .toLowerCase();
+        String email = request.getEmail()
+                .trim()
+                .toLowerCase();
 
-        String cpf =
-                request.getCpf()
-                        .trim();
+        String cpf = request.getCpf().trim();
 
         if (clienteRepository.existsByEmail(email)) {
-
             throw new ApiException(
-                "Ja existe uma conta com esse e-mail",
-                HttpStatus.CONFLICT
+                    "Ja existe uma conta com esse e-mail",
+                    HttpStatus.CONFLICT
+            );
+        }
+
+        if (funcionarioRepository.existsByEmail(email)) {
+            throw new ApiException(
+                    "Ja existe uma conta com esse e-mail",
+                    HttpStatus.CONFLICT
             );
         }
 
         if (clienteRepository.existsByCpf(cpf)) {
-
             throw new ApiException(
-                "Ja existe uma conta com esse CPF",
-                HttpStatus.CONFLICT
+                    "Ja existe uma conta com esse CPF",
+                    HttpStatus.CONFLICT
             );
         }
 
-        Cliente cliente =
-                new Cliente();
+        Cliente cliente = new Cliente();
 
-        cliente.setNome(
-            request.getNome().trim()
-        );
-
+        cliente.setNome(request.getNome().trim());
         cliente.setCpf(cpf);
-
         cliente.setEmail(email);
-
-        cliente.setTelefone(
-            request.getTelefone().trim()
-        );
+        cliente.setTelefone(request.getTelefone().trim());
 
         cliente.setSenha(
-            passwordEncoder.encode(
-                request.getSenha()
-            )
+                passwordEncoder.encode(request.getSenha())
         );
 
         cliente.setDataCadastro(
-            java.time.LocalDate.now()
+                java.time.LocalDate.now()
         );
 
         cliente.setContaAprovada(false);
 
-        cliente =
-                clienteRepository.save(cliente);
+        cliente = clienteRepository.save(cliente);
 
-        return new ClienteResponse(cliente);
+        return new AuthResponse(cliente, "ROLE_CLIENTE");
     }
 
-    private String autenticarNaSessao(
-            Cliente cliente,
+    private void validarSenha(String senhaInformada, String senhaBanco) {
+
+        if (!passwordEncoder.matches(senhaInformada, senhaBanco)) {
+            throw credenciaisInvalidas();
+        }
+    }
+
+    private ApiException credenciaisInvalidas() {
+        return new ApiException(
+                "E-mail/CPF ou senha invalidos",
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+
+    private String identificarRole(Funcionario funcionario) {
+
+        if (funcionario instanceof Administrador) {
+            return "ROLE_ADMINISTRADOR";
+        }
+
+        if (funcionario instanceof Farmaceutico) {
+            return "ROLE_FARMACEUTICO";
+        }
+
+        if (funcionario instanceof Atendente) {
+            return "ROLE_ATENDENTE";
+        }
+
+        if (funcionario instanceof FuncionarioEstoqueLogistica) {
+            return "ROLE_FUNCIONARIO_ESTOQUE_LOGISTICA";
+        }
+
+        throw new ApiException(
+                "Tipo de funcionario nao reconhecido",
+                HttpStatus.FORBIDDEN
+        );
+    }
+
+    private void autenticarNaSessao(
+            String email,
+            String role,
             HttpServletRequest httpRequest) {
 
-        String email =
-                cliente.getEmail()
-                        .toLowerCase();
+        HttpSession session = httpRequest.getSession(false);
 
-        String role;
-
-        if (emailsAdministrativos()
-                .contains(email)) {
-
-            role = "ROLE_ADMINISTRADOR";
-
-        } else if (emails(pharmacistEmails)
-                .contains(email)) {
-
-            role = "ROLE_FARMACEUTICO";
-
-        } else if (emails(attendantEmails)
-                .contains(email)) {
-
-            role = "ROLE_ATENDENTE";
-
-        } else if (emails(stockEmails)
-                .contains(email)) {
-
-            role =
-                "ROLE_FUNCIONARIO_ESTOQUE_LOGISTICA";
-
+        if (session != null) {
+            httpRequest.changeSessionId();
         } else {
-
-            role = "ROLE_CLIENTE";
+            session = httpRequest.getSession(true);
         }
 
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(
-                    cliente.getEmail(),
-                    null,
-                    java.util.List.of(
-                        () -> role
-                    )
+                        email,
+                        null,
+                        java.util.List.of(
+                                new SimpleGrantedAuthority(role)
+                        )
                 );
 
-        SecurityContextHolder
-                .getContext()
-                .setAuthentication(
-                    authentication
-                );
+        SecurityContext context =
+                SecurityContextHolder.createEmptyContext();
 
-        HttpSession session =
-                httpRequest.getSession(true);
+        context.setAuthentication(authentication);
+
+        SecurityContextHolder.setContext(context);
 
         session.setAttribute(
-            "SPRING_SECURITY_CONTEXT",
-            SecurityContextHolder.getContext()
+                "SPRING_SECURITY_CONTEXT",
+                context
         );
-
-        return role;
-    }
-
-    private Set<String> emailsAdministrativos() {
-        return emails(adminEmails);
-    }
-
-    private Set<String> emails(String value) {
-
-        return Arrays.stream(
-                value.split(",")
-            )
-            .map(String::trim)
-            .map(String::toLowerCase)
-            .filter(
-                email -> !email.isBlank()
-            )
-            .collect(
-                Collectors.toSet()
-            );
     }
 }
