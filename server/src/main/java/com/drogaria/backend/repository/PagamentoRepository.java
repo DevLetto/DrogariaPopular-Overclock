@@ -6,4 +6,8 @@ import java.util.Optional;
 
 public interface PagamentoRepository extends JpaRepository<Pagamento, Integer> {
     Optional<Pagamento> findByPedidoId(Integer idPedido);
+    Optional<Pagamento> findByIdAndPedidoClienteEmailIgnoreCase(Integer id, String email);
+    Optional<Pagamento> findByPedidoIdAndPedidoClienteEmailIgnoreCase(
+            Integer idPedido,
+            String email);
 }

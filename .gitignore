@@ -59,6 +59,14 @@ build/
 
 application-local.properties
 application-local.yml
+# Arquivos privados enviados pelos usuarios
+/storage/
+
+# Storage privado do backend quando iniciado dentro de server/
+/server/storage/
+
+# Arquivos privados enviados pelos usuarios
+/storage/
 
 # Arquivos de ambiente
 .env

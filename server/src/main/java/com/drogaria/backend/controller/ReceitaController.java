@@ -2,7 +2,9 @@ package com.drogaria.backend.controller;
 
 import java.util.List;
 
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.drogaria.backend.dto.ReceitaRequest;
 import com.drogaria.backend.dto.ReceitaResponse;
@@ -32,19 +35,34 @@ public class ReceitaController {
 		this.a = a;	
 	}
 
-	@PostMapping
+	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ReceitaResponse> enviar(@Valid @RequestBody ReceitaRequest r, Authentication x) {
 		a.validarAcesso(r.getIdCliente(), x);
 		return ResponseEntity.status(HttpStatus.CREATED).body(s.enviar(r));
 	}
 
-	@GetMapping("/{id}")
-    public ReceitaResponse buscar(
-        @PathVariable Integer id,
-        Authentication auth) {
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<ReceitaResponse> enviarArquivo(
+			@RequestParam("arquivo") MultipartFile arquivo,
+			@RequestParam(value = "idCliente", required = false) Integer idCliente,
+			Authentication authentication) {
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(s.enviarArquivo(arquivo, idCliente, authentication));
+	}
 
-    return s.buscar(id, auth);
-    }
+	@GetMapping("/{id}")
+	public ReceitaResponse buscar(
+			@PathVariable Integer id,
+			Authentication auth) {
+		return s.buscar(id, auth);
+	}
+
+	@GetMapping("/{id}/arquivo")
+	public ResponseEntity<Resource> baixarArquivo(
+			@PathVariable Integer id,
+			Authentication authentication) {
+		return s.baixarArquivo(id, authentication);
+	}
 
 	@GetMapping("/cliente/{id}")
 	public List<ReceitaResponse> cliente(@PathVariable Integer id, Authentication x) {

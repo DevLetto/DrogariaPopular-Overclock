@@ -40,15 +40,20 @@ public class SecurityConfig {
         }
 
         http
+            
             .csrf(csrf -> csrf
                 .csrfTokenRepository(
                     CookieCsrfTokenRepository.withHttpOnlyFalse()
+                )
+                .csrfTokenRequestHandler(
+                    new SpaCsrfTokenRequestHandler()
                 )
                 .ignoringRequestMatchers(
                     "/api/auth/login",
                     "/api/auth/cadastro"
                 )
             )
+
             .cors(cors -> {})
             .securityContext(context ->
                 context.requireExplicitSave(false)
@@ -125,6 +130,13 @@ public class SecurityConfig {
                         "ROLE_ATENDENTE"
                     )
 
+                // Alteração de status de pagamentos restrita aos perfis operacionais
+                .requestMatchers(HttpMethod.PUT, "/api/pagamento/*/status")
+                    .hasAnyAuthority(
+                        "ROLE_ADMINISTRADOR",
+                        "ROLE_ATENDENTE"
+                    )
+
                 // Receitas: consulta de todas as receitas para os funcionários autorizados
                 .requestMatchers(HttpMethod.GET, "/api/receita")
                     .hasAnyAuthority(
@@ -139,6 +151,19 @@ public class SecurityConfig {
                     "/api/receita/*/rejeitar"
                 )
                     .hasAuthority("ROLE_FARMACEUTICO")
+
+
+                // Listagem completa de clientes: somente administrador
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/cliente"
+                ).hasAuthority("ROLE_ADMINISTRADOR")
+
+                // Aprovação de cadastro: somente administrador
+                .requestMatchers(
+                    HttpMethod.PUT,
+                    "/api/cliente/*/aprovacao"
+                ).hasAuthority("ROLE_ADMINISTRADOR")
                 // Demais rotas exigem autenticação
                 .anyRequest().authenticated()
             )

@@ -58,7 +58,8 @@ public class PedidoController {
     public PedidoResponse cancelar(
         @PathVariable Integer id,
         Authentication auth) {
-
+            System.out.println(">>> ENTROU NO CANCELAR PEDIDO");
+            System.out.println(">>> USUARIO: " + auth.getName());
         return pedidoService.cancelar(id, auth);
     }
 

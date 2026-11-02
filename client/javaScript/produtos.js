@@ -62,6 +62,16 @@
       .trim();
   }
 
+  function obterTokenCSRF() {
+  const cookie = document.cookie
+    .split("; ")
+    .find((item) => item.startsWith("XSRF-TOKEN="));
+
+  return cookie
+    ? decodeURIComponent(cookie.substring("XSRF-TOKEN=".length))
+    : null;
+  }
+
   async function fetchJson(url) {
     const resposta = await fetch(url);
 
@@ -495,6 +505,7 @@
       const controlado =
     produto.medicamentoControlado === true ||
     produto.medicamentoControlado === 1;
+    const produtoRestrito = receita || controlado;
 
     return `
       <article
@@ -550,7 +561,9 @@
           </div>
 
           ${
-            foraEstoque
+            produtoRestrito
+              ? `<button type="button" class="btn-notify btn-restricted-contact" data-contato-farmacia>Falar com a farmácia</button>`
+              : foraEstoque
               ? `<button type="button" class="btn-notify">Avisar quando chegar</button>`
               : `<button type="button" class="btn-add-cart">Adicionar <img src="../img/carrinho_icon.png" alt=""></button>`
           }
@@ -561,6 +574,18 @@
   function adicionarEventosProdutos(container) {
     container.querySelectorAll("[data-produto-id]").forEach((card) => {
       const botaoCarrinho = card.querySelector(".btn-add-cart");
+      const botaoContato = card.querySelector("[data-contato-farmacia]");
+
+      if (botaoContato) {
+        botaoContato.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          window.open(
+            "https://wa.me/5561996044119?text=Olá,%20gostaria%20de%20informações%20sobre%20um%20medicamento%20com%20receita%20ou%20controlado.",
+            "_blank",
+          );
+        });
+      }
 
       if (botaoCarrinho) {
         botaoCarrinho.addEventListener("click", async (event) => {
@@ -657,6 +682,23 @@
   }
 
   async function adicionarProdutoAoCarrinho(idProduto, botao) {
+    const produto = todosProdutos.find(
+      (item) => String(obterIdProduto(item)) === String(idProduto),
+    );
+    const produtoRestrito =
+      produto?.necessitaReceita === true ||
+      produto?.necessitaReceita === 1 ||
+      produto?.medicamentoControlado === true ||
+      produto?.medicamentoControlado === 1;
+
+    if (produtoRestrito) {
+      mostrarNotificacao(
+        "Este produto não pode ser comprado diretamente. Entre em contato com a farmácia.",
+        "aviso",
+      );
+      return;
+    }
+
     const usuarioSalvo = localStorage.getItem("usuarioLogado");
 
     if (!usuarioSalvo) {
@@ -705,10 +747,17 @@
       botao.disabled = true;
       botao.textContent = "Adicionando...";
 
+      const tokenCSRF = obterTokenCSRF();
+
+      if (!tokenCSRF) {
+        throw new Error("Token CSRF não encontrado. Atualize a página e tente novamente.");
+      }
+
       const resposta = await fetch(`${API_BASE_URL}/carrinho`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-XSRF-TOKEN": tokenCSRF,
         },
         credentials: "include",
         body: JSON.stringify({

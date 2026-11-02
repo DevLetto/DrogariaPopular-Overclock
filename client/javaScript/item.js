@@ -25,7 +25,6 @@
     }
 
     configurarQuantidade();
-    configurarBotaoCarrinho();
 
     await carregarProduto(id);
   }
@@ -82,6 +81,7 @@
       produtoAtual.promocao = promocao;
 
       preencherProduto(produtoAtual);
+      configurarBotaoCarrinho();
 
       carregarProdutosRelacionados(produtoAtual);
 
@@ -785,6 +785,24 @@
       return;
     }
 
+    const produtoRestrito =
+      produtoAtual?.necessitaReceita === true ||
+      produtoAtual?.necessitaReceita === 1 ||
+      produtoAtual?.medicamentoControlado === true ||
+      produtoAtual?.medicamentoControlado === 1;
+
+    if (produtoRestrito) {
+      botao.innerHTML = "Falar com a farmácia";
+      botao.type = "button";
+      botao.addEventListener("click", () => {
+        window.open(
+          "https://wa.me/5561996044119?text=Olá,%20gostaria%20de%20informações%20sobre%20um%20medicamento%20com%20receita%20ou%20controlado.",
+          "_blank",
+        );
+      });
+      return;
+    }
+
 
     botao.addEventListener(
       "click",
@@ -805,6 +823,20 @@
         "Produto ainda não carregado.", "aviso"
       );
 
+      return;
+    }
+
+    const produtoRestrito =
+      produtoAtual.necessitaReceita === true ||
+      produtoAtual.necessitaReceita === 1 ||
+      produtoAtual.medicamentoControlado === true ||
+      produtoAtual.medicamentoControlado === 1;
+
+    if (produtoRestrito) {
+      mostrarNotificacao(
+        "Este produto não pode ser comprado diretamente. Entre em contato com a farmácia.",
+        "aviso",
+      );
       return;
     }
 

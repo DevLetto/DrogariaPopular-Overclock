@@ -320,20 +320,43 @@ async function renderizarCheckout() {
         precoProduto: Number(produto.precoProduto || 0),
 
         imagemURL: produto.imagemURL || null,
+        medicamentoControlado:
+          produto.medicamentoControlado === true ||
+          produto.medicamentoControlado === 1,
+        necessitaReceita:
+          produto.necessitaReceita === true ||
+          produto.necessitaReceita === 1,
       };
     }),
   );
 
   carrinhoItens = itensComProduto;
 
-  if (listaRevisao) {
-    listaRevisao.innerHTML = carrinhoItens.map(criarItemRevisao).join("");
+  const produtosRestritos = carrinhoItens.filter(
+    (item) =>
+      item.medicamentoControlado === true ||
+      item.medicamentoControlado === 1 ||
+      item.necessitaReceita === true ||
+      item.necessitaReceita === 1,
+  );
+
+  if (produtosRestritos.length > 0) {
+    const aviso =
+      '<li class="checkout-restricao">Existem produtos controlados ou que exigem receita nesta compra. Entre em contato com a farmácia; estes produtos não podem ser finalizados pelo sistema.</li>';
+
+    if (listaRevisao) {
+      listaRevisao.innerHTML =
+        aviso + carrinhoItens.map(criarItemRevisao).join("");
+    }
+  } else if (listaRevisao) {
+    listaRevisao.innerHTML =
+      carrinhoItens.map(criarItemRevisao).join("");
   }
 
   atualizarResumo();
 
   if (btnConfirmar) {
-    btnConfirmar.disabled = false;
+    btnConfirmar.disabled = produtosRestritos.length > 0;
   }
 }
 
@@ -497,6 +520,20 @@ function configurarConfirmacao() {
 // =========================================================
 
 function abrirModalConfirmacao() {
+  const possuiRestrito = carrinhoItens.some(
+    (item) =>
+      item.medicamentoControlado === true ||
+      item.medicamentoControlado === 1 ||
+      item.necessitaReceita === true ||
+      item.necessitaReceita === 1,
+  );
+  if (possuiRestrito) {
+    alert(
+      "Produtos controlados ou que exigem receita não podem ser finalizados diretamente. Entre em contato com a farmácia.",
+    );
+    return;
+  }
+
   if (!carrinhoItens.length) {
     alert("Seu carrinho está vazio.");
 
@@ -720,6 +757,20 @@ async function finalizarPedido(modal) {
   if (!Array.isArray(carrinhoItens) || carrinhoItens.length === 0) {
     alert("Seu carrinho está vazio.");
 
+    return;
+  }
+
+  const possuiRestrito = carrinhoItens.some(
+    (item) =>
+      item.medicamentoControlado === true ||
+      item.medicamentoControlado === 1 ||
+      item.necessitaReceita === true ||
+      item.necessitaReceita === 1,
+  );
+  if (possuiRestrito) {
+    alert(
+      "Produtos controlados ou que exigem receita não podem ser finalizados diretamente.",
+    );
     return;
   }
 

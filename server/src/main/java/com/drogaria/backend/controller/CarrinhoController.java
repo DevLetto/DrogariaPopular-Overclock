@@ -28,9 +28,12 @@ public class CarrinhoController {
 	}
 
 	@GetMapping("/{idCliente}")
-	public ResponseEntity<List<CarrinhoResponse>> buscar(@PathVariable Integer idCliente,
+	public ResponseEntity<List<CarrinhoResponse>> buscar(
+			@PathVariable Integer idCliente,
 			Authentication authentication) {
-		// carrinhoService.validarAcesso(idCliente, authentication);
+
+		carrinhoService.validarAcesso(idCliente, authentication);
+
 		return ResponseEntity.ok(carrinhoService.buscar(idCliente));
 	}
 
@@ -41,18 +44,29 @@ public class CarrinhoController {
 	}
 
 	@PostMapping
-	public ResponseEntity<CarrinhoResponse> adicionar(@RequestBody CarrinhoRequest request,
-			Authentication authentication) {
-		Integer idCliente = resolveIdCliente(null, request);
-		Integer idProduto = resolveIdProduto(null, request);
+	public ResponseEntity<CarrinhoResponse> adicionar(
+        @RequestBody CarrinhoRequest request,
+        Authentication authentication) {
 
-		if (idCliente == null || idProduto == null) {
-			throw new IllegalArgumentException("idCliente e idProduto sao obrigatorios");
-		}
+    Integer idCliente = resolveIdCliente(null, request);
+    Integer idProduto = resolveIdProduto(null, request);
 
-		// carrinhoService.validarAcesso(idCliente, authentication);
-		return ResponseEntity.ok(carrinhoService.adicionar(request.getIdCliente(), request.getIdProduto(), request.getQuantidade()));
-	}
+    if (idCliente == null || idProduto == null) {
+        throw new IllegalArgumentException(
+            "idCliente e idProduto sao obrigatorios"
+        );
+    }
+
+    carrinhoService.validarAcesso(idCliente, authentication);
+
+    return ResponseEntity.ok(
+        carrinhoService.adicionar(
+            idCliente,
+            idProduto,
+            request.getQuantidade()
+        )
+    );
+	}	
 
 	@PutMapping("/{idCliente}/{idProduto}")
 	public ResponseEntity<CarrinhoResponse> editar(@PathVariable Integer idCliente,
@@ -61,7 +75,7 @@ public class CarrinhoController {
 		Integer idClienteResolvido = resolveIdCliente(idCliente, request);
 		Integer idProdutoResolvido = resolveIdProduto(idProduto, request);
 
-		// carrinhoService.validarAcesso(idClienteResolvido, authentication);
+		carrinhoService.validarAcesso(idClienteResolvido, authentication);
 		CarrinhoResponse resultado = carrinhoService.editar(idClienteResolvido, idProdutoResolvido,
 				request.getQuantidade());
 
@@ -78,7 +92,8 @@ public class CarrinhoController {
 	@DeleteMapping("/{idCliente}/{idProduto}")
 	public ResponseEntity<Void> deletar(@PathVariable Integer idCliente,
 			@PathVariable Integer idProduto, Authentication authentication) {
-		// carrinhoService.validarAcesso(idCliente, authentication);
+
+		carrinhoService.validarAcesso(idCliente, authentication);
 		carrinhoService.deletar(idCliente, idProduto);
 		return ResponseEntity.noContent().build();
 	}

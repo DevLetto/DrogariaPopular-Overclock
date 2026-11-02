@@ -1,5 +1,7 @@
 package com.drogaria.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -47,6 +49,7 @@ public class Endereco {
 
     public void setId(Integer id) { this.id = id; }
 
+    @JsonIgnore
     public Cliente getCliente() { return cliente; }
 
     public void setCliente(Cliente cliente) { this.cliente = cliente; }

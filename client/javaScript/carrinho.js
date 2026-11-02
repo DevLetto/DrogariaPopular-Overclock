@@ -285,7 +285,15 @@ async function carregarCarrinho() {
 
               imagemURL:
                 produto.imagemURL ||
-                null
+                null,
+
+              medicamentoControlado:
+                produto.medicamentoControlado === true ||
+                produto.medicamentoControlado === 1,
+
+              necessitaReceita:
+                produto.necessitaReceita === true ||
+                produto.necessitaReceita === 1
 
             };
 
@@ -321,8 +329,9 @@ async function carregarCarrinho() {
 
 
 function renderizarCarrinho() {
-  // Todos os produtos aparecem em "Para comprar agora".
-  const comprarAgora = carrinhoItens;
+  const comprarAgora = carrinhoItens.filter(
+    (item) => !item.medicamentoControlado && !item.necessitaReceita,
+  );
 
   if (qtdComprarEl) {
     qtdComprarEl.textContent =
@@ -332,7 +341,7 @@ function renderizarCarrinho() {
   }
 
   listaComprarEl.innerHTML =
-    comprarAgora.map(criarItemHTML).join("") ||
+    carrinhoItens.map(criarItemHTML).join("") ||
     '<p class="carrinho-vazio">Seu carrinho está vazio.</p>';
 
   document.querySelectorAll(".item").forEach(bindItemEvents);
@@ -362,6 +371,16 @@ function voltarParaCompras(){
  */
 
 function criarItemHTML(item) {
+  const produtoRestrito =
+    item.medicamentoControlado === true ||
+    item.medicamentoControlado === 1 ||
+    item.necessitaReceita === true ||
+    item.necessitaReceita === 1;
+  const motivoRestricao = item.medicamentoControlado
+    ? "Medicamento controlado: não pode ser comprado diretamente. Entre em contato com a farmácia."
+    : item.necessitaReceita
+      ? "Exige receita: não pode ser comprado diretamente. Entre em contato com a farmácia."
+      : "";
 
   const iconeOuImagem =
     item.imagemURL
@@ -405,6 +424,11 @@ function criarItemHTML(item) {
           ${formatarPreco(item.precoProduto)}
           cada
         </p>
+        ${
+          produtoRestrito
+            ? `<p class="item-restricao">${escaparHTML(motivoRestricao)}</p>`
+            : ""
+        }
 
       </div>
 
@@ -415,6 +439,7 @@ function criarItemHTML(item) {
           type="button"
           class="qtd-btn menos"
           aria-label="Diminuir quantidade"
+          ${produtoRestrito ? "disabled" : ""}
         >
           -
         </button>
@@ -429,6 +454,7 @@ function criarItemHTML(item) {
           type="button"
           class="qtd-btn mais"
           aria-label="Aumentar quantidade"
+          ${produtoRestrito ? "disabled" : ""}
         >
           +
         </button>
@@ -859,9 +885,32 @@ function atualizarResumo(
  */
 
 function irParaCheckout() {
+  const comprarAgora = carrinhoItens.filter(
+    (item) =>
+      item.medicamentoControlado !== true &&
+      item.medicamentoControlado !== 1 &&
+      item.necessitaReceita !== true &&
+      item.necessitaReceita !== 1,
+  );
 
-  const comprarAgora = carrinhoItens;
+  const possuiRestrito = carrinhoItens.some(
+    (item) =>
+      item.medicamentoControlado === true ||
+      item.medicamentoControlado === 1 ||
+      item.necessitaReceita === true ||
+      item.necessitaReceita === 1,
+  );
 
+  if (possuiRestrito && comprarAgora.length > 0) {
+    alert(
+      "Produtos controlados ou que exigem receita não podem ser finalizados. Somente os demais produtos serão encaminhados ao checkout.",
+    );
+  } else if (possuiRestrito) {
+    alert(
+      "Este carrinho contém somente produtos que exigem atendimento pela farmácia e não pode ser encaminhado ao checkout.",
+    );
+    return;
+  }
 
   if (
     comprarAgora.length === 0
