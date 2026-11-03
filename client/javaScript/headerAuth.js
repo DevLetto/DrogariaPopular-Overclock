@@ -19,6 +19,12 @@
     }
 
     // =========================================================
+    // BARRA DE PESQUISA (todas as páginas)
+    // =========================================================
+
+    configurarBusca();
+
+    // =========================================================
     // MENU DO USUÁRIO
     // =========================================================
 
@@ -63,6 +69,42 @@
       );
     }
   });
+
+  // =========================================================
+  // BARRA DE PESQUISA
+  // Leva para produtos.html?busca=termo, que já filtra pelo termo.
+  // A própria produtos.html tem busca com filtro na hora (produtos.js),
+  // então ela fica de fora.
+  // =========================================================
+
+  function configurarBusca() {
+    if (document.getElementById('gridProdutos')) return;
+
+    const input = document.querySelector('.search-bar input');
+    const botao = document.querySelector('.search-bar button');
+
+    if (!input) return;
+
+    const buscar = () => {
+      const termo = input.value.trim();
+
+      window.location.href = termo
+        ? `produtos.html?busca=${encodeURIComponent(termo)}`
+        : 'produtos.html';
+    };
+
+    if (botao) {
+      botao.addEventListener('click', buscar);
+    }
+
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+
+        buscar();
+      }
+    });
+  }
 
   // =========================================================
   // RECUPERA USUÁRIO LOGADO
@@ -148,7 +190,7 @@
         </li>
 
         <li>
-          <a href="meus_pedidos.html">
+          <a href="meus-pedidos.html">
             Meus pedidos
           </a>
         </li>
@@ -322,4 +364,4 @@
         );
       });
   }
-})();
+})(); 

@@ -41,7 +41,7 @@ async function carregarLojas() {
 
     try {
 
-        const resposta = await fetch(API_LOJA);
+        const resposta = await window.AdminCsrf.fetch(API_LOJA);
 
         if (!resposta.ok) {
             throw new Error("Erro ao carregar lojas.");
@@ -339,7 +339,7 @@ formLoja.addEventListener(
 
             if (lojaEditando !== null) {
 
-                resposta = await fetch(
+                resposta = await window.AdminCsrf.fetch(
                     `${API_LOJA}/${lojaEditando}`,
                     {
                         method: "PUT",
@@ -361,7 +361,7 @@ formLoja.addEventListener(
 
             else {
 
-                resposta = await fetch(
+                resposta = await window.AdminCsrf.fetch(
                     API_LOJA,
                     {
                         method: "POST",
@@ -451,7 +451,7 @@ async function excluirLoja(id) {
 
     try {
 
-        const resposta = await fetch(
+        const resposta = await window.AdminCsrf.fetch(
             `${API_LOJA}/${id}`,
             {
                 method: "DELETE"

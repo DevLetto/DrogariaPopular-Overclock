@@ -109,13 +109,6 @@ public class SecurityConfig {
                     "/api/promocao/**"
                 ).hasAuthority("ROLE_ADMINISTRADOR")
 
-                // Aprovação e rejeição de receitas
-                .requestMatchers(
-                    HttpMethod.PUT,
-                    "/api/receita/*/aprovar",
-                    "/api/receita/*/rejeitar"
-                ).hasAuthority("ROLE_FARMACEUTICO")
-                
                                 // Pedidos: consultas gerais para administrador e atendente
                 .requestMatchers(HttpMethod.GET, "/api/pedido")
                     .hasAnyAuthority(
@@ -144,13 +137,16 @@ public class SecurityConfig {
                         "ROLE_FARMACEUTICO"
                     )
 
-                // Aprovação e rejeição somente por farmacêuticos
+                // Aprovação e rejeição por administradores e farmacêuticos
                 .requestMatchers(
                     HttpMethod.PUT,
                     "/api/receita/*/aprovar",
                     "/api/receita/*/rejeitar"
                 )
-                    .hasAuthority("ROLE_FARMACEUTICO")
+                    .hasAnyAuthority(
+                        "ROLE_ADMINISTRADOR",
+                        "ROLE_FARMACEUTICO"
+                    )
 
 
                 // Listagem completa de clientes: somente administrador

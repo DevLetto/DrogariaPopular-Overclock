@@ -56,6 +56,9 @@ const btnVoltarParaCarrinhoMain = document.getElementById(
 
 let carrinhoItens = [];
 
+let itensAguardando = [];
+let receitaAprovada = false;
+
 let tipoEntrega = "retirada";
 
 let formaPagamento = "pix";
@@ -66,6 +69,35 @@ let desconto = 0;
 
 // Valor provisório do frete.
 const VALOR_FRETE_ENTREGA = 10;
+
+// =========================================================
+// RECEITAS
+// =========================================================
+
+
+function isRestrito(item) {
+  return (
+    item.medicamentoControlado === true || item.medicamentoControlado === 1 ||
+    item.necessitaReceita === true || item.necessitaReceita === 1
+  );
+}
+
+async function verificarReceitaAprovada() {
+  try {
+    const res = await fetch(`http://localhost:8080/api/receita/cliente/${ID_CLIENTE}`, {
+      credentials: "include",
+    });
+    if (!res.ok) return false;
+    const dados = await res.json();
+    return (
+      Array.isArray(dados) &&
+      dados.some((r) => String(r.status).toUpperCase().includes("APROV"))
+    );
+  } catch (erro) {
+    console.error("Erro ao verificar receitas:", erro);
+    return false;
+  }
+}
 
 // =========================================================
 // CSRF
@@ -330,33 +362,29 @@ async function renderizarCheckout() {
     }),
   );
 
-  carrinhoItens = itensComProduto;
+    receitaAprovada = await verificarReceitaAprovada();
 
-  const produtosRestritos = carrinhoItens.filter(
-    (item) =>
-      item.medicamentoControlado === true ||
-      item.medicamentoControlado === 1 ||
-      item.necessitaReceita === true ||
-      item.necessitaReceita === 1,
+  itensAguardando = itensComProduto.filter(
+    (item) => isRestrito(item) && !receitaAprovada,
+  );
+  carrinhoItens = itensComProduto.filter(
+    (item) => !isRestrito(item) || receitaAprovada,
   );
 
-  if (produtosRestritos.length > 0) {
-    const aviso =
-      '<li class="checkout-restricao">Existem produtos controlados ou que exigem receita nesta compra. Entre em contato com a farmácia; estes produtos não podem ser finalizados pelo sistema.</li>';
+  const aviso = itensAguardando.length
+    ? '<li class="checkout-restricao">Alguns itens controlados aguardam receita aprovada e ficarão no carrinho. Este pedido inclui apenas os demais.</li>'
+    : "";
 
-    if (listaRevisao) {
-      listaRevisao.innerHTML =
-        aviso + carrinhoItens.map(criarItemRevisao).join("");
-    }
-  } else if (listaRevisao) {
+  if (listaRevisao) {
     listaRevisao.innerHTML =
-      carrinhoItens.map(criarItemRevisao).join("");
+      aviso + (carrinhoItens.map(criarItemRevisao).join("") ||
+        '<li class="checkout-vazio">Nenhum item disponível para compra agora.</li>');
   }
 
   atualizarResumo();
 
   if (btnConfirmar) {
-    btnConfirmar.disabled = produtosRestritos.length > 0;
+    btnConfirmar.disabled = carrinhoItens.length === 0;
   }
 }
 
@@ -520,19 +548,8 @@ function configurarConfirmacao() {
 // =========================================================
 
 function abrirModalConfirmacao() {
-  const possuiRestrito = carrinhoItens.some(
-    (item) =>
-      item.medicamentoControlado === true ||
-      item.medicamentoControlado === 1 ||
-      item.necessitaReceita === true ||
-      item.necessitaReceita === 1,
-  );
-  if (possuiRestrito) {
-    alert(
-      "Produtos controlados ou que exigem receita não podem ser finalizados diretamente. Entre em contato com a farmácia.",
-    );
-    return;
-  }
+  
+  
 
   if (!carrinhoItens.length) {
     alert("Seu carrinho está vazio.");
@@ -760,19 +777,7 @@ async function finalizarPedido(modal) {
     return;
   }
 
-  const possuiRestrito = carrinhoItens.some(
-    (item) =>
-      item.medicamentoControlado === true ||
-      item.medicamentoControlado === 1 ||
-      item.necessitaReceita === true ||
-      item.necessitaReceita === 1,
-  );
-  if (possuiRestrito) {
-    alert(
-      "Produtos controlados ou que exigem receita não podem ser finalizados diretamente.",
-    );
-    return;
-  }
+ 
 
   btn.disabled = true;
 
@@ -946,7 +951,7 @@ async function finalizarPedido(modal) {
     `;
 
     setTimeout(() => {
-      window.location.href = "index.html";
+      window.location.href = "meus-pedidos.html";
     }, 700);
   } catch (erro) {
     console.error("Erro ao finalizar pedido:", erro);

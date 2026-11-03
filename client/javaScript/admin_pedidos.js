@@ -1,4 +1,68 @@
 const API_BASE_URL = "http://localhost:8080/api";
+let tokenCsrf = null;
+let headerNameCsrf = null;
+let preparacaoCsrf = null;
+
+async function obterCsrf() {
+    if (tokenCsrf && headerNameCsrf) {
+        return { token: tokenCsrf, headerName: headerNameCsrf };
+    }
+
+    if (!preparacaoCsrf) {
+        preparacaoCsrf = fetch(
+            `${API_BASE_URL}/auth/csrf`,
+            { credentials: "include" }
+        ).then(async (resposta) => {
+            if (!resposta.ok) {
+                throw new Error(
+                    "Não foi possível obter o token CSRF. Atualize a página e autentique-se novamente."
+                );
+            }
+
+            const dados = await resposta.json();
+
+            if (!dados?.token) {
+                throw new Error(
+                    "O servidor não retornou um token CSRF válido. Atualize a página."
+                );
+            }
+
+            tokenCsrf = dados.token;
+            headerNameCsrf = dados.headerName || "X-CSRF-TOKEN";
+
+            return {
+                token: tokenCsrf,
+                headerName: headerNameCsrf
+            };
+        }).catch((erro) => {
+            tokenCsrf = null;
+            headerNameCsrf = null;
+            throw erro;
+        }).finally(() => {
+            preparacaoCsrf = null;
+        });
+    }
+
+    return preparacaoCsrf;
+}
+
+async function prepararOpcoesCsrf(opcoes) {
+    const metodo = String(opcoes.method || "GET").toUpperCase();
+
+    if (!["POST", "PUT", "DELETE"].includes(metodo)) {
+        return opcoes;
+    }
+
+    const csrf = await obterCsrf();
+
+    return {
+        ...opcoes,
+        headers: {
+            ...(opcoes.headers || {}),
+            [csrf.headerName]: csrf.token
+        }
+    };
+}
 
 const estado = {
     pedidos: [],
@@ -73,20 +137,28 @@ function configurarEventos() {
 // ======================================================
 
 async function requisicao(endpoint, opcoes = {}) {
+    const opcoesComCsrf = await prepararOpcoesCsrf(opcoes);
 
     const resposta = await fetch(
         `${API_BASE_URL}${endpoint}`,
         {
             headers: {
                 "Content-Type": "application/json",
-                ...(opcoes.headers || {})
+                ...(opcoesComCsrf.headers || {})
             },
             credentials: "include",
-            ...opcoes
+            ...opcoesComCsrf
         }
     );
 
     if (!resposta.ok) {
+        if (resposta.status === 403) {
+            tokenCsrf = null;
+            headerNameCsrf = null;
+            throw new Error(
+                "Acesso negado ou sessão CSRF expirada. Atualize a página, autentique-se novamente e tente outra vez."
+            );
+        }
 
         let mensagem =
             `Erro HTTP ${resposta.status}`;

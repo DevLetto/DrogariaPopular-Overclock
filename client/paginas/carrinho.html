@@ -92,19 +92,40 @@
 
       <section class="separador-main">
         <section class="section-listas">
-          <section class="section-lista-comprar-agora">
-            <p class="lista-comprar-p" id="quantidadeComprar">
-              Para comprar agora
-            </p>
 
-            <div class="lista-comprar-agora"></div>
+          <!-- CONTAINER 1: produtos comuns -->
+          <section class="section-lista-comprar-agora">
+            <p class="lista-comprar-p" id="quantidadeComprar">Para comprar agora</p>
+
+            <section class="categoria-carrinho categoria-produtos-comuns">
+              <p class="lista-comprar-p">Produtos comuns</p>
+              <div class="lista-comprar-agora"></div>
+            </section>
 
             <hr />
-
             <p class="esvazia-carrinho">Esvaziar carrinho</p>
           </section>
 
-         
+          <!-- CONTAINER 2: medicamentos controlados (separado, abaixo) -->
+         <section class="section-lista-controlados" id="containerControlados">
+            <div class="controlados-header">
+              <p class="lista-comprar-p">Medicamentos controlados</p>
+              <p class="controlados-aviso">
+                Estes itens exigem receita e só entram no pedido após aprovação do farmacêutico.
+              </p>
+            </div>
+
+            <div class="lista-medicamentos-controlados"></div>
+
+            <div class="controlados-receita">
+              <input type="file" id="inputReceita" accept=".pdf,.jpg,.jpeg,.png" hidden />
+              <button type="button" id="btnAnexarReceita" class="btn-anexar-receita">
+                📎 Anexar receita
+              </button>
+              <div id="listaReceitas"></div>
+            </div>
+          </section>
+
         </section>
 
         <aside class="resumo-pedido">

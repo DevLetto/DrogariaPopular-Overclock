@@ -12,8 +12,8 @@ import java.util.Locale;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.drogaria.backend.dto.ReceitaRequest;
@@ -189,25 +190,39 @@ public class ReceitaService {
     Receita receita;
 
     if (funcionarioAutorizado) {
-        receita = repository.findById(id)
+        receita = repository.findWithClienteById(id)
             .orElseThrow(() -> new ApiException(
                 "Receita nao encontrada",
                 HttpStatus.NOT_FOUND
             ));
     } else {
-        receita = repository
-            .findByIdAndClienteEmailIgnoreCase(id, auth.getName())
+        receita = repository.findWithClienteById(id)
             .orElseThrow(() -> new ApiException(
                 "Receita nao encontrada",
                 HttpStatus.NOT_FOUND
             ));
+        if (receita.getCliente() == null ||
+                !auth.getName().equalsIgnoreCase(receita.getCliente().getEmail())) {
+            throw new ApiException(
+                "Receita nao encontrada",
+                HttpStatus.NOT_FOUND
+            );
+        }
     }
 
     return new ReceitaResponse(receita);
     }       
-
+    
+    @Transactional(readOnly = true)
     public List<ReceitaResponse> cliente(Integer idCliente) {
         return repository.findByClienteId(idCliente).stream().map(ReceitaResponse::new).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReceitaResponse> listar() {
+        return repository.findAllWithCliente().stream()
+                .map(ReceitaResponse::new)
+                .toList();
     }
 
     public ResponseEntity<Resource> baixarArquivo(Integer id, Authentication authentication) {
@@ -250,11 +265,32 @@ public class ReceitaService {
         }
     }
 
+    @Transactional
     public ReceitaResponse aprovar(
         Integer id,
         Authentication auth) {
 
-    Receita receita = repository.findById(id)
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new ApiException(
+                "Autenticacao necessaria",
+                HttpStatus.UNAUTHORIZED
+            );
+        }
+
+        boolean autorizado = auth.getAuthorities().stream()
+            .anyMatch(a ->
+                a.getAuthority().equals("ROLE_ADMINISTRADOR") ||
+                a.getAuthority().equals("ROLE_FARMACEUTICO")
+            );
+
+        if (!autorizado) {
+            throw new ApiException(
+                "Voce nao tem permissao para avaliar receitas",
+                HttpStatus.FORBIDDEN
+            );
+        }
+
+    Receita receita = repository.findWithClienteById(id)
         .orElseThrow(() -> new ApiException(
             "Receita nao encontrada",
             HttpStatus.NOT_FOUND
@@ -267,25 +303,49 @@ public class ReceitaService {
         );
     }
 
-    Farmaceutico farmaceutico = farmaceuticos
-        .findByEmailIgnoreCase(auth.getName())
-        .orElseThrow(() -> new ApiException(
-            "Farmaceutico nao encontrado",
-            HttpStatus.FORBIDDEN
-        ));
+    if (auth.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_FARMACEUTICO"))) {
+        Farmaceutico farmaceutico = farmaceuticos
+            .findByEmailIgnoreCase(auth.getName())
+            .orElseThrow(() -> new ApiException(
+                "Farmaceutico nao encontrado",
+                HttpStatus.FORBIDDEN
+            ));
+        receita.setFarmaceutico(farmaceutico);
+    }
 
     receita.setStatus("APROVADA");
     receita.setDataValidacao(LocalDate.now());
-    receita.setFarmaceutico(farmaceutico);
     receita.setMotivoRejeicao(null);
 
     return new ReceitaResponse(repository.save(receita));
 }
 
+    @Transactional
     public ReceitaResponse rejeitar(
         Integer id,
         String motivo,
         Authentication auth) {
+
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new ApiException(
+                "Autenticacao necessaria",
+                HttpStatus.UNAUTHORIZED
+            );
+        }
+
+        boolean autorizado = auth.getAuthorities().stream()
+            .anyMatch(a ->
+                a.getAuthority().equals("ROLE_ADMINISTRADOR") ||
+                a.getAuthority().equals("ROLE_FARMACEUTICO")
+            );
+
+        if (!autorizado) {
+            throw new ApiException(
+                "Voce nao tem permissao para avaliar receitas",
+                HttpStatus.FORBIDDEN
+            );
+        }
 
     if (motivo == null || motivo.isBlank()) {
         throw new ApiException(
@@ -294,7 +354,7 @@ public class ReceitaService {
         );
     }
 
-    Receita receita = repository.findById(id)
+    Receita receita = repository.findWithClienteById(id)
         .orElseThrow(() -> new ApiException(
             "Receita nao encontrada",
             HttpStatus.NOT_FOUND
@@ -307,16 +367,19 @@ public class ReceitaService {
         );
     }
 
-    Farmaceutico farmaceutico = farmaceuticos
-        .findByEmailIgnoreCase(auth.getName())
-        .orElseThrow(() -> new ApiException(
-            "Farmaceutico nao encontrado",
-            HttpStatus.FORBIDDEN
-        ));
+    if (auth.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_FARMACEUTICO"))) {
+        Farmaceutico farmaceutico = farmaceuticos
+            .findByEmailIgnoreCase(auth.getName())
+            .orElseThrow(() -> new ApiException(
+                "Farmaceutico nao encontrado",
+                HttpStatus.FORBIDDEN
+            ));
+        receita.setFarmaceutico(farmaceutico);
+    }
 
     receita.setStatus("REJEITADA");
     receita.setDataValidacao(LocalDate.now());
-    receita.setFarmaceutico(farmaceutico);
     receita.setMotivoRejeicao(motivo.trim());
 
     return new ReceitaResponse(repository.save(receita));

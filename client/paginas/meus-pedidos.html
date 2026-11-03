@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Meus pedidos - Drogaria Ponte Alta</title>
+
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/carrinho.css" />
+    <link rel="stylesheet" href="../css/meus-pedidos.css" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <header>
+      <div class="top-bar">
+        <span> 📍 Entregamos em toda a Ponte Alta e região </span>
+        <span> 📞 (61) 3333-4455 · Seg a Sáb, 7h-22h </span>
+      </div>
+
+      <div class="main-header header-checkout">
+        <section class="logo-titulo-section">
+          <div class="symbols-square" onclick="window.location.href='index.html'">
+            <img
+              src="../img/logo_drogaria_ponteAlta.png"
+              alt="Ícone com um P e +"
+            />
+          </div>
+
+          <div class="logo-titulo-texto">
+            <p class="logo-titulo-texto-p1 p1">Drogaria Popular</p>
+            <p class="logo-titulo-texto-p2 p2">Ponte Alta</p>
+          </div>
+        </section>
+      </div>
+    </header>
+
+    <main class="mainCarrinho mainPedidos">
+      <aside class="goBack-container">
+        <button class="goBack-btn" id="btnVoltarLoja">← Voltar à loja</button>
+      </aside>
+
+      <h1>Meus pedidos</h1>
+
+      <div id="avisoPedido" class="aviso-pedido" hidden></div>
+
+      <section id="listaPedidos" class="lista-pedidos">
+        <p class="carrinho-vazio">Carregando pedidos...</p>
+      </section>
+    </main>
+
+    <script src="../javaScript/meus-pedidos.js"></script>
+  </body>
+</html>

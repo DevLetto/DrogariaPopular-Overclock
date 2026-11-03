@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Favoritos · Drogaria Popular Ponte Alta</title>
+
+  <!-- Mesmos CSS do produtos.html: os cards ficam idênticos -->
+  <link rel="stylesheet" href="../css/global.css" />
+  <link rel="stylesheet" href="../css/produtos.css" />
+  <link rel="stylesheet" href="../css/header-auth.css" />
+</head>
+
+<body>
+
+  <header>
+
+    <div class="top-bar">
+      <span>📍 Entregamos em toda a Ponte Alta e região</span>
+      <span>📞 (61) 3333-4455 · Seg a Sáb, 7h-22h</span>
+    </div>
+
+    <div class="main-header">
+
+      <div class="logo">
+        <a href="index.html">
+          <img
+            src="../img/logo_drogaria_popular_ponte_alta.jpeg"
+            alt="DROGARIA POPULAR PONTE ALTA"
+          />
+        </a>
+      </div>
+
+      <div class="search-bar">
+        <button type="button" aria-label="Buscar" id="btnBuscarFavoritos">
+          <img src="../img/lupa_icon.png" alt="Buscar" />
+        </button>
+
+        <input
+          type="text"
+          id="campoBusca"
+          placeholder="Buscar remédio, marca ou produto..."
+        />
+      </div>
+
+      <div class="user-actions">
+
+        <a href="sobre_nos.html" class="action-item">
+          <img src="../img/info_icon.png" alt="Sobre nós" />
+          Sobre nós
+        </a>
+
+        <a href="favoritos.html" class="action-item">
+          <img src="../img/coracao_icon.png" alt="Favoritos" />
+          Favoritos
+        </a>
+
+        <a href="login.html" class="action-item">
+          <img src="../img/usuario_icon.png" alt="Entrar" />
+          Entrar
+        </a>
+
+        <a href="carrinho.html" class="action-item">
+          <img src="../img/carrinho_icon.png" alt="Carrinho" />
+          Carrinho
+        </a>
+
+        <button type="button" class="btn-whatsapp-header">
+          <img src="../img/whatsapp-circle.png" alt="WhatsApp" />
+          WhatsApp
+        </button>
+
+      </div>
+
+    </div>
+
+    <nav class="main-nav">
+      <ul>
+        <li><a href="produtos.html?categoria=medicamentos"><img src="../img/medicamentos_icon.png" alt="Medicamentos" /> Medicamentos</a></li>
+        <li><a href="produtos.html?categoria=higiene"><img src="../img/higiene_icon.png" alt="Higiene" /> Higiene</a></li>
+        <li><a href="produtos.html?categoria=infantil"><img src="../img/infantil_icon.png" alt="Infantil" /> Infantil</a></li>
+        <li><a href="produtos.html?categoria=capilares"><img src="../img/cabelos_icon.png" alt="Capilares" /> Capilares</a></li>
+        <li><a href="produtos.html?categoria=unhas"><img src="../img/unhas_icon.png" alt="Unhas" /> Unhas</a></li>
+        <li><a href="produtos.html?categoria=promocoes"><img src="../img/promocoes_icon.png" alt="Promoções" /> Promoções</a></li>
+        <li><a href="servicos.html?categoria=servicos"><img src="../img/servicos_icon.png" alt="Serviços" /> Serviços</a></li>
+        <li class="recompra-rapida">
+          <a href="#"><img src="../img/relogio_icon.png" alt="Recompra rápida" /> Recompra rápida</a>
+        </li>
+      </ul>
+    </nav>
+
+  </header>
+
+  <main class="produtos-main">
+
+    <div class="breadcrumb">
+      <a href="index.html">Início</a>
+      <span>/</span>
+      <span>Favoritos</span>
+    </div>
+
+    <div class="page-header">
+      <div class="title-area">
+        <h1>MEUS FAVORITOS</h1>
+        <p id="contadorFavoritos">Carregando favoritos...</p>
+      </div>
+    </div>
+
+    <!-- products-grid ocupa a largura toda (sem sidebar de filtros) -->
+    <section class="products-section">
+      <div class="products-grid" id="gridFavoritos">
+        <p class="sem-dados">Carregando favoritos...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+
+    <div class="footer-container">
+
+      <div class="footer-column">
+        <h4>DROGARIA POPULAR PONTE ALTA</h4>
+        <p>
+          Sua farmácia de bairro em Ponte Alta,
+          <br />
+          Gama - DF. Cuidado de verdade, sempre
+          <br />
+          por perto.
+        </p>
+      </div>
+
+      <div class="footer-column">
+        <h4>COMPRAR</h4>
+        <ul>
+          <li><a href="produtos.html">Categorias</a></li>
+          <li><a href="produtos.html">Promoções</a></li>
+          <li><a href="produtos.html">Mais vendidos</a></li>
+          <li><a href="favoritos.html">Favoritos</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>ATENDIMENTO</h4>
+        <ul>
+          <li><a href="meus-pedidos.html">Meus pedidos</a></li>
+          <li><a href="https://wa.me/5561996044119?text=Olá,%20vim%20pelo%20site%20e%20gostaria%20de%20atendimento!" target="_blank">Fale no WhatsApp</a></li>
+          <li><a href="#">Lojas e horários</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>INSTITUCIONAL</h4>
+        <ul>
+          <li><a href="sobre_nos.html">Sobre nós</a></li>
+          <li><a href="servicos.html">Nossos serviços</a></li>
+          <li><a href="termos_de_uso.html">Termos de uso</a></li>
+          <li><a href="politica_privacidade.html">Política de privacidade</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 Drogaria Popular Ponte Alta. Todos os direitos reservados.</p>
+      <p>CNPJ 00.000.000/0001-00</p>
+    </div>
+
+  </footer>
+
+  <script src="../javaScript/headerAuth.js"></script>
+  <script src="../javaScript/favoritos.js"></script>
+  <script src="../javaScript/favoritos-pagina.js"></script>
+
+</body>
+
+</html>

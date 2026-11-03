@@ -36,14 +36,36 @@ public class CarrinhoService {
     }
 
     public void validarAcesso(Integer idCliente, Authentication authentication) {
+        System.out.println("ID do cliente recebido: " + idCliente);
+
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new ApiException("Autenticacao necessaria", HttpStatus.UNAUTHORIZED);
+            System.out.println("Usuário não autenticado");
+            throw new ApiException(
+                "Autenticacao necessaria",
+                HttpStatus.UNAUTHORIZED
+            );
         }
-        boolean proprietario = clienteRepository.findById(idCliente)
-                .map(cliente -> cliente.getEmail().equalsIgnoreCase(authentication.getName()))
-                .orElse(false);
+
+        System.out.println("Nome da autenticação: " + authentication.getName());
+
+        Cliente cliente = clienteRepository.findById(idCliente).orElse(null);
+
+        System.out.println(
+            "E-mail do cliente: " +
+            (cliente != null ? cliente.getEmail() : "Cliente não encontrado")
+        );
+
+        boolean proprietario = cliente != null
+            && cliente.getEmail() != null
+            && cliente.getEmail().equalsIgnoreCase(authentication.getName());
+
+        System.out.println("É o proprietário? " + proprietario);
+
         if (!proprietario) {
-            throw new ApiException("Acesso nao permitido", HttpStatus.FORBIDDEN);
+            throw new ApiException(
+                "Acesso nao permitido",
+                HttpStatus.FORBIDDEN
+            );
         }
     }
 

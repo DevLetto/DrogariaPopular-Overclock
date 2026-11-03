@@ -52,7 +52,7 @@ async function carregarServicos() {
 
     try {
 
-        const resposta = await fetch(API_SERVICO);
+        const resposta = await window.AdminCsrf.fetch(API_SERVICO);
 
         if (!resposta.ok) {
             throw new Error("Erro ao carregar serviços.");
@@ -88,7 +88,7 @@ async function carregarLojas() {
 
     try {
 
-        const resposta = await fetch(API_LOJA);
+        const resposta = await window.AdminCsrf.fetch(API_LOJA);
 
         if (!resposta.ok) {
             throw new Error("Erro ao carregar lojas.");
@@ -463,7 +463,7 @@ formServico.addEventListener(
 
             if (servicoEditando !== null) {
 
-                resposta = await fetch(
+                resposta = await window.AdminCsrf.fetch(
                     `${API_SERVICO}/${servicoEditando}`,
                     {
                         method: "PUT",
@@ -487,7 +487,7 @@ formServico.addEventListener(
 
             else {
 
-                resposta = await fetch(
+                resposta = await window.AdminCsrf.fetch(
                     API_SERVICO,
                     {
                         method: "POST",
@@ -583,7 +583,7 @@ async function excluirServico(id) {
     try {
 
         const resposta =
-            await fetch(
+            await window.AdminCsrf.fetch(
                 `${API_SERVICO}/${id}`,
                 {
                     method: "DELETE"

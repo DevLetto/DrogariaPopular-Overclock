@@ -11,7 +11,7 @@
   <body>
 
     <!-- =====================================================
-    HEADER — global, copiado do index.html
+    HEADER
     ===================================================== -->
     <header>
       <div class="top-bar">
@@ -21,10 +21,12 @@
 
       <div class="main-header">
         <div class="logo">
-          <img
-            src="../img/logo_drogaria_popular_ponte_alta.jpeg"
-            alt="DROGARIA POPULAR PONTE ALTA"
-          />
+          <a href="index.html">
+            <img
+              src="../img/logo_drogaria_popular_ponte_alta.jpeg"
+              alt="DROGARIA POPULAR PONTE ALTA"
+            />
+          </a>
         </div>
 
         <div class="search-bar">
@@ -41,7 +43,7 @@
           <a href="sobre_nos.html" class="action-item"
             ><img src="../img/info_icon.png" alt="Sobre nós" /> Sobre nós</a
           >
-          <a href="#" class="action-item"
+          <a href="favoritos.html" class="action-item"
             ><img src="../img/coracao_icon.png" alt="Favoritos" /> Favoritos</a
           >
           <a href="login.html" class="action-item"
@@ -58,41 +60,41 @@
 
       <nav class="main-nav">
         <ul>
-          <li class="active">
-            <a href="produtos.html"
+          <li>
+            <a href="produtos.html?categoria=medicamentos"
               ><img src="../img/medicamentos_icon.png" alt="Medicamentos" />
               Medicamentos</a
             >
           </li>
           <li>
-            <a href="produtos.html"
+            <a href="produtos.html?categoria=higiene"
               ><img src="../img/higiene_icon.png" alt="Higiene" /> Higiene</a
             >
           </li>
           <li>
-            <a href="produtos.html"
+            <a href="produtos.html?categoria=infantil"
               ><img src="../img/infantil_icon.png" alt="Infantil" /> Infantil</a
             >
           </li>
           <li>
-            <a href="produtos.html"
+            <a href="produtos.html?categoria=capilares"
               ><img src="../img/cabelos_icon.png" alt="Capilares" />
               Capilares</a
             >
           </li>
           <li>
-            <a href="produtos.html"
+            <a href="produtos.html?categoria=unhas"
               ><img src="../img/unhas_icon.png" alt="Unhas" /> Unhas</a
             >
           </li>
           <li>
-            <a href="produtos.html"
+            <a href="produtos.html?categoria=promocoes"
               ><img src="../img/promocoes_icon.png" alt="Promoções" />
               Promoções</a
             >
           </li>
           <li>
-            <a href="servicos.html"
+            <a href="servicos.html?categoria=servicos"
               ><img src="../img/servicos_icon.png" alt="Serviços" /> Serviços</a
             >
           </li>
@@ -108,61 +110,51 @@
 
 
     <!-- =====================================================
-    MAIN — único desta página
+    MAIN
     ===================================================== -->
     <main>
 
-      <div class="section-container">
-        <nav class="breadcrumb" data-breadcrumb aria-label="Caminho de navegação">
+      <div class="section-container page-top">
+        <button type="button" class="btn-voltar" data-btn-voltar>
+          ← Voltar
+        </button>
+
+        <nav class="breadcrumb" aria-label="Caminho de navegação">
           <a href="index.html">Início</a>
           <span class="sep">/</span>
-          <a href="produtos.html">Medicamentos</a>
+          <a href="produtos.html" data-breadcrumb-categoria>Produtos</a>
           <span class="sep">/</span>
-          <span class="current" data-produto-nome-breadcrumb>Dipirona Sódica 500mg</span>
+          <span class="current" data-produto-nome-breadcrumb>Carregando...</span>
         </nav>
       </div>
 
       <section class="product-detail">
         <div class="section-container product-detail-grid">
 
-          <!-- Galeria -->
+          <!-- Imagem -->
           <div class="product-gallery">
             <div class="gallery-main">
-             <span
+              <span
                 class="badge-promo"
                 data-produto-badge-promo
                 hidden
-            ></span>
-              <img
-                data-produto-imagem-principal
-                src="../img/produto_placeholder.png"
-                alt="Foto do produto"
-              />
-            </div>
-            <div class="gallery-thumbs" data-produto-galeria>
-              <button class="thumb active" type="button">
-                <img src="../img/produto_placeholder.png" alt="Miniatura 1" />
-              </button>
-              <button class="thumb" type="button">
-                <img src="../img/produto_placeholder.png" alt="Miniatura 2" />
-              </button>
-              <button class="thumb" type="button">
-                <img src="../img/produto_placeholder.png" alt="Miniatura 3" />
-              </button>
+              ></span>
+              <img data-produto-imagem-principal alt="" />
             </div>
           </div>
 
           <!-- Informações -->
           <div class="product-info">
-            <span class="cat-tag" data-produto-categoria>Farmácia / Medicamentos</span>
-            <h1 data-produto-nome>Dipirona Sódica 500mg · Caixa com 20 comprimidos</h1>
+            <span class="cat-tag" data-produto-categoria></span>
+            <h1 data-produto-nome>Carregando produto...</h1>
+
             <div class="product-sku">
-              <span data-produto-tipo>Genérico</span> · Referência
-              <span data-produto-sku>#DIP500-20</span>
+              <span data-produto-tipo></span> · Referência
+              <span data-produto-sku></span>
             </div>
 
             <div class="product-price">
-              <span class="preco-atual" data-produto-preco-atual>R$ 6,90</span>
+              <span class="preco-atual" data-produto-preco-atual></span>
               <span
                 class="preco-antigo"
                 data-produto-preco-antigo
@@ -170,11 +162,7 @@
               ></span>
             </div>
 
-            <div class="product-badges" data-produto-badges>
-              <span class="badge badge-estoque">
-                <img src="../img/check_icon.png" alt="" /> Em estoque
-              </span>
-            </div>
+            <div class="product-badges" data-produto-badges></div>
 
             <div class="qty-row">
               <div class="qty-control">
@@ -182,67 +170,39 @@
                 <input type="text" data-qty-input value="1" inputmode="numeric" />
                 <button type="button" data-qty-mais aria-label="Aumentar quantidade">+</button>
               </div>
-              <span class="qty-note">Disponível em ambas as lojas</span>
             </div>
 
             <div class="product-cta">
               <button class="btn-primary-dark" data-btn-add-carrinho>
                 <img src="../img/carrinho_icon.png" alt="" /> Adicionar ao carrinho
               </button>
-              <button class="btn-fav" data-btn-favoritar aria-label="Favoritar produto">
+              <button
+                class="btn-fav"
+                type="button"
+                data-btn-favoritar
+                aria-label="Favoritar produto"
+                aria-pressed="false"
+              >
                 <img src="../img/coracao_icon.png" alt="" />
               </button>
             </div>
 
             <div class="info-block">
               <h3>Descrição</h3>
-              <p data-produto-descricao>
-                Analgésico e antitérmico indicado para o alívio de dores de intensidade
-                leve a moderada e redução de febre. Uso adulto e pediátrico conforme
-                orientação médica ou farmacêutica.
-              </p>
-            </div>
-
-            <div class="info-block">
-              <h3>Informações importantes</h3>
-              <ul class="info-list" data-produto-informacoes>
-                <li><img src="../img/info_icon.png" alt="" /> Não é necessária receita médica para este produto.</li>
-                <li><img src="../img/info_icon.png" alt="" /> Contém lactose na composição — atenção para intolerantes.</li>
-                <li><img src="../img/info_icon.png" alt="" /> Mantenha fora do alcance de crianças, em local seco e arejado.</li>
-              </ul>
-            </div>
-
-            <div class="info-block">
-              <h3>Disponibilidade por loja</h3>
-              <div class="store-avail-list" data-produto-disponibilidade>
-                <div class="store-avail-row">
-                  <div>
-                    <div class="sn">Ponte Alta Norte</div>
-                    <div class="sa">Retirada em até 1h</div>
-                  </div>
-                  <span class="avail-tag yes">● Disponível</span>
-                </div>
-                <div class="store-avail-row">
-                  <div>
-                    <div class="sn">Ponte Alta Sul</div>
-                    <div class="sa">Retirada em até 1h</div>
-                  </div>
-                  <span class="avail-tag yes">● Disponível</span>
-                </div>
-              </div>
+              <p data-produto-descricao></p>
             </div>
 
             <div class="whats-doubt">
               <img src="../img/whatsapp-circle.png" alt="" />
-              Dúvidas sobre esse remédio?
-              <a href="#" class="btn-whats-inline">Falar com farmacêutico</a>
+              Dúvidas sobre esse produto?
+              <a href="#" class="btn-whats-inline" data-whats-produto>Falar com farmacêutico</a>
             </div>
           </div>
 
         </div>
       </section>
 
-      <section class="related-products">
+      <section class="related-products" data-secao-relacionados>
         <div class="section-container">
           <div class="section-header">
             <div>
@@ -259,7 +219,7 @@
     </main>
 
     <!-- =====================================================
-    FOOTER — global, copiado do index.html
+    FOOTER
     ===================================================== -->
     <footer>
       <div class="footer-container">
@@ -273,26 +233,27 @@
         <div class="footer-column">
           <h4>COMPRAR</h4>
           <ul>
-            <li><a href="#">Categorias</a></li>
-            <li><a href="#">Promoções</a></li>
-            <li><a href="#">Mais vendidos</a></li>
-            <li><a href="#">Favoritos</a></li>
+            <li><a href="produtos.html">Categorias</a></li>
+            <li><a href="produtos.html?categoria=promocoes">Promoções</a></li>
+            <li><a href="produtos.html">Mais vendidos</a></li>
+            <li><a href="favoritos.html">Favoritos</a></li>
           </ul>
         </div>
         <div class="footer-column">
           <h4>ATENDIMENTO</h4>
           <ul>
-            <li><a href="#">Meus pedidos</a></li>
-            <li><a href="#">Fale no WhatsApp</a></li>
+            <li><a href="meus-pedidos.html">Meus pedidos</a></li>
+            <li><a href="https://wa.me/5561996044119?text=Olá,%20vim%20pelo%20site%20e%20gostaria%20de%20atendimento!" target="_blank" rel="noopener">Fale no WhatsApp</a></li>
             <li><a href="#">Lojas e horários</a></li>
           </ul>
         </div>
         <div class="footer-column">
           <h4>INSTITUCIONAL</h4>
           <ul>
-            <li><a href="#">Sobre nós</a></li>
-            <li><a href="#">Nossos serviços</a></li>
-            <li><a href="#">Trabalhe conosco</a></li>
+            <li><a href="sobre_nos.html">Sobre nós</a></li>
+            <li><a href="servicos.html">Nossos serviços</a></li>
+            <li><a href="termos_de_uso.html">Termos de uso</a></li>
+            <li><a href="politica_privacidade.html">Política de privacidade</a></li>
           </ul>
         </div>
       </div>
@@ -306,8 +267,10 @@
 
       <div class="whatsapp-float">
         <button
+          type="button"
           aria-label="Falar no WhatsApp"
           style="background: #25d366; border-radius: 50%"
+          onclick="window.open('https://wa.me/5561996044119?text=Olá,%20vim%20pelo%20site%20e%20gostaria%20de%20atendimento!', '_blank')"
         >
           <img src="../img/whatsapp-circle.png" alt="WhatsApp" />
         </button>
@@ -315,6 +278,7 @@
     </footer>
 
     <script src="../javaScript/headerAuth.js"></script>
+    <script src="../javaScript/favoritos.js"></script>
     <script src="../javaScript/item.js"></script>
   </body>
 </html>

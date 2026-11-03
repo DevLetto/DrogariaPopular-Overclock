@@ -35,6 +35,11 @@ public class ReceitaController {
 		this.a = a;	
 	}
 
+	@GetMapping
+	public List<ReceitaResponse> listar() {
+		return s.listar();
+	}
+
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ReceitaResponse> enviar(@Valid @RequestBody ReceitaRequest r, Authentication x) {
 		a.validarAcesso(r.getIdCliente(), x);
@@ -81,7 +86,7 @@ public class ReceitaController {
 	@PutMapping("/{id}/rejeitar")
     public ReceitaResponse rejeitar(
         @PathVariable Integer id,
-        @RequestParam String motivo,
+        @RequestParam("motivo") String motivo,
         Authentication auth) {
 
     return s.rejeitar(id, motivo, auth);

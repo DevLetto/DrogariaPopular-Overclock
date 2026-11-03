@@ -62,14 +62,25 @@
       .trim();
   }
 
-  function obterTokenCSRF() {
-  const cookie = document.cookie
-    .split("; ")
-    .find((item) => item.startsWith("XSRF-TOKEN="));
+  async function obterCsrfCarrinho() {
+    const resposta = await fetch(`${API_BASE_URL}/auth/csrf`, {
+      credentials: "include",
+    });
 
-  return cookie
-    ? decodeURIComponent(cookie.substring("XSRF-TOKEN=".length))
-    : null;
+    if (!resposta.ok) {
+      throw new Error("Não foi possível obter o token CSRF.");
+    }
+
+    const dados = await resposta.json();
+
+    if (!dados?.token || !dados?.headerName) {
+      throw new Error("O servidor não retornou os dados CSRF válidos.");
+    }
+
+    return {
+      token: dados.token,
+      headerName: dados.headerName,
+    };
   }
 
   async function fetchJson(url) {
@@ -104,6 +115,7 @@
         Array.isArray(promocoesApi) ? promocoesApi : []
       ).filter(promocaoEstaAtiva);
 
+      await Favoritos.carregar();
       renderizarCategorias();
       definirCategoriaAtual();
       preencherBuscaInicial();
@@ -505,7 +517,6 @@
       const controlado =
     produto.medicamentoControlado === true ||
     produto.medicamentoControlado === 1;
-    const produtoRestrito = receita || controlado;
 
     return `
       <article
@@ -526,12 +537,14 @@
 
           <button
             type="button"
-            class="btn-fav"
+            class="btn-fav ${Favoritos.eh(id) ? "ativo" : ""}"
             data-favoritar
             aria-label="Favoritar produto"
+            aria-pressed="${Favoritos.eh(id) ? "true" : "false"}"
           >
             <img src="../img/coracao_icon.png" alt="Favoritar">
           </button>
+          
 
           <img
             src="${escaparAtributo(imagem)}"
@@ -561,9 +574,7 @@
           </div>
 
           ${
-            produtoRestrito
-              ? `<button type="button" class="btn-notify btn-restricted-contact" data-contato-farmacia>Falar com a farmácia</button>`
-              : foraEstoque
+            foraEstoque
               ? `<button type="button" class="btn-notify">Avisar quando chegar</button>`
               : `<button type="button" class="btn-add-cart">Adicionar <img src="../img/carrinho_icon.png" alt=""></button>`
           }
@@ -573,19 +584,18 @@
 
   function adicionarEventosProdutos(container) {
     container.querySelectorAll("[data-produto-id]").forEach((card) => {
-      const botaoCarrinho = card.querySelector(".btn-add-cart");
-      const botaoContato = card.querySelector("[data-contato-farmacia]");
+            const botaoFav = card.querySelector(".btn-fav");
 
-      if (botaoContato) {
-        botaoContato.addEventListener("click", (event) => {
+      if (botaoFav) {
+        botaoFav.addEventListener("click", async (event) => {
           event.preventDefault();
           event.stopPropagation();
-          window.open(
-            "https://wa.me/5561996044119?text=Olá,%20gostaria%20de%20informações%20sobre%20um%20medicamento%20com%20receita%20ou%20controlado.",
-            "_blank",
-          );
+
+          await alternarFavorito(card.dataset.produtoId, botaoFav);
         });
       }
+      const botaoCarrinho = card.querySelector(".btn-add-cart");
+    
 
       if (botaoCarrinho) {
         botaoCarrinho.addEventListener("click", async (event) => {
@@ -681,24 +691,34 @@
     });
   }
 
-  async function adicionarProdutoAoCarrinho(idProduto, botao) {
-    const produto = todosProdutos.find(
-      (item) => String(obterIdProduto(item)) === String(idProduto),
-    );
-    const produtoRestrito =
-      produto?.necessitaReceita === true ||
-      produto?.necessitaReceita === 1 ||
-      produto?.medicamentoControlado === true ||
-      produto?.medicamentoControlado === 1;
 
-    if (produtoRestrito) {
+  async function alternarFavorito(idProduto, botao) {
+    botao.disabled = true;
+
+    try {
+      const favoritado = await Favoritos.alternar(idProduto);
+
+      botao.classList.toggle("ativo", favoritado);
+      botao.setAttribute("aria-pressed", String(favoritado));
+
       mostrarNotificacao(
-        "Este produto não pode ser comprado diretamente. Entre em contato com a farmácia.",
-        "aviso",
+        favoritado ? "Adicionado aos favoritos!" : "Removido dos favoritos.",
       );
-      return;
-    }
+    } catch (erro) {
+      if (erro.naoLogado) {
+        mostrarNotificacao(erro.message, "aviso");
+        setTimeout(() => (window.location.href = "login.html"), 1200);
+        return;
+      }
 
+      console.error("Erro ao atualizar favoritos:", erro);
+      mostrarNotificacao("Não foi possível atualizar os favoritos.", "erro");
+    } finally {
+      botao.disabled = false;
+    }
+  }
+
+  async function adicionarProdutoAoCarrinho(idProduto, botao) {
     const usuarioSalvo = localStorage.getItem("usuarioLogado");
 
     if (!usuarioSalvo) {
@@ -747,17 +767,13 @@
       botao.disabled = true;
       botao.textContent = "Adicionando...";
 
-      const tokenCSRF = obterTokenCSRF();
-
-      if (!tokenCSRF) {
-        throw new Error("Token CSRF não encontrado. Atualize a página e tente novamente.");
-      }
+      const csrf = await obterCsrfCarrinho();
 
       const resposta = await fetch(`${API_BASE_URL}/carrinho`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-XSRF-TOKEN": tokenCSRF,
+          [csrf.headerName]: csrf.token,
         },
         credentials: "include",
         body: JSON.stringify({

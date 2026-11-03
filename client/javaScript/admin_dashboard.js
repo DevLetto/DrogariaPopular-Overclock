@@ -13,6 +13,12 @@
     let clientes = [];
     let estoques = [];
     let produtos = [];
+    let estadoEndpoints = {
+        pedidos: false,
+        clientes: false,
+        estoques: false,
+        produtos: false
+    };
 
     let periodoAtual = "7d";
 
@@ -80,6 +86,7 @@
                     periodoAtual =
                         botao.dataset.periodo || "7d";
 
+                    atualizarKPIs();
                     renderizarGrafico();
 
                 }
@@ -179,61 +186,46 @@
     async function carregarDashboard() {
 
         mostrarEstadoCarregando();
+        estadoEndpoints = {
+            pedidos: false,
+            clientes: false,
+            estoques: false,
+            produtos: false
+        };
 
-        try {
+        const resultados =
+            await Promise.allSettled([
+                buscar(ENDPOINTS.PEDIDOS),
+                buscar(ENDPOINTS.CLIENTES),
+                buscar(ENDPOINTS.ESTOQUE),
+                buscar(ENDPOINTS.PRODUTOS)
+            ]);
 
-            const resultados =
-                await Promise.allSettled([
+        pedidos = resultadoOuVazio(
+            resultados[0],
+            "pedidos",
+            estadoEndpoints
+        );
+        clientes = resultadoOuVazio(
+            resultados[1],
+            "clientes",
+            estadoEndpoints
+        );
+        estoques = resultadoOuVazio(
+            resultados[2],
+            "estoques",
+            estadoEndpoints
+        );
+        produtos = resultadoOuVazio(
+            resultados[3],
+            "produtos",
+            estadoEndpoints
+        );
 
-                    buscar(ENDPOINTS.PEDIDOS),
-
-                    buscar(ENDPOINTS.CLIENTES),
-
-                    buscar(ENDPOINTS.ESTOQUE),
-
-                    buscar(ENDPOINTS.PRODUTOS)
-
-                ]);
-
-
-            pedidos =
-                resultadoOuVazio(
-                    resultados[0]
-                );
-
-            clientes =
-                resultadoOuVazio(
-                    resultados[1]
-                );
-
-            estoques =
-                resultadoOuVazio(
-                    resultados[2]
-                );
-
-            produtos =
-                resultadoOuVazio(
-                    resultados[3]
-                );
-
-
-            atualizarKPIs();
-
-            renderizarGrafico();
-
-            renderizarPedidosRecentes();
-
-            renderizarEstoqueBaixo();
-
-
-        } catch (erro) {
-
-            console.error(
-                "Erro ao carregar dashboard:",
-                erro
-            );
-
-        }
+        executarSeguro(atualizarKPIs);
+        executarSeguro(renderizarGrafico);
+        executarSeguro(renderizarPedidosRecentes);
+        executarSeguro(renderizarEstoqueBaixo);
 
     }
 
@@ -243,6 +235,7 @@
         const resposta =
             await fetch(url, {
                 method: "GET",
+                credentials: "include",
                 headers: {
                     "Content-Type":
                         "application/json"
@@ -264,30 +257,30 @@
     }
 
 
-    function resultadoOuVazio(resultado) {
+    function resultadoOuVazio(resultado, chave, estado) {
 
         if (
             resultado.status === "fulfilled" &&
             Array.isArray(resultado.value)
         ) {
+            estado[chave] = true;
 
             return resultado.value;
 
         }
 
-        if (
-            resultado.status === "fulfilled" &&
-            resultado.value
-        ) {
-
-            return resultado.value;
-
+        if (resultado.status === "fulfilled") {
+            console.error(
+                `Resposta inválida em ${chave}: esperado um array.`
+            );
+            estado[chave] = false;
+        } else {
+            console.error(
+                "Erro em uma requisição:",
+                resultado.reason
+            );
+            estado[chave] = false;
         }
-
-        console.error(
-            "Erro em uma requisição:",
-            resultado.reason
-        );
 
         return [];
 
@@ -299,6 +292,13 @@
     // =========================================================
 
     function atualizarKPIs() {
+        if (!estadoEndpoints.pedidos) {
+            definirTexto("kpi-vendas-hoje", "Indisponível");
+            definirTexto("kpi-pedidos-hoje", "Indisponível");
+            definirTexto("kpi-ticket-medio", "Indisponível");
+            definirTexto("kpi-vendas-variacao", "Falha ao carregar pedidos");
+            definirTexto("kpi-pedidos-preparo", "Dados indisponíveis");
+        } else {
 
         const hoje =
             inicioDoDia(new Date());
@@ -462,6 +462,7 @@
             "kpi-ticket-medio",
             formatarMoeda(ticketMedio)
         );
+        }
 
 
         // -----------------------------------------------------
@@ -469,22 +470,49 @@
         // -----------------------------------------------------
 
         /*
-         * ClienteResponse atualmente não possui
-         * data de cadastro.
-         *
-         * Portanto não é possível saber quais
-         * clientes foram cadastrados hoje.
+         * ClienteResponse expõe dataCadastro como
+         * uma data real LocalDate.
          */
 
-        definirTexto(
-            "kpi-clientes-novos",
-            "—"
-        );
+        if (!estadoEndpoints.clientes) {
+            definirTexto("kpi-clientes-novos", "Indisponível");
+            definirTexto(
+                "kpi-clientes-sub",
+                "falha ao carregar clientes"
+            );
+        } else {
+            const diasPeriodo =
+                periodoAtual === "30d" ? 30 : 7;
+            const inicio =
+                new Date(inicioDoDia(new Date()));
 
-        definirTexto(
-            "kpi-clientes-sub",
-            "data de cadastro não disponível"
-        );
+            inicio.setDate(
+                inicio.getDate() - (diasPeriodo - 1)
+            );
+
+            const clientesNovos =
+                clientes.filter(function (cliente) {
+                    const data =
+                        converterData(
+                            cliente.dataCadastro
+                        );
+
+                    return (
+                        data !== 0 &&
+                        data >= inicio.getTime() &&
+                        data <= Date.now()
+                    );
+                }).length;
+
+            definirTexto(
+                "kpi-clientes-novos",
+                clientesNovos
+            );
+            definirTexto(
+                "kpi-clientes-sub",
+                `cadastros nos últimos ${diasPeriodo} dias`
+            );
+        }
 
     }
 
@@ -507,6 +535,11 @@
 
 
         grafico.innerHTML = "";
+        if (!estadoEndpoints.pedidos) {
+            grafico.innerHTML =
+                '<div style="width:100%;text-align:center;padding:40px 10px;">Dados de vendas indisponíveis</div>';
+            return;
+        }
 
 
         if (periodoAtual === "30d") {
@@ -557,6 +590,16 @@
                 );
 
             });
+
+        if (
+            valores.every(function (valor) {
+                return valor === 0;
+            })
+        ) {
+            grafico.innerHTML =
+                '<div style="width:100%;text-align:center;padding:40px 10px;">Nenhuma venda no período.</div>';
+            return;
+        }
 
 
         const maiorValor =
@@ -737,6 +780,15 @@
 
         }
 
+        if (
+            grupos.every(function (grupo) {
+                return grupo.valor === 0;
+            })
+        ) {
+            grafico.innerHTML =
+                '<div style="width:100%;text-align:center;padding:40px 10px;">Nenhuma venda no período.</div>';
+            return;
+        }
 
         const maiorValor =
             Math.max(
@@ -886,6 +938,16 @@
 
 
         tbody.innerHTML = "";
+        if (!estadoEndpoints.pedidos) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = 5;
+            td.style.textAlign = "center";
+            td.textContent = "Pedidos indisponíveis — falha ao carregar o endpoint.";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            return;
+        }
 
 
         const recentes =
@@ -957,6 +1019,24 @@
                 tdPedido.textContent =
                     `#${pedido.id ?? "—"}`;
 
+                const dataPedido =
+                    converterData(
+                        pedido.dataPedido
+                    );
+
+                if (dataPedido) {
+                    const data =
+                        document.createElement("small");
+                    data.style.display = "block";
+                    data.textContent =
+                        formatarDataHora(
+                            pedido.dataPedido
+                        );
+                    if (data.textContent) {
+                        tdPedido.appendChild(data);
+                    }
+                }
+
 
                 // Cliente
 
@@ -970,8 +1050,7 @@
                  * informações do cliente.
                  */
 
-                tdCliente.textContent =
-                    "—";
+                tdCliente.textContent = nomeDoCliente(pedido)
 
 
                 // Entrega
@@ -986,8 +1065,7 @@
                  * endereço/tipo de entrega.
                  */
 
-                tdEntrega.textContent =
-                    "—";
+                tdEntrega.textContent = textoEntrega(pedido)
 
 
                 // Total
@@ -1004,6 +1082,9 @@
                         )
                     );
 
+
+
+                
 
                 // Status
 
@@ -1029,9 +1110,11 @@
                     "status-badge";
 
 
-                badge.classList.add(
-                    classeStatus(status)
-                );
+                const classe = classeStatus(status);
+
+                if (classe) {
+                    badge.classList.add(classe);
+                }
 
 
                 badge.textContent =
@@ -1071,6 +1154,26 @@
 
     }
 
+        function nomeDoCliente(pedido) {
+        if (pedido.nomeCliente) {
+            return pedido.nomeCliente;
+        }
+
+        const cliente = clientes.find(function (item) {
+            return String(item.idCliente ?? item.id) === String(pedido.idCliente);
+        });
+
+        return cliente?.nome ?? cliente?.nomeCompleto ?? "—";
+    }
+
+    function textoEntrega(pedido) {
+        const forma = String(pedido.formaEntrega ?? "").toLowerCase();
+
+        if (forma.includes("retir")) return "Retirada";
+        if (forma.includes("entreg")) return "Entrega";
+
+        return "—";
+    }
 
     // =========================================================
     // ESTOQUE BAIXO
@@ -1090,6 +1193,13 @@
 
 
         lista.innerHTML = "";
+        if (!estadoEndpoints.estoques) {
+            const li = document.createElement("li");
+            li.className = "sem-dados";
+            li.textContent = "Estoque indisponível — falha ao carregar o endpoint.";
+            lista.appendChild(li);
+            return;
+        }
 
 
         const itens =
@@ -1106,6 +1216,11 @@
                      * idProduto
                      */
 
+                    const estoqueProdutoId =
+                        estoque.idProduto ??
+                        estoque.produto?.idProduto ??
+                        estoque.produto?.id;
+
                     const produto =
                         produtos.find(
                             function (produto) {
@@ -1115,30 +1230,46 @@
                                         produto.idProduto
                                     ) ===
                                     String(
-                                        estoque.idProduto
+                                        estoqueProdutoId
                                     )
                                 );
 
                             }
                         );
 
+                    const quantidade =
+                        Number(
+                            Number.isFinite(
+                                Number(estoque.quantidade)
+                            )
+                                ? Number(estoque.quantidade)
+                                : 0
+                        );
+
+                    const estoqueMinimo =
+                        Number(
+                            Number.isFinite(
+                                Number(estoque.estoqueMinimo)
+                            )
+                                ? Number(estoque.estoqueMinimo)
+                                : 0
+                        );
 
                     return {
 
                         nome:
                             produto
                                 ? produto.nomeProduto
-                                : `Produto #${estoque.idProduto}`,
+                                : `Produto #${estoqueProdutoId ?? "—"}`,
 
-                        quantidade:
-                            Number(
-                                estoque.quantidade || 0
-                            ),
-
-                        estoqueMinimo:
-                            Number(
-                                estoque.estoqueMinimo || 0
-                            )
+                        quantidade,
+                        estoqueMinimo,
+                        status:
+                            quantidade <= 0
+                                ? "esgotado"
+                                : quantidade <= estoqueMinimo
+                                    ? "baixo"
+                                    : "ativo"
 
                     };
 
@@ -1148,8 +1279,7 @@
                 .filter(function (item) {
 
                     return (
-                        item.quantidade <=
-                        item.estoqueMinimo
+                        item.status !== "ativo"
                     );
 
                 })
@@ -1262,6 +1392,13 @@
 
     }
 
+    function executarSeguro(funcao) {
+        try {
+            funcao();
+        } catch (erro) {
+            console.error(`Erro em ${funcao.name}:`, erro);
+        }
+    }
 
     // =========================================================
     // STATUS
@@ -1281,7 +1418,8 @@
             .replace(
                 /[\u0300-\u036f]/g,
                 ""
-            );
+            )
+            .replace(/[\s_-]+/g, " ");
 
     }
 
@@ -1346,6 +1484,8 @@
             case "cancelado":
             case "cancelada":
                 return "status-cancelado";
+            case "pendente":
+                return "status-pendente";
 
 
             default:
@@ -1399,6 +1539,29 @@
             return 0;
         }
 
+        if (
+            typeof valor === "string" &&
+            /^\d{4}-\d{2}-\d{2}$/.test(valor)
+        ) {
+            const partes =
+                valor.split("-").map(Number);
+            const data =
+                new Date(
+                    partes[0],
+                    partes[1] - 1,
+                    partes[2]
+                );
+
+            if (
+                data.getFullYear() !== partes[0] ||
+                data.getMonth() !== partes[1] - 1 ||
+                data.getDate() !== partes[2]
+            ) {
+                return 0;
+            }
+
+            return data.getTime();
+        }
 
         const data =
             new Date(valor);
@@ -1416,6 +1579,42 @@
 
 
         return data.getTime();
+
+    }
+
+    function formatarDataHora(valor) {
+
+        if (!valor) {
+            return "";
+        }
+
+        const data =
+            new Date(valor);
+
+        if (
+            Number.isNaN(
+                data.getTime()
+            )
+        ) {
+            return "";
+        }
+
+        const dia =
+            String(data.getDate())
+                .padStart(2, "0");
+        const mes =
+            String(data.getMonth() + 1)
+                .padStart(2, "0");
+        const ano =
+            data.getFullYear();
+        const hora =
+            String(data.getHours())
+                .padStart(2, "0");
+        const minuto =
+            String(data.getMinutes())
+                .padStart(2, "0");
+
+        return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
 
     }
 
@@ -1604,6 +1803,13 @@
 
 
     function mostrarEstadoCarregando() {
+        definirTexto("kpi-vendas-hoje", "Carregando...");
+        definirTexto("kpi-vendas-variacao", "Carregando...");
+        definirTexto("kpi-pedidos-hoje", "Carregando...");
+        definirTexto("kpi-pedidos-preparo", "Carregando...");
+        definirTexto("kpi-ticket-medio", "Carregando...");
+        definirTexto("kpi-clientes-novos", "—");
+        definirTexto("kpi-clientes-sub", "data de cadastro não disponível");
 
         const tbody =
             document.getElementById(

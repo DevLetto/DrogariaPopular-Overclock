@@ -1,6 +1,7 @@
 package com.drogaria.backend.dto;
 
 import com.drogaria.backend.entity.Cliente;
+import java.time.LocalDate;
 
 public class ClienteResponse {
 
@@ -11,6 +12,7 @@ public class ClienteResponse {
     private String telefone;
     private String role;
     private boolean contaAprovada;
+    private LocalDate dataCadastro;
 
     public ClienteResponse() {
     }
@@ -23,6 +25,7 @@ public class ClienteResponse {
         this.email = cliente.getEmail();
         this.telefone = cliente.getTelefone();
         this.contaAprovada = cliente.isContaAprovada();
+        this.dataCadastro = cliente.getDataCadastro();
     }
 
     public Integer getIdCliente() {
@@ -81,5 +84,13 @@ public class ClienteResponse {
     
     public void setContaAprovada(boolean contaAprovada) {
         this.contaAprovada = contaAprovada; 
+    }
+
+    public LocalDate getDataCadastro() {
+        return dataCadastro;
+    }
+
+    public void setDataCadastro(LocalDate dataCadastro) {
+        this.dataCadastro = dataCadastro;
     }
 }

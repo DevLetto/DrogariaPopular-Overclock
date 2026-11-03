@@ -17,6 +17,70 @@
  */
 
 const API_BASE_URL = "http://localhost:8080/api";
+let tokenCsrf = null;
+let headerNameCsrf = null;
+let preparacaoCsrf = null;
+
+async function obterCsrf() {
+    if (tokenCsrf && headerNameCsrf) {
+        return { token: tokenCsrf, headerName: headerNameCsrf };
+    }
+
+    if (!preparacaoCsrf) {
+        preparacaoCsrf = fetch(
+            `${API_BASE_URL}/auth/csrf`,
+            { credentials: "include" }
+        ).then(async (resposta) => {
+            if (!resposta.ok) {
+                throw new Error(
+                    "Não foi possível obter o token CSRF. Atualize a página e autentique-se novamente."
+                );
+            }
+
+            const dados = await resposta.json();
+
+            if (!dados?.token) {
+                throw new Error(
+                    "O servidor não retornou um token CSRF válido. Atualize a página."
+                );
+            }
+
+            tokenCsrf = dados.token;
+            headerNameCsrf = dados.headerName || "X-CSRF-TOKEN";
+
+            return {
+                token: tokenCsrf,
+                headerName: headerNameCsrf
+            };
+        }).catch((erro) => {
+            tokenCsrf = null;
+            headerNameCsrf = null;
+            throw erro;
+        }).finally(() => {
+            preparacaoCsrf = null;
+        });
+    }
+
+    return preparacaoCsrf;
+}
+
+async function prepararOpcoesCsrf(opcoes) {
+    const metodo = String(opcoes.method || "GET").toUpperCase();
+
+    if (!["POST", "PUT", "DELETE"].includes(metodo)) {
+        return opcoes;
+    }
+
+    const csrf = await obterCsrf();
+
+    return {
+        ...opcoes,
+        headers: {
+            ...(opcoes.headers || {}),
+            [csrf.headerName]: csrf.token
+        }
+    };
+}
 
 const state = {
     produtos: [],
@@ -81,7 +145,7 @@ async function carregarDados() {
             categorias,
             estoques,
             promocoes
-        ] = await Promise.all([
+        ] = await Promise.allSettled([
 
             requisicao("/produto"),
 
@@ -93,26 +157,61 @@ async function carregarDados() {
         ]);
 
         state.produtos =
-            Array.isArray(produtos)
-                ? produtos
+            produtos.status === "fulfilled" &&
+            Array.isArray(produtos.value)
+                ? produtos.value
                 : [];
 
         state.categorias =
-            Array.isArray(categorias)
-                ? categorias
+            categorias.status === "fulfilled" &&
+            Array.isArray(categorias.value)
+                ? categorias.value
                 : [];
 
         state.estoques =
-            Array.isArray(estoques)
-                ? estoques
+            estoques.status === "fulfilled" &&
+            Array.isArray(estoques.value)
+                ? estoques.value
                 : [];
 
         state.promocoes =
-            Array.isArray(promocoes)
-                ? promocoes
+            promocoes.status === "fulfilled" &&
+            Array.isArray(promocoes.value)
+                ? promocoes.value
                 : [];
 
+        if (estoques.status === "rejected") {
+            console.warn(
+                "Não foi possível carregar o estoque:",
+                estoques.reason.message
+            );
+        }
+
         renderizarTudo();
+
+        if (
+            produtos.status === "rejected" ||
+            categorias.status === "rejected"
+        ) {
+            const erro =
+                produtos.status === "rejected"
+                    ? produtos.reason
+                    : categorias.reason;
+
+            console.error(
+                "Erro ao carregar produtos ou categorias:",
+                erro
+            );
+
+            if (produtos.status === "rejected") {
+                mostrarErroTabela(erro.message);
+            }
+
+            mostrarMensagem(
+                "Não foi possível carregar todos os dados.",
+                "erro"
+            );
+        }
 
     } catch (error) {
 
@@ -1355,17 +1454,19 @@ async function requisicao(
     endpoint,
     opcoes = {}
 ) {
+    const opcoesComCsrf = await prepararOpcoesCsrf(opcoes);
 
     const configuracao = {
 
-        ...opcoes,
+        ...opcoesComCsrf,
+        credentials: "include",
 
         headers: {
 
             "Content-Type":
                 "application/json",
 
-            ...(opcoes.headers || {})
+            ...(opcoesComCsrf.headers || {})
         }
     };
 
@@ -1394,6 +1495,13 @@ async function requisicao(
     }
 
     if (!resposta.ok) {
+        if (resposta.status === 403) {
+            tokenCsrf = null;
+            headerNameCsrf = null;
+            throw new Error(
+                "Acesso negado ou sessão CSRF expirada. Atualize a página, autentique-se novamente e tente outra vez."
+            );
+        }
 
         const mensagem =
 

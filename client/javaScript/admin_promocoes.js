@@ -36,7 +36,7 @@ function configurarEventos() {
 ================================ */
 
 async function requisicao(endpoint, opcoes = {}) {
-    const resposta = await fetch(
+    const resposta = await window.AdminCsrf.fetch(
         `${API_BASE_URL}${endpoint}`,
         {
             headers: {

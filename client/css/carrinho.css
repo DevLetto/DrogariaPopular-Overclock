@@ -395,3 +395,64 @@ h1 {
 .resumo-pedido button:last-child:hover{
   background-color: var(--green);
 }
+
+
+.section-lista-controlados {
+  background-color: var(--white);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #f3d9a4;
+  border-left: 4px solid #e6a100;
+}
+
+.controlados-aviso {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin: -6px 0 12px;
+}
+
+.controlados-receita {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--paper-dim);
+}
+
+.btn-anexar-receita {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  background-color: var(--navy-800);
+  color: var(--white);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-anexar-receita:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.receita-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.receita-status {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.receita-status.analise   { background: #fff4d6; color: #8a6100; }
+.receita-status.aprovada  { background: #e0f6e9; color: var(--green); }
+.receita-status.rejeitada { background: #fdecea; color: var(--red); }
+
+.item-restricao {
+  font-size: 11px;
+  color: #8a6100;
+  margin-top: 4px;
+}

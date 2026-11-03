@@ -38,7 +38,7 @@
           <a href="sobre_nos.html" class="action-item"
             ><img src="../img/info_icon.png" alt="Sobre nós" /> Sobre nós</a
           >
-          <a href="#" class="action-item"
+          <a href="favoritos.html" class="action-item"
             ><img src="../img/coracao_icon.png" alt="Favoritos" /> Favoritos</a
           >
           <a href="login.html" class="action-item"
@@ -117,8 +117,14 @@
             ajuda? É só chamar no WhatsApp.
           </p>
           <div class="hero-buttons">
-            <button class="btn-primary">Ver ofertas da semana →</button>
-            <button class="btn-secondary">Encontrar minha loja</button>
+            <button
+              type="button"
+              class="btn-primary"
+              data-btn-ofertas
+              data-destino="produtos.html?promocao=true"
+            >
+              Ver ofertas da semana →
+            </button>
           </div>
           <div class="hero-stats">
             <div class="stat">
@@ -133,8 +139,8 @@
 
         <div class="hero-card-floating">
           <div class="card-header">
-            <span>OFERTAS DE HOJE</span>
-            <span class="status-green">● ATUALIZADO AGORA</span>
+            <span data-ofertas-titulo>OFERTAS DE HOJE</span>
+            <span class="status-green" data-ofertas-status>● ATUALIZADO AGORA</span>
           </div>
           <ul class="cart-preview" data-ofertas-hero>
             <li><span>Carregando ofertas...</span></li>
@@ -147,49 +153,49 @@
           <span class="section-tag">ACESSO RÁPIDO</span>
           <h2>O QUE VOCÊ PROCURA?</h2>
           <div class="icon-grid">
-            <a href="#" class="icon-item"
+            <a href="produtos.html?categoria=medicamentos" class="icon-item"
               ><span class="icon"
                 ><img src="../img/medicamentos_icon.png" alt="Remédios"
               /></span>
               Remédios</a
             >
-            <a href="#" class="icon-item"
+            <a href="produtos.html?categoria=infantil" class="icon-item"
               ><span class="icon"
                 ><img src="../img/infantil_icon.png" alt="Fraldas e leites"
               /></span>
               Fraldas e leites</a
             >
-            <a href="#" class="icon-item"
+            <a href="produtos.html?categoria=capilares" class="icon-item"
               ><span class="icon"
                 ><img src="../img/cabelos_icon.png" alt="Shampoo e tintas"
               /></span>
               Shampoo e tintas</a
             >
-            <a href="#" class="icon-item"
+            <a href="produtos.html?categoria=unhas" class="icon-item"
               ><span class="icon"
                 ><img src="../img/unhas_icon.png" alt="Esmaltes"
               /></span>
               Esmaltes</a
             >
-            <a href="#" class="icon-item"
+            <a href="servicos.html" class="icon-item"
               ><span class="icon"
                 ><img src="../img/injecao_icon.png" alt="Injeção"
               /></span>
               Injeção</a
             >
-            <a href="#" class="icon-item"
+            <a href="servicos.html" class="icon-item"
               ><span class="icon"
                 ><img src="../img/servicos_icon.png" alt="Furo de orelha"
               /></span>
               Furo de orelha</a
             >
-            <a href="#" class="icon-item"
+            <a href="produtos.html?categoria=higiene" class="icon-item"
               ><span class="icon"
                 ><img src="../img/higiene_icon.png" alt="Higiene"
               /></span>
               Higiene</a
             >
-            <a href="#" class="icon-item"
+            <a href="produtos.html" class="icon-item"
               ><span class="icon"
                 ><img src="../img/check_icon.png" alt="Ver tudo"
               /></span>
@@ -237,7 +243,7 @@
               <span class="section-tag">NAVEGUE POR SEÇÃO</span>
               <h2>CATEGORIAS</h2>
             </div>
-            <a href="#">Ver todas as categorias →</a>
+            <a href="produtos.html">Ver todas as categorias →</a>
           </div>
           <div class="category-cards" data-categorias>
             <p class="sem-dados">Carregando categorias...</p>
@@ -252,7 +258,7 @@
               <span class="section-tag">POR TEMPO LIMITADO</span>
               <h2>EM PROMOÇÃO</h2>
             </div>
-            <a href="#">Ver todas as ofertas →</a>
+            <a href="produtos.html?promocao=true">Ver todas as ofertas →</a>
           </div>
           <div class="product-carousel" data-promocoes>
             <p class="sem-dados">Carregando promoções...</p>
@@ -266,7 +272,7 @@
             <span class="section-tag">PREFERIDOS DA VIZINHANÇA</span>
             <h2>MAIS VENDIDOS</h2>
           </div>
-          <a href="#">Ver mais →</a>
+          <a href="produtos.html">Ver mais →</a>
         </div>
         <div class="product-carousel" data-mais-vendidos>
           <p class="sem-dados">Carregando produtos...</p>
@@ -316,13 +322,12 @@
         </div>
       </section>
 
-      <section class="stores">
+      <section class="stores" id="lojas">
         <div class="section-header">
           <div>
             <span class="section-tag">PERTO DE VOCÊ</span>
             <h2>NOSSAS LOJAS</h2>
           </div>
-          <a href="#">Ver no mapa →</a>
         </div>
         <div class="stores-grid" data-lojas>
           <p class="sem-dados">Carregando lojas...</p>
@@ -351,33 +356,34 @@
     <footer>
       <div class="footer-container">
 
-      <div class="footer-column">
-      <h4>DROGARIA POPULAR PONTE ALTA</h4>
-      <p>
-        Sua farmácia de bairro em Ponte Alta,<br />
-        Gama - DF. Cuidado de verdade, sempre<br />
-        por perto.
-      </p>
-      </div>
+        <div class="footer-column">
+          <h4>DROGARIA POPULAR PONTE ALTA</h4>
+          <p>
+            Sua farmácia de bairro em Ponte Alta,<br />
+            Gama - DF. Cuidado de verdade, sempre<br />
+            por perto.
+          </p>
+        </div>
 
-      <div class="footer-column">
-      <h4>COMPRAR</h4>
-      <ul>
-        <li><a href="#">Categorias</a></li>
-        <li><a href="#">Promoções</a></li>
-        <li><a href="#">Mais vendidos</a></li>
-        <li><a href="#">Favoritos</a></li>
-      </ul>
-    </div>
-
-      <div class="footer-column">
-          <h4>ATENDIMENTO</h4>
+        <div class="footer-column">
+          <h4>COMPRAR</h4>
           <ul>
-            <li><a href="#">Meus pedidos</a></li>
-            <li><a href="https://wa.me/5561996044119?text=Olá,%20vim%20pelo%20site%20e%20gostaria%20de%20atendimento!", target="_blank">Fale no WhatsApp</a></li>
-            <li><a href="#">Lojas e horários</a></li>
+            <li><a href="produtos.html">Categorias</a></li>
+            <li><a href="produtos.html?promocao=true">Promoções</a></li>
+            <li><a href="produtos.html">Mais vendidos</a></li>
+            <li><a href="favoritos.html">Favoritos</a></li>
           </ul>
         </div>
+
+        <div class="footer-column">
+          <h4>ATENDIMENTO</h4>
+          <ul>
+            <li><a href="meus-pedidos.html">Meus pedidos</a></li>
+            <li><a href="https://wa.me/5561996044119?text=Olá,%20vim%20pelo%20site%20e%20gostaria%20de%20atendimento!" target="_blank" rel="noopener">Fale no WhatsApp</a></li>
+            <li><a href="#lojas">Lojas e horários</a></li>
+          </ul>
+        </div>
+
         <div class="footer-column">
           <h4>INSTITUCIONAL</h4>
           <ul>
@@ -387,34 +393,35 @@
             <li><a href="politica_privacidade.html">Política de privacidade</a></li>
           </ul>
         </div>
+
       </div>
 
-  <!-- MAPA DO SITE -->
-  <div class="footer-sitemap">
-    <h4>MAPA DO SITE</h4>
+      <!-- MAPA DO SITE -->
+      <div class="footer-sitemap">
+        <h4>MAPA DO SITE</h4>
 
-    <div class="footer-sitemap-image">
-      <img
-        src="../img/mapa_site.png"
-        alt="Mapa do site da Drogaria Popular Ponte Alta"
-      />
-    </div>
-  </div>
+        <div class="footer-sitemap-image">
+          <img
+            src="../img/mapa_site.png"
+            alt="Mapa do site da Drogaria Popular Ponte Alta"
+          />
+        </div>
+      </div>
 
-  <div class="footer-bottom">
-    <p>
-      &copy; 2026 Drogaria Popular Ponte Alta. Todos os direitos reservados.
-    </p>
+      <div class="footer-bottom">
+        <p>
+          &copy; 2026 Drogaria Popular Ponte Alta. Todos os direitos reservados.
+        </p>
 
-    <p>CNPJ 00.000.000/0001-00</p>
-  </div>
+        <p>CNPJ 00.000.000/0001-00</p>
+      </div>
 
-  <div class="whatsapp-float">
-    <button type="button" aria-label="Falar no WhatsApp" style="background: #25d366; border-radius: 50%; cursor: pointer; border: none; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(37,211,102,0.3);"
-      onclick="window.open('https://wa.me/5561996044119?text=Olá,%20vim%20pelo%20site%20e%20gostaria%20de%20atendimento!', '_blank')">
-      <img src="../img/whatsapp-circle.png" alt="WhatsApp" style="width: 35px; height: 35px;"/>
-    </button>
-  </div>
+      <div class="whatsapp-float">
+        <button type="button" aria-label="Falar no WhatsApp" style="background: #25d366; border-radius: 50%; cursor: pointer; border: none; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(37,211,102,0.3);"
+          onclick="window.open('https://wa.me/5561996044119?text=Olá,%20vim%20pelo%20site%20e%20gostaria%20de%20atendimento!', '_blank')">
+          <img src="../img/whatsapp-circle.png" alt="WhatsApp" style="width: 35px; height: 35px;"/>
+        </button>
+      </div>
     </footer>
 
     <script src="../javaScript/headerAuth.js"></script>

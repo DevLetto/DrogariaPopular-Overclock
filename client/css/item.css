@@ -553,3 +553,82 @@
         animation: none;
     }
 }
+
+/* Voltar + breadcrumb na mesma linha */
+.page-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-top: 18px;
+}
+
+.page-top .breadcrumb {
+    padding: 0;
+}
+
+.btn-voltar {
+    background: var(--cor-branca);
+    border: 1px solid var(--borda-suave);
+    color: var(--cor-primaria);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.btn-voltar:hover {
+    border-color: var(--cor-primaria);
+    background: var(--cor-fundo-destaque);
+}
+
+/* Selo de esgotado */
+.badge-esgotado {
+    background-color: #fdeceb;
+    color: var(--cor-secundaria);
+}
+
+/* Botão de carrinho desativado (produto esgotado) */
+.btn-primary-dark:disabled,
+.btn-primary-dark:disabled:hover {
+    background-color: var(--cor-primaria);
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* Coração ativo */
+.btn-fav.ativo {
+    background-color: var(--cor-secundaria);
+    border-color: var(--cor-secundaria);
+}
+
+.btn-fav.ativo img {
+    filter: brightness(0) invert(1);
+}
+
+.btn-fav:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+/* Imagem do produto sem estourar a caixa */
+.gallery-main img {
+    max-width: 80%;
+}
+
+/* Imagens dos produtos relacionados */
+[data-produtos-relacionados] .product-image-container {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    height: 140px;
+    overflow: hidden;
+}
+
+[data-produtos-relacionados] .product-image-container img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}

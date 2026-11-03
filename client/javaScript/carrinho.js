@@ -10,6 +10,10 @@ const STORAGE_USUARIO =
 const STORAGE_CHECKOUT =
   "checkoutCarrinho";
 
+const API_RECEITA = "http://localhost:8080/api/receita";
+
+
+
 
 /*
  * =========================================================
@@ -52,6 +56,11 @@ const ID_CLIENTE =
 const listaComprarEl =
   document.querySelector(
     ".lista-comprar-agora"
+  );
+
+const listaControladosEl =
+  document.querySelector(
+    ".lista-medicamentos-controlados"
   );
 
 
@@ -115,6 +124,8 @@ let carrinhoItens = [];
 
 let descontoAtual = 0;
 
+let receitas = [];
+
 
 /*
  * =========================================================
@@ -158,6 +169,10 @@ async function carregarCarrinho() {
 
     listaComprarEl.innerHTML =
       '<p class="carrinho-vazio">Faça login para ver o carrinho.</p>';
+    if (listaControladosEl) {
+      listaControladosEl.innerHTML =
+        '<p class="carrinho-vazio">Não há medicamentos controlados nesta sessão.</p>';
+    }
 
 
     if (qtdComprarEl) {
@@ -303,7 +318,8 @@ async function carregarCarrinho() {
       );
 
 
-    renderizarCarrinho();
+       await carregarReceitas();
+       renderizarCarrinho();
 
 
   } catch (err) {
@@ -315,6 +331,10 @@ async function carregarCarrinho() {
       `<p class="carrinho-vazio">
         ${escaparHTML(err.message)}
       </p>`;
+    if (listaControladosEl) {
+      listaControladosEl.innerHTML =
+        '<p class="carrinho-vazio">Não foi possível carregar os medicamentos controlados.</p>';
+    }
 
   }
 
@@ -329,8 +349,22 @@ async function carregarCarrinho() {
 
 
 function renderizarCarrinho() {
+  const produtosComuns = carrinhoItens.filter(
+    (item) =>
+      item.medicamentoControlado !== true &&
+      item.medicamentoControlado !== 1 &&
+      item.necessitaReceita !== true &&
+      item.necessitaReceita !== 1,
+  );
   const comprarAgora = carrinhoItens.filter(
     (item) => !item.medicamentoControlado && !item.necessitaReceita,
+  );
+  const medicamentosControlados = carrinhoItens.filter(
+    (item) =>
+      item.medicamentoControlado === true ||
+      item.medicamentoControlado === 1 ||
+      item.necessitaReceita === true ||
+      item.necessitaReceita === 1,
   );
 
   if (qtdComprarEl) {
@@ -341,8 +375,21 @@ function renderizarCarrinho() {
   }
 
   listaComprarEl.innerHTML =
-    carrinhoItens.map(criarItemHTML).join("") ||
-    '<p class="carrinho-vazio">Seu carrinho está vazio.</p>';
+    produtosComuns.map(criarItemHTML).join("") ||
+    '<p class="carrinho-vazio">Não há produtos comuns neste carrinho.</p>';
+
+  if (listaControladosEl) {
+    listaControladosEl.innerHTML =
+      medicamentosControlados.map(criarItemHTML).join("") ||
+      '';
+  }
+
+  const containerControlados = document.getElementById("containerControlados");
+  if (containerControlados) {
+    containerControlados.style.display =
+      medicamentosControlados.length > 0 ? "" : "none";
+  }
+  renderizarReceitas(); 
 
   document.querySelectorAll(".item").forEach(bindItemEvents);
 
@@ -376,11 +423,9 @@ function criarItemHTML(item) {
     item.medicamentoControlado === 1 ||
     item.necessitaReceita === true ||
     item.necessitaReceita === 1;
-  const motivoRestricao = item.medicamentoControlado
-    ? "Medicamento controlado: não pode ser comprado diretamente. Entre em contato com a farmácia."
-    : item.necessitaReceita
-      ? "Exige receita: não pode ser comprado diretamente. Entre em contato com a farmácia."
-      : "";
+    const motivoRestricao = produtoRestrito
+    ? "Exige receita aprovada para entrar no pedido."
+    : "";
 
   const iconeOuImagem =
     item.imagemURL
@@ -885,43 +930,17 @@ function atualizarResumo(
  */
 
 function irParaCheckout() {
+  const temReceitaAprovada = receitas.some(
+    (r) => String(r.status).toUpperCase().includes("APROV"),
+  );
+
   const comprarAgora = carrinhoItens.filter(
-    (item) =>
-      item.medicamentoControlado !== true &&
-      item.medicamentoControlado !== 1 &&
-      item.necessitaReceita !== true &&
-      item.necessitaReceita !== 1,
+    (item) => !(item.medicamentoControlado || item.necessitaReceita) || temReceitaAprovada,
   );
 
-  const possuiRestrito = carrinhoItens.some(
-    (item) =>
-      item.medicamentoControlado === true ||
-      item.medicamentoControlado === 1 ||
-      item.necessitaReceita === true ||
-      item.necessitaReceita === 1,
-  );
-
-  if (possuiRestrito && comprarAgora.length > 0) {
-    alert(
-      "Produtos controlados ou que exigem receita não podem ser finalizados. Somente os demais produtos serão encaminhados ao checkout.",
-    );
-  } else if (possuiRestrito) {
-    alert(
-      "Este carrinho contém somente produtos que exigem atendimento pela farmácia e não pode ser encaminhado ao checkout.",
-    );
+  if (comprarAgora.length === 0) {
+    alert("Nenhum item disponível para compra. Controlados exigem receita aprovada.");
     return;
-  }
-
-  if (
-    comprarAgora.length === 0
-  ) {
-
-    alert(
-      "Seu carrinho está vazio."
-    );
-
-    return;
-
   }
 
 
@@ -943,6 +962,116 @@ function irParaCheckout() {
 
 }
 
+
+/*
+ * =========================================================
+ * RECEITAS
+ * =========================================================
+ */
+
+async function carregarReceitas() {
+  try {
+    const res = await fetch(`${API_RECEITA}/cliente/${ID_CLIENTE}`, {
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      console.error("Erro ao listar receitas:", res.status, await res.text());
+      receitas = [];
+      return;
+    }
+
+    const dados = await res.json();
+    receitas = Array.isArray(dados) ? dados : [];
+  } catch (erro) {
+    console.error("Erro ao carregar receitas:", erro);
+    receitas = [];
+  }
+}
+
+function statusReceita(receita) {
+  const s = String(receita.status ?? "").toUpperCase();
+  if (s.includes("APROV")) return { classe: "aprovada", texto: "Aprovada" };
+  if (s.includes("REJEIT")) return { classe: "rejeitada", texto: "Rejeitada" };
+  return { classe: "analise", texto: "Em análise" };
+}
+
+function criarReceitaHTML(receita) {
+  const st = statusReceita(receita);
+  const id = receita.id ?? receita.idReceita ?? "";
+  const data = receita.dataEnvio
+    ? String(receita.dataEnvio).slice(0, 10).split("-").reverse().join("/")
+    : "";
+
+  return `
+    <div class="receita-item">
+      <span>Receita ${escaparHTML(id)} ${data ? `· ${escaparHTML(data)}` : ""}</span>
+      <span class="receita-status ${st.classe}">${st.texto}</span>
+      ${receita.motivoRejeicao ? `<small class="receita-motivo">${escaparHTML(receita.motivoRejeicao)}</small>` : ""}
+    </div>
+  `;
+}
+
+function renderizarReceitas() {
+  const lista = document.getElementById("listaReceitas");
+  if (!lista) return;
+
+  lista.innerHTML = receitas.length
+    ? receitas.map(criarReceitaHTML).join("")
+    : '<p class="carrinho-vazio">Nenhuma receita enviada ainda.</p>';
+}
+
+async function enviarReceita(arquivo) {
+  const MAX_MB = 5;
+
+  if (arquivo.size > MAX_MB * 1024 * 1024) {
+    alert(`O arquivo deve ter no máximo ${MAX_MB} MB.`);
+    return;
+  }
+
+  const form = new FormData();
+  form.append("arquivo", arquivo);
+  form.append("idCliente", ID_CLIENTE);
+
+  const btn = document.getElementById("btnAnexarReceita");
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await fetch(API_RECEITA, {
+      method: "POST",
+      credentials: "include",
+      headers: csrfHeaders(), // sem Content-Type: o navegador define o boundary
+      body: form,
+    });
+
+    if (!res.ok) {
+      const erro = await res.json().catch(() => ({}));
+      throw new Error(erro.mensagem || `Erro ao enviar receita (${res.status}).`);
+    }
+
+    await carregarReceitas();
+    renderizarReceitas();
+    alert("Receita enviada! Ela ficará em análise até a aprovação.");
+  } catch (erro) {
+    console.error(erro);
+    alert(erro.message);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+const btnAnexarReceita = document.getElementById("btnAnexarReceita");
+const inputReceita = document.getElementById("inputReceita");
+
+if (btnAnexarReceita && inputReceita) {
+  btnAnexarReceita.addEventListener("click", () => inputReceita.click());
+
+  inputReceita.addEventListener("change", () => {
+    const arquivo = inputReceita.files[0];
+    if (arquivo) enviarReceita(arquivo);
+    inputReceita.value = "";
+  });
+}
 
 /*
  * =========================================================

@@ -1,0 +1,224 @@
+/* Página: Meus pedidos
+   Usa as variáveis de carrinho.css (--navy-800, --paper-dim, --green...) */
+
+.mainPedidos {
+  max-width: 900px;
+}
+
+.aviso-pedido {
+  background-color: #e0f6e9;
+  color: var(--green);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.lista-pedidos {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pedido-card {
+  background-color: var(--white);
+  border-radius: 12px;
+  padding: 20px 24px;
+  border: 1px solid transparent;
+}
+
+.pedido-card.destaque {
+  border-color: var(--green);
+}
+
+.pedido-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pedido-numero {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--navy-900);
+}
+
+.pedido-data {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+.pedido-total {
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--navy-800);
+}
+
+.pedido-status {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.pedido-status.pendente  { background: #fff4d6; color: #8a6100; }
+.pedido-status.andamento { background: #e4ecff; color: var(--navy-700); }
+.pedido-status.concluido { background: #e0f6e9; color: var(--green); }
+.pedido-status.cancelado { background: #fdecea; color: var(--red); }
+
+/* Linha do tempo */
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 22px 0 6px;
+}
+
+.timeline-etapa {
+  position: relative;
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.timeline-etapa::before {
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: -50%;
+  width: 100%;
+  height: 3px;
+  background-color: var(--paper-dim);
+  z-index: 0;
+}
+
+.timeline-etapa:first-child::before {
+  display: none;
+}
+
+.timeline-ponto {
+  position: relative;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  margin: 0 auto 6px;
+  border-radius: 50%;
+  background-color: var(--paper-dim);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timeline-etapa.feita {
+  color: var(--navy-800);
+  font-weight: 600;
+}
+
+.timeline-etapa.feita::before,
+.timeline-etapa.feita .timeline-ponto {
+  background-color: var(--green);
+}
+
+.timeline-etapa.atual .timeline-ponto {
+  background-color: var(--navy-800);
+}
+
+/* Ações e detalhes */
+.pedido-acoes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  gap: 12px;
+}
+
+.btn-detalhes {
+  border: none;
+  background: none;
+  color: var(--navy-800);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.btn-detalhes:hover {
+  text-decoration: underline;
+}
+
+.btn-cancelar-pedido {
+  border: 1px solid var(--red);
+  background: var(--white);
+  color: var(--red);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-cancelar-pedido:hover:not(:disabled) {
+  background: var(--red);
+  color: var(--white);
+}
+
+.btn-cancelar-pedido:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.pedido-detalhes {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--paper-dim);
+}
+
+.pedido-detalhes ul {
+  list-style: none;
+}
+
+.pedido-detalhes li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 0;
+  color: var(--navy-900);
+}
+
+.pedido-linha {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--ink-soft);
+  padding: 4px 0;
+}
+
+.pedido-linha.total {
+  color: var(--navy-900);
+  font-weight: 700;
+  border-top: 1px solid var(--paper-dim);
+  margin-top: 6px;
+  padding-top: 10px;
+}
+
+@media (max-width: 600px) {
+  .timeline-etapa {
+    font-size: 10px;
+  }
+
+  .pedido-card {
+    padding: 16px;
+  }
+}

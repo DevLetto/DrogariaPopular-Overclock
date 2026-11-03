@@ -1,0 +1,125 @@
+.receitas-filtros {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.receita-arquivo {
+    max-width: 220px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.receita-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.receita-acoes button {
+    min-height: 34px;
+}
+
+.btn-rejeitar {
+    background: #fff;
+    border: 1px solid #dc2626;
+    color: #b91c1c;
+}
+
+.receita-cliente {
+    color: #565F8C;
+    font-size: 0.85rem;
+}
+
+.receita-modal-overlay {
+    z-index: 10000;
+}
+
+.receita-modal {
+    width: min(960px, 100%);
+    max-width: 960px;
+}
+
+.receita-documento {
+    min-height: 320px;
+    background: #f3f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.receita-pdf {
+    width: 100%;
+    height: min(62vh, 720px);
+    border: 0;
+}
+
+.receita-imagem {
+    display: block;
+    max-width: 100%;
+    max-height: min(62vh, 720px);
+    object-fit: contain;
+}
+
+.receita-modal-acoes,
+.receita-confirmacao,
+.receita-rejeicao {
+    margin-top: 18px;
+}
+
+.receita-modal-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.receita-confirmacao p {
+    margin: 0 0 12px;
+    color: #565F8C;
+}
+
+.receita-modal-erro {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 0.88rem;
+}
+
+@media (max-width: 700px) {
+    .receita-modal-overlay {
+        padding: 12px;
+    }
+
+    .receita-modal {
+        max-height: calc(100vh - 24px);
+        padding: 18px;
+    }
+
+    .receita-pdf,
+    .receita-imagem {
+        height: 50vh;
+        max-height: 50vh;
+    }
+
+    .receita-modal-acoes,
+    .receita-confirmacao .modal-acoes,
+    .receita-rejeicao .modal-acoes {
+        flex-direction: column-reverse;
+    }
+
+    .receita-modal-acoes button,
+    .receita-confirmacao .modal-acoes button,
+    .receita-rejeicao .modal-acoes button {
+        width: 100%;
+    }
+}

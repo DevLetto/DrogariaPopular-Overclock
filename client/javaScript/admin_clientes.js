@@ -1,4 +1,49 @@
 const API_CLIENTE = "http://localhost:8080/api/cliente";
+let tokenCsrf = null;
+let headerNameCsrf = null;
+let preparacaoCsrf = null;
+
+async function obterCsrf() {
+  if (tokenCsrf && headerNameCsrf) {
+    return { token: tokenCsrf, headerName: headerNameCsrf };
+  }
+
+  if (!preparacaoCsrf) {
+    preparacaoCsrf = fetch("http://localhost:8080/api/auth/csrf", {
+      credentials: "include",
+    }).then(async (resposta) => {
+      if (!resposta.ok) {
+        throw new Error(
+          "Não foi possível obter o token CSRF. Atualize a página e autentique-se novamente.",
+        );
+      }
+
+      const dados = await resposta.json();
+
+      if (!dados?.token) {
+        throw new Error(
+          "O servidor não retornou um token CSRF válido. Atualize a página.",
+        );
+      }
+
+      tokenCsrf = dados.token;
+      headerNameCsrf = dados.headerName || "X-CSRF-TOKEN";
+
+      return {
+        token: tokenCsrf,
+        headerName: headerNameCsrf,
+      };
+    }).catch((erro) => {
+      tokenCsrf = null;
+      headerNameCsrf = null;
+      throw erro;
+    }).finally(() => {
+      preparacaoCsrf = null;
+    });
+  }
+
+  return preparacaoCsrf;
+}
 
 let clientes = [];
 
@@ -11,7 +56,9 @@ const campoBusca = document.getElementById("campoBusca");
 
 async function carregarClientes() {
   try {
-    const resposta = await fetch(API_CLIENTE);
+    const resposta = await fetch(API_CLIENTE, {
+      credentials: "include",
+    });
 
     if (!resposta.ok) {
       throw new Error("Erro ao carregar clientes.");
@@ -128,10 +175,15 @@ async function alterarAprovacao(idCliente, aprovado) {
   }
 
   try {
+    const csrf = await obterCsrf();
     const resposta = await fetch(
       `${API_CLIENTE}/${idCliente}/aprovacao?aprovado=${aprovado}`,
       {
         method: "PUT",
+        credentials: "include",
+        headers: {
+          [csrf.headerName]: csrf.token,
+        },
       },
     );
 
@@ -139,6 +191,14 @@ async function alterarAprovacao(idCliente, aprovado) {
       const erro = await resposta.text();
 
       console.error("Erro da API:", erro);
+
+      if (resposta.status === 403) {
+        tokenCsrf = null;
+        headerNameCsrf = null;
+        throw new Error(
+          "Acesso negado ou sessão CSRF expirada. Atualize a página, autentique-se novamente e tente outra vez.",
+        );
+      }
 
       throw new Error(`Não foi possível ${acao} o cliente.`);
     }

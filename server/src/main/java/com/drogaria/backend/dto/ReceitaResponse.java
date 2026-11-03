@@ -2,4 +2,35 @@ package com.drogaria.backend.dto;
 import java.time.LocalDate;
 
  import com.drogaria.backend.entity.Receita;
-public class ReceitaResponse { private Integer id; private String arquivo; private String status; private LocalDate dataEnvio; private LocalDate dataValidacao; private String motivoRejeicao; public ReceitaResponse(Receita r){id=r.getId();arquivo=r.getArquivo();status=r.getStatus();dataEnvio=r.getDataEnvio();dataValidacao=r.getDataValidacao();motivoRejeicao=r.getMotivoRejeicao();} public Integer getId(){return id;} public String getArquivo(){return arquivo;} public String getStatus(){return status;} public LocalDate getDataEnvio(){return dataEnvio;} public LocalDate getDataValidacao(){return dataValidacao;} public String getMotivoRejeicao(){return motivoRejeicao;} }
+public class ReceitaResponse {
+    private Integer id;
+    private String arquivo;
+    private String status;
+    private LocalDate dataEnvio;
+    private LocalDate dataValidacao;
+    private String motivoRejeicao;
+    private Integer idCliente;
+    private String nomeCliente;
+
+    public ReceitaResponse(Receita r) {
+        id = r.getId();
+        arquivo = r.getArquivo();
+        status = r.getStatus();
+        dataEnvio = r.getDataEnvio();
+        dataValidacao = r.getDataValidacao();
+        motivoRejeicao = r.getMotivoRejeicao();
+        if (r.getCliente() != null) {
+            idCliente = r.getCliente().getId();
+            nomeCliente = r.getCliente().getNome();
+        }
+    }
+
+    public Integer getId() { return id; }
+    public String getArquivo() { return arquivo; }
+    public String getStatus() { return status; }
+    public LocalDate getDataEnvio() { return dataEnvio; }
+    public LocalDate getDataValidacao() { return dataValidacao; }
+    public String getMotivoRejeicao() { return motivoRejeicao; }
+    public Integer getIdCliente() { return idCliente; }
+    public String getNomeCliente() { return nomeCliente; }
+}
