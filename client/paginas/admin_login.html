@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Acesso ao painel - Ponte Alta</title>
+
+    <link rel="stylesheet" href="../css/admin_login.css">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+        rel="stylesheet"
+    >
+</head>
+
+<body>
+
+    <main class="acesso-pagina">
+
+        <section class="acesso-cartao">
+
+            <div class="acesso-marca">
+
+                <div class="acesso-logo">
+                    <img
+                        src="../img/logo_drogaria_ponteAlta.png"
+                        alt="Logo Drogaria Popular Ponte Alta"
+                    >
+                </div>
+
+                <div class="acesso-marca-texto">
+                    <p class="marca-linha1">Drogaria Popular</p>
+                    <p class="marca-linha2">Ponte Alta</p>
+                </div>
+
+            </div>
+
+            <span class="acesso-selo">
+                <span class="material-symbols-outlined" aria-hidden="true">shield_person</span>
+                ÁREA RESTRITA
+            </span>
+
+            <h1>Acesso ao painel</h1>
+
+            <p class="acesso-sub">
+                Entre com o e-mail e a senha de funcionário para continuar.
+            </p>
+
+            <p class="acesso-aviso" id="avisoContaAnterior" hidden></p>
+
+            <p class="acesso-erro" id="loginErro" role="alert" hidden></p>
+
+            <form id="formLogin" novalidate>
+
+                <div class="acesso-campo">
+
+                    <label for="loginIdentificador">E-mail</label>
+
+                    <div class="acesso-input">
+
+                        <span class="material-symbols-outlined acesso-icone" aria-hidden="true">mail</span>
+
+                        <input
+                            type="email"
+                            id="loginIdentificador"
+                            name="identificador"
+                            placeholder="voce@drogariaponte.com"
+                            autocomplete="username"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+                <div class="acesso-campo">
+
+                    <label for="loginSenha">Senha</label>
+
+                    <div class="acesso-input">
+
+                        <span class="material-symbols-outlined acesso-icone" aria-hidden="true">lock</span>
+
+                        <input
+                            type="password"
+                            id="loginSenha"
+                            name="senha"
+                            class="acesso-senha"
+                            placeholder="Sua senha"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="acesso-olho"
+                            id="btnVerSenha"
+                            aria-label="Mostrar senha"
+                            aria-pressed="false"
+                        >
+                            <span class="material-symbols-outlined" aria-hidden="true">visibility</span>
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <button type="submit" class="acesso-enviar" id="loginSubmit">
+                    Entrar no painel
+                    <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                </button>
+
+            </form>
+
+            <a class="acesso-voltar" href="index.html">← Voltar à loja</a>
+
+        </section>
+
+    </main>
+
+    <script src="../javaScript/admin_login.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,310 @@
+/* ==========================================================
+   admin_login.css — tela de acesso ao painel (funcionários)
+   Visual próprio, mesma paleta e fontes da loja.
+   ========================================================== */
+
+:root {
+    --navy-900: #060b3d;
+    --navy-800: #0b1157;
+    --navy-700: #161f7a;
+    --red: #ed1c24;
+    --red-dark: #b8121a;
+    --paper: #f4f6fc;
+    --paper-dim: #e7ebf7;
+    --ink: #0b1157;
+    --ink-soft: #565f8c;
+    --white: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+body {
+    min-height: 100vh;
+    font-family: "Inter", sans-serif;
+    color: var(--ink);
+    background: var(--navy-900);
+}
+
+.material-symbols-outlined {
+    font-size: 20px;
+    line-height: 1;
+}
+
+/* ---------- FUNDO ---------- */
+
+.acesso-pagina {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 15% 10%, rgba(237, 28, 36, 0.28), transparent 45%),
+        radial-gradient(circle at 90% 95%, rgba(22, 31, 122, 0.9), transparent 55%),
+        linear-gradient(160deg, var(--navy-900) 0%, var(--navy-800) 100%);
+}
+
+/* ---------- CARTÃO ---------- */
+
+.acesso-cartao {
+    width: min(430px, 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 34px 32px 28px;
+    border-radius: 18px;
+    background: var(--white);
+    box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.55);
+    animation: acessoEntrar 0.35s ease;
+}
+
+@keyframes acessoEntrar {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------- MARCA ---------- */
+
+.acesso-marca {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.acesso-logo {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: var(--navy-800);
+}
+
+.acesso-logo img {
+    width: 78%;
+    object-fit: contain;
+}
+
+.marca-linha1 {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.016em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.marca-linha2 {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    line-height: 1.05;
+    color: var(--navy-800);
+}
+
+/* ---------- TEXTOS ---------- */
+
+.acesso-selo {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: rgba(237, 28, 36, 0.1);
+    color: var(--red-dark);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+.acesso-selo .material-symbols-outlined {
+    font-size: 16px;
+}
+
+h1 {
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+    text-transform: uppercase;
+}
+
+.acesso-sub {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+}
+
+/* ---------- AVISOS ---------- */
+
+.acesso-aviso,
+.acesso-erro {
+    padding: 11px 13px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.acesso-aviso {
+    background: var(--paper-dim);
+    color: var(--navy-700);
+}
+
+.acesso-erro {
+    background: #fde8e9;
+    color: var(--red-dark);
+    border: 1px solid rgba(237, 28, 36, 0.25);
+}
+
+/* ---------- FORMULÁRIO ---------- */
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 4px;
+}
+
+.acesso-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.acesso-campo label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.acesso-input {
+    position: relative;
+}
+
+.acesso-input input {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px 0 42px;
+    border: 1px solid var(--paper-dim);
+    border-radius: 10px;
+    outline: none;
+    background: var(--paper);
+    color: var(--navy-800);
+    font: inherit;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.acesso-input input.acesso-senha {
+    padding-right: 46px;
+}
+
+.acesso-input input::placeholder {
+    color: #9aa2c9;
+}
+
+.acesso-input input:focus {
+    background: var(--white);
+    border-color: var(--navy-800);
+    box-shadow: 0 0 0 3px rgba(11, 17, 87, 0.12);
+}
+
+.acesso-icone {
+    position: absolute;
+    top: 50%;
+    left: 13px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--ink-soft);
+}
+
+.acesso-olho {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+}
+
+.acesso-olho:hover {
+    color: var(--navy-800);
+}
+
+.acesso-enviar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 48px;
+    margin-top: 4px;
+    border: none;
+    border-radius: 10px;
+    background: var(--navy-800);
+    color: var(--white);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.acesso-enviar:hover:not(:disabled) {
+    background: var(--red);
+    transform: translateY(-2px);
+}
+
+.acesso-enviar:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.acesso-voltar {
+    align-self: center;
+    margin-top: 6px;
+    color: var(--ink-soft);
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.acesso-voltar:hover {
+    color: var(--red);
+}
+
+@media (max-width: 480px) {
+
+    .acesso-cartao {
+        padding: 28px 22px 24px;
+    }
+
+    h1 {
+        font-size: 30px;
+    }
+}
