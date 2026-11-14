@@ -1422,17 +1422,14 @@ async function excluirProduto(
 
     try {
 
-        await requisicao(
-            `/produto/${idProduto}`,
-            {
-                method: "DELETE"
-            }
-        );
+       const resultado = await requisicao(`/produto/${idProduto}`, { method: "DELETE" });
 
         await carregarDados();
 
         mostrarMensagem(
-            "Produto excluído com sucesso.",
+            resultado?.arquivado
+                 ? "Produto removido do catálogo. Ele continua no histórico dos pedidos antigos."
+                : "Produto excluído com sucesso.",
             "sucesso"
         );
 

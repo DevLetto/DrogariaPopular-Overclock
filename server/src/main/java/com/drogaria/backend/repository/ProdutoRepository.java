@@ -21,4 +21,7 @@ public interface ProdutoRepository extends JpaRepository<Produto, Integer> {
 
     @EntityGraph(attributePaths = {"categoria", "medicamentoControlado"})
     List<Produto> findByCategoriaId(Integer idCategoria);
+
+    List<Produto> findByAtivoTrue();
+    List<Produto> findByCategoriaIdAndAtivoTrue(Integer idCategoria);
 }

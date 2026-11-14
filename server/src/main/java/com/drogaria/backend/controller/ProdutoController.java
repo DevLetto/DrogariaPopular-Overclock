@@ -1,6 +1,7 @@
 package com.drogaria.backend.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,51 +24,43 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/produto")
 public class ProdutoController {
 
-    private final ProdutoService produtoService;
+	private final ProdutoService produtoService;
 
-    public ProdutoController(ProdutoService produtoService) {
-        this.produtoService = produtoService;
-    }
+	public ProdutoController(ProdutoService produtoService) {
+		this.produtoService = produtoService;
+	}
 
-    @PostMapping
-    public ResponseEntity<ProdutoResponse> adicionar(
-            @Valid @RequestBody ProdutoRequest request) {
+	@PostMapping
+	public ResponseEntity<ProdutoResponse> adicionar(@Valid @RequestBody ProdutoRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(produtoService.adicionar(request));
-    }
+		return ResponseEntity.status(HttpStatus.CREATED).body(produtoService.adicionar(request));
+	}
 
-    @GetMapping
-    public List<ProdutoResponse> listar() {
-        return produtoService.listar();
-    }
+	@GetMapping
+	public List<ProdutoResponse> listar() {
+		return produtoService.listar();
+	}
 
-    @GetMapping("/{id}")
-    public ProdutoResponse buscar(@PathVariable Integer id) {
-        return produtoService.buscar(id);
-    }
+	@GetMapping("/{id}")
+	public ProdutoResponse buscar(@PathVariable Integer id) {
+		return produtoService.buscar(id);
+	}
 
-    @GetMapping("/categoria/{idCategoria}")
-    public List<ProdutoResponse> listarPorCategoria(
-            @PathVariable Integer idCategoria) {
+	@GetMapping("/categoria/{idCategoria}")
+	public List<ProdutoResponse> listarPorCategoria(@PathVariable Integer idCategoria) {
 
-        return produtoService.listarPorCategoria(idCategoria);
-    }
+		return produtoService.listarPorCategoria(idCategoria);
+	}
 
-    @PutMapping("/{id}")
-    public ProdutoResponse atualizar(
-            @PathVariable Integer id,
-            @RequestBody ProdutoRequest request) {
+	@PutMapping("/{id}")
+	public ProdutoResponse atualizar(@PathVariable Integer id, @RequestBody ProdutoRequest request) {
 
-        return produtoService.atualizar(id, request);
-    }
+		return produtoService.atualizar(id, request);
+	}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Integer id) {
-
-        produtoService.excluir(id);
-
-        return ResponseEntity.noContent().build();
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Map<String, Boolean>> excluir(@PathVariable Integer id) {
+		boolean arquivado = produtoService.excluir(id);
+		return ResponseEntity.ok(Map.of("arquivado", arquivado)); // import java.util.Map
+	}
 }

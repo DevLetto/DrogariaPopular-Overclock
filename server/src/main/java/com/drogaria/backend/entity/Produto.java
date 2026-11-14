@@ -20,196 +20,190 @@ import jakarta.persistence.Table;
 @Table(name = "produto")
 public class Produto {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+	private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer idProduto;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Integer idProduto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_categoria")
-    private Categoria categoria;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_categoria")
+	private Categoria categoria;
 
-    @Column(name = "nome")
-    private String nomeProduto;
+	@Column(name = "nome")
+	private String nomeProduto;
 
-    @Column(name = "descricao")
-    private String descricao;
+	@Column(name = "descricao")
+	private String descricao;
 
-    @Column(name = "preco")
-    private Double precoProduto;
+	@Column(name = "preco")
+	private Double precoProduto;
 
-    @Column(name = "fotos", columnDefinition = "LONGTEXT")
-    private String fotos;
+	@Column(name = "fotos", columnDefinition = "LONGTEXT")
+	private String fotos;
 
-    @Column(name = "necessita_receita", nullable = false)
-    private boolean necessitaReceita;
+	@Column(name = "necessita_receita", nullable = false)
+	private boolean necessitaReceita;
 
-    @Column(name = "disponivel", nullable = false)
-    private boolean disponivel = true;
+	@Column(name = "disponivel", nullable = false)
+	private boolean disponivel = true;
 
-    @Column(name = "esgotado", nullable = false)
-    private boolean esgotado;
+	@Column(name = "esgotado", nullable = false)
+	private boolean esgotado;
 
-    @Column(name = "retirada_somente_loja", nullable = false)
-    private boolean retiradaSomenteLoja;
+	@Column(name = "retirada_somente_loja", nullable = false)
+	private boolean retiradaSomenteLoja;
 
-    @OneToOne(
-        mappedBy = "produto",
-        fetch = FetchType.LAZY,
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
-    private MedicamentoControlado medicamentoControlado;
+	@Column(name = "ativo", nullable = false)
+	private boolean ativo = true;
 
-    public Integer getIdProduto() {
-        return idProduto;
-    }
+	@OneToOne(mappedBy = "produto", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	private MedicamentoControlado medicamentoControlado;
 
-    public void setIdProduto(Integer idProduto) {
-        this.idProduto = idProduto;
-    }
+	public Integer getIdProduto() {
+		return idProduto;
+	}
 
-    public Integer getIdCategoria() {
-        return categoria == null ? null : categoria.getId();
-    }
+	public void setIdProduto(Integer idProduto) {
+		this.idProduto = idProduto;
+	}
 
-    public void setIdCategoria(Integer idCategoria) {
-        if (categoria == null) {
-            categoria = new Categoria();
-        }
+	public Integer getIdCategoria() {
+		return categoria == null ? null : categoria.getId();
+	}
 
-        categoria.setId(idCategoria);
-    }
+	public void setIdCategoria(Integer idCategoria) {
+		if (categoria == null) {
+			categoria = new Categoria();
+		}
 
-    public Categoria getCategoria() {
-        return categoria;
-    }
+		categoria.setId(idCategoria);
+	}
 
-    public void setCategoria(Categoria categoria) {
-        this.categoria = categoria;
-    }
+	public Categoria getCategoria() {
+		return categoria;
+	}
 
-    public String getNomeProduto() {
-        return nomeProduto;
-    }
+	public void setCategoria(Categoria categoria) {
+		this.categoria = categoria;
+	}
 
-    public void setNomeProduto(String nomeProduto) {
-        this.nomeProduto = nomeProduto;
-    }
+	public String getNomeProduto() {
+		return nomeProduto;
+	}
 
-    public String getDescricao() {
-        return descricao;
-    }
+	public void setNomeProduto(String nomeProduto) {
+		this.nomeProduto = nomeProduto;
+	}
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
+	public String getDescricao() {
+		return descricao;
+	}
 
-    public double getPrecoProduto() {
-        return precoProduto;
-    }
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
 
-    public void setPrecoProduto(double precoProduto) {
-        this.precoProduto = precoProduto;
-    }
+	public double getPrecoProduto() {
+		return precoProduto;
+	}
 
-    // Converte o JSON armazenado no banco para uma URL simples.
-    public String getImagemURL() {
+	public void setPrecoProduto(double precoProduto) {
+		this.precoProduto = precoProduto;
+	}
 
-        if (fotos == null || fotos.isBlank()) {
-            return null;
-        }
+	// Converte o JSON armazenado no banco para uma URL simples.
+	public String getImagemURL() {
 
-        try {
-            String[] imagens = objectMapper.readValue(
-                fotos,
-                String[].class
-            );
+		if (fotos == null || fotos.isBlank()) {
+			return null;
+		}
 
-            return imagens.length > 0 ? imagens[0] : null;
+		try {
+			String[] imagens = objectMapper.readValue(fotos, String[].class);
 
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException(
-                "Erro ao converter fotos do produto",
-                e
-            );
-        }
-    }
+			return imagens.length > 0 ? imagens[0] : null;
 
-    // Converte a URL recebida em um array JSON válido.
-    public void setImagemURL(String imagemURL) {
+		} catch (JsonProcessingException e) {
+			throw new IllegalStateException("Erro ao converter fotos do produto", e);
+		}
+	}
 
-        if (imagemURL == null || imagemURL.isBlank()) {
-            this.fotos = null;
-            return;
-        }
+	// Converte a URL recebida em um array JSON válido.
+	public void setImagemURL(String imagemURL) {
 
-        try {
-            this.fotos = objectMapper.writeValueAsString(
-                new String[]{imagemURL}
-            );
+		if (imagemURL == null || imagemURL.isBlank()) {
+			this.fotos = null;
+			return;
+		}
 
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException(
-                "Erro ao converter URL da imagem",
-                e
-            );
-        }
-    }
+		try {
+			this.fotos = objectMapper.writeValueAsString(new String[] { imagemURL });
 
-    public String getFotos() {
-        return fotos;
-    }
+		} catch (JsonProcessingException e) {
+			throw new IllegalStateException("Erro ao converter URL da imagem", e);
+		}
+	}
 
-    public void setFotos(String fotos) {
-        this.fotos = fotos;
-    }
+	public String getFotos() {
+		return fotos;
+	}
 
-    public boolean isNecessitaReceita() {
-        return necessitaReceita;
-    }
+	public void setFotos(String fotos) {
+		this.fotos = fotos;
+	}
 
-    public void setNecessitaReceita(boolean necessitaReceita) {
-        this.necessitaReceita = necessitaReceita;
-    }
+	public boolean isNecessitaReceita() {
+		return necessitaReceita;
+	}
 
-    public boolean isDisponivel() {
-        return disponivel;
-    }
+	public void setNecessitaReceita(boolean necessitaReceita) {
+		this.necessitaReceita = necessitaReceita;
+	}
 
-    public void setDisponivel(boolean disponivel) {
-        this.disponivel = disponivel;
-    }
+	public boolean isDisponivel() {
+		return disponivel;
+	}
 
-    public boolean isEsgotado() {
-        return esgotado;
-    }
+	public void setDisponivel(boolean disponivel) {
+		this.disponivel = disponivel;
+	}
 
-    public void setEsgotado(boolean esgotado) {
-        this.esgotado = esgotado;
-    }
+	public boolean isEsgotado() {
+		return esgotado;
+	}
 
-    public boolean isRetiradaSomenteLoja() {
-        return retiradaSomenteLoja;
-    }
+	public void setEsgotado(boolean esgotado) {
+		this.esgotado = esgotado;
+	}
 
-    public void setRetiradaSomenteLoja(boolean retiradaSomenteLoja) {
-        this.retiradaSomenteLoja = retiradaSomenteLoja;
-    }
+	public boolean isRetiradaSomenteLoja() {
+		return retiradaSomenteLoja;
+	}
 
-    public MedicamentoControlado getMedicamentoControlado() {
-        return medicamentoControlado;
-    }
+	public void setRetiradaSomenteLoja(boolean retiradaSomenteLoja) {
+		this.retiradaSomenteLoja = retiradaSomenteLoja;
+	}
 
-    public void setMedicamentoControlado(
-            MedicamentoControlado medicamentoControlado) {
+	public MedicamentoControlado getMedicamentoControlado() {
+		return medicamentoControlado;
+	}
 
-        this.medicamentoControlado = medicamentoControlado;
+	public void setMedicamentoControlado(MedicamentoControlado medicamentoControlado) {
 
-        if (medicamentoControlado != null) {
-            medicamentoControlado.setProduto(this);
-        }
-    }
+		this.medicamentoControlado = medicamentoControlado;
+
+		if (medicamentoControlado != null) {
+			medicamentoControlado.setProduto(this);
+		}
+	}
+
+	public boolean isAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
+	}
 }

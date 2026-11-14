@@ -1,333 +1,311 @@
-/**
- * Comportamentos compartilhados por todas as páginas do painel admin:
- *  1. Botão "Voltar à loja"
- *  2. Item "Funcionários" no menu lateral
- *  3. Rodapé da sidebar vira o botão da conta atual (nome + cargo).
- *     Ao clicar, a sessão é encerrada e a pessoa vai para admin_login.html.
- *
- * Tudo roda dentro de uma função para não colidir com as variáveis
- * globais dos scripts de cada página.
- */
-(function () {
-    "use strict";
+// ======================================================
+// BOTÃO "VOLTAR À LOJA"
+// ======================================================
+
+const backBtn = document.getElementById("btnVoltarALoja");
+
+if (backBtn) {
+    backBtn.addEventListener("click", voltar);
+}
+
+function voltar() {
+    window.location.href = "index.html";
+}
+
+// ======================================================
+// MENU: garante o item "Funcionários" em todas as páginas
+// do painel (evita editar a sidebar de cada HTML na mão).
+// Se a página já tiver o link, nada é feito.
+// ======================================================
+
+(function garantirMenuFuncionarios() {
+
+    if (document.querySelector('.sidebar-menu a[href="admin_funcionarios.html"]')) {
+        return;
+    }
+
+    const rotulo = [...document.querySelectorAll(".sidebar-menu .menu-label")]
+        .find((el) => el.textContent.trim().toUpperCase().startsWith("PESSOAS"));
+
+    const lista = rotulo?.nextElementSibling;
+
+    if (!lista || lista.tagName !== "UL") {
+        return;
+    }
+
+    const item = document.createElement("li");
+
+    item.innerHTML = `
+        <a href="admin_funcionarios.html">
+            <img src="../img/usuario_icon.png" alt="" class="sidebar-icon">
+            Funcionários
+        </a>
+    `;
+
+    // Logo depois de "Clientes"
+    if (lista.firstElementChild) {
+        lista.firstElementChild.after(item);
+    } else {
+        lista.appendChild(item);
+    }
+})();
+
+// ======================================================
+// RODAPÉ DA SIDEBAR: botão "conta atual / trocar de conta"
+// Mostra nome e cargo de quem está logado. Os dados vêm do
+// admin_guard.js (que pergunta ao servidor); se o guard não
+// estiver na página, usa o localStorage.usuarioLogado.
+// Ao clicar, encerra a sessão e vai para a tela de login.
+// ======================================================
+
+(function configurarBotaoConta() {
 
     const API_AUTH = "http://localhost:8080/api/auth";
     const PAGINA_LOGIN = "admin_login.html";
 
-    // ======================================================
-    // 1. VOLTAR À LOJA
-    // ======================================================
+    const CARGOS = {
+        ROLE_ADMINISTRADOR: "Administrador",
+        ROLE_FARMACEUTICO: "Farmacêutico",
+        ROLE_ATENDENTE: "Atendente",
+        ROLE_FUNCIONARIO_ESTOQUE_LOGISTICA: "Estoque e logística"
+    };
 
-    function voltar() {
-        window.location.href = "index.html";
+    const rodape = document.querySelector(".sidebar-footer");
+
+    if (!rodape) {
+        return;
     }
 
-    window.voltar = voltar;
+    const avatar = rodape.querySelector(".user-avatar");
+    const info = rodape.querySelector(".user-info");
+    const titulo = info?.querySelector("p, strong");
+    const subtitulo = info?.querySelector("span");
 
-    const backBtn = document.getElementById("btnVoltarALoja");
+    // Estado atual (atualizado por renderizar)
+    let usuario = null;
+    let nome = "";
+    let cargo = "";
 
-    if (backBtn) {
-        backBtn.addEventListener("click", voltar);
-    }
+    function lerUsuarioSalvo() {
 
-    // ======================================================
-    // 2. MENU: garante o item "Funcionários"
-    // ======================================================
-
-    function garantirMenuFuncionarios() {
-
-        if (document.querySelector('.sidebar-menu a[href="admin_funcionarios.html"]')) {
-            return;
-        }
-
-        const rotulo = [...document.querySelectorAll(".sidebar-menu .menu-label")]
-            .find((el) => el.textContent.trim().toUpperCase().startsWith("PESSOAS"));
-
-        const lista = rotulo?.nextElementSibling;
-
-        if (!lista || lista.tagName !== "UL") {
-            return;
-        }
-
-        const item = document.createElement("li");
-
-        item.innerHTML = `
-            <a href="admin_funcionarios.html">
-                <img src="../img/usuario_icon.png" alt="" class="sidebar-icon">
-                Funcionários
-            </a>
-        `;
-
-        if (lista.firstElementChild) {
-            lista.firstElementChild.after(item);
-        } else {
-            lista.appendChild(item);
-        }
-    }
-
-    // ======================================================
-    // 3. CONTA ATUAL (rodapé da sidebar)
-    // ======================================================
-
-    const CARGOS = [
-        ["ADMINISTRADOR", "Administrador"],
-        ["FARMACEUTICO", "Farmacêutico"],
-        ["ATENDENTE", "Atendente"],
-        ["ESTOQUE", "Estoque e logística"],
-        ["LOGISTICA", "Estoque e logística"],
-        ["CLIENTE", "Cliente"]
-    ];
-
-    function lerUsuarioLogado() {
         try {
-            return JSON.parse(localStorage.getItem("usuarioLogado"));
+            return JSON.parse(localStorage.getItem("usuarioLogado") || "null");
         } catch (_) {
             return null;
         }
     }
 
-    // O formato exato do AuthResponse pode variar, então tentamos os nomes mais comuns.
-    function obterNome(usuario) {
+    function rotuloCargo(valor) {
 
-        const nome =
-            usuario.nome ??
-            usuario.nomeCompleto ??
-            usuario.nomeUsuario ??
-            usuario.name ??
-            usuario.usuario?.nome ??
-            null;
-
-        if (nome) {
-            return String(nome).trim();
+        if (!valor) {
+            return "Sem cargo";
         }
 
-        return usuario.email ? String(usuario.email).split("@")[0] : null;
-    }
-
-    function obterRole(usuario) {
-
-        const autoridade = Array.isArray(usuario.authorities)
-            ? (usuario.authorities[0]?.authority ?? usuario.authorities[0])
-            : null;
-
-        const papel = Array.isArray(usuario.roles) ? usuario.roles[0] : null;
-
-        return [
-            usuario.role,
-            usuario.tipoFuncionario,
-            usuario.cargo,
-            usuario.perfil,
-            usuario.tipo,
-            autoridade,
-            papel
-        ].find(Boolean) ?? null;
-    }
-
-    function formatarCargo(role) {
-
-        if (!role) {
-            return null;
+        if (CARGOS[valor]) {
+            return CARGOS[valor];
         }
 
-        const chave = String(role)
-            .toUpperCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "");
+        const limpo = String(valor)
+            .replace(/^ROLE_/, "")
+            .replaceAll("_", " ")
+            .toLowerCase();
 
-        const encontrado = CARGOS.find(([trecho]) => chave.includes(trecho));
-
-        if (encontrado) {
-            return encontrado[1];
-        }
-
-        const texto = chave.replace(/^ROLE_/, "").replaceAll("_", " ").toLowerCase();
-
-        return texto.charAt(0).toUpperCase() + texto.slice(1);
+        return limpo.charAt(0).toUpperCase() + limpo.slice(1);
     }
 
-    function adicionarEstilosConta() {
+    function renderizar(dados) {
 
-        if (document.getElementById("estilos-conta-atual")) {
+        usuario = dados || null;
+
+        const role = usuario?.role ?? usuario?.perfil ?? usuario?.tipoFuncionario ?? "";
+
+        nome = usuario
+            ? (usuario.nome ?? usuario.nomeCompleto ?? usuario.email ?? "Usuário")
+            : "Visitante";
+
+        cargo = usuario ? rotuloCargo(role) : "Entrar";
+
+        if (avatar) {
+            avatar.textContent = nome.trim().charAt(0).toUpperCase() || "?";
+        }
+
+        if (titulo) {
+            titulo.textContent = nome;
+        }
+
+        if (subtitulo) {
+            subtitulo.textContent = cargo;
+        }
+
+        rodape.setAttribute(
+            "title",
+            usuario ? `Trocar de conta (${nome})` : "Entrar"
+        );
+    }
+
+    // -------- vira botão --------
+
+    rodape.classList.add("conta-botao");
+    rodape.setAttribute("role", "button");
+    rodape.setAttribute("tabindex", "0");
+
+    const icone = document.createElement("span");
+
+    icone.className = "conta-trocar";
+    icone.setAttribute("aria-hidden", "true");
+
+    icone.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 4 3 8l4 4"></path>
+            <path d="M3 8h14"></path>
+            <path d="m17 20 4-4-4-4"></path>
+            <path d="M21 16H7"></path>
+        </svg>
+    `;
+
+    rodape.appendChild(icone);
+
+    adicionarEstilos();
+
+    // Primeiro com o que já existe; depois o guard confirma com o servidor
+    renderizar(window.__usuarioAdmin ?? lerUsuarioSalvo());
+
+    document.addEventListener("admin-usuario-pronto", (event) => {
+        renderizar(event.detail);
+    });
+
+    rodape.addEventListener("click", trocarConta);
+
+    rodape.addEventListener("keydown", (event) => {
+
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            trocarConta();
+        }
+    });
+
+    // -------- ação --------
+
+    let trocando = false;
+
+    async function trocarConta() {
+
+        if (trocando) {
+            return;
+        }
+
+        trocando = true;
+
+        rodape.classList.add("conta-trocando");
+
+        if (usuario) {
+            // Só para a tela de login mostrar "você saiu da conta de ..."
+            sessionStorage.setItem(
+                "contaAnterior",
+                JSON.stringify({ nome, cargo })
+            );
+        }
+
+        await encerrarSessao();
+
+        window.location.href = PAGINA_LOGIN;
+    }
+
+    async function encerrarSessao() {
+
+        // Se o servidor demorar, não prende a pessoa na tela
+        const controle = new AbortController();
+        const limite = setTimeout(() => controle.abort(), 4000);
+
+        try {
+
+            const resposta = await fetch(`${API_AUTH}/csrf`, {
+                credentials: "include",
+                signal: controle.signal
+            });
+
+            const csrf = await resposta.json();
+
+            await fetch(`${API_AUTH}/logout`, {
+                method: "POST",
+                credentials: "include",
+                signal: controle.signal,
+                headers: {
+                    [csrf.headerName || "X-CSRF-TOKEN"]: csrf.token
+                }
+            });
+
+        } catch (erro) {
+
+            console.warn("Não foi possível encerrar a sessão no servidor:", erro);
+
+        } finally {
+
+            clearTimeout(limite);
+
+            localStorage.removeItem("usuarioLogado");
+        }
+    }
+
+    function adicionarEstilos() {
+
+        if (document.getElementById("estilos-conta-botao")) {
             return;
         }
 
         const style = document.createElement("style");
 
-        style.id = "estilos-conta-atual";
+        style.id = "estilos-conta-botao";
 
         style.textContent = `
+
             .sidebar-footer.conta-botao {
                 cursor: pointer;
                 border-radius: 10px;
-                user-select: none;
                 transition: background 0.2s ease, opacity 0.2s ease;
             }
 
             .sidebar-footer.conta-botao:hover {
-                background: rgba(128, 128, 128, 0.18);
+                background: rgba(255, 255, 255, 0.1);
             }
 
             .sidebar-footer.conta-botao:focus-visible {
-                outline: 2px solid rgba(255, 255, 255, 0.7);
+                outline: 2px solid #ffffff;
                 outline-offset: 2px;
             }
 
-            .sidebar-footer.conta-botao.conta-ocupada {
+            .sidebar-footer.conta-trocando {
                 opacity: 0.6;
                 pointer-events: none;
             }
 
-            .sidebar-footer.conta-botao .user-info {
+            .sidebar-footer .user-info {
                 min-width: 0;
-                flex: 1;
             }
 
-            .sidebar-footer.conta-botao .user-info p,
-            .sidebar-footer.conta-botao .user-info strong,
-            .sidebar-footer.conta-botao .user-info span {
+            .sidebar-footer .user-info p,
+            .sidebar-footer .user-info strong,
+            .sidebar-footer .user-info span {
+                display: block;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
 
-            .conta-botao-icone {
-                display: flex;
-                align-items: center;
-                flex-shrink: 0;
+            .sidebar-footer .conta-trocar {
                 margin-left: auto;
+                display: flex;
+                flex-shrink: 0;
                 opacity: 0.7;
-                transition: opacity 0.2s ease, transform 0.2s ease;
             }
 
-            .sidebar-footer.conta-botao:hover .conta-botao-icone {
+            .sidebar-footer.conta-botao:hover .conta-trocar {
                 opacity: 1;
-                transform: scale(1.1);
             }
         `;
 
         document.head.appendChild(style);
     }
-
-    let trocandoConta = false;
-
-    async function trocarConta(rodape, nome, cargo) {
-
-        if (trocandoConta) {
-            return;
-        }
-
-        trocandoConta = true;
-
-        rodape.classList.add("conta-ocupada");
-
-        try {
-
-            // Usado pela tela de login para avisar quem acabou de sair
-            if (nome) {
-                sessionStorage.setItem("contaAnterior", JSON.stringify({ nome, cargo }));
-            }
-
-            const respostaCsrf = await fetch(`${API_AUTH}/csrf`, { credentials: "include" });
-            const csrf = await respostaCsrf.json();
-
-            await fetch(`${API_AUTH}/logout`, {
-                method: "POST",
-                credentials: "include",
-                headers: { [csrf.headerName || "X-CSRF-TOKEN"]: csrf.token }
-            });
-
-        } catch (erro) {
-
-            // Mesmo que o servidor não responda, seguimos para o login.
-            console.warn("Não foi possível encerrar a sessão no servidor:", erro);
-
-        } finally {
-
-            try {
-                localStorage.removeItem("usuarioLogado");
-            } catch (_) {
-                // armazenamento indisponível
-            }
-
-            window.location.href = PAGINA_LOGIN;
-        }
-    }
-
-    function configurarContaAtual() {
-
-        const rodape = document.querySelector(".sidebar-footer");
-
-        if (!rodape) {
-            return;
-        }
-
-        const usuario = lerUsuarioLogado();
-
-        const nome = usuario ? obterNome(usuario) : null;
-        const cargo = usuario ? formatarCargo(obterRole(usuario)) : null;
-
-        // Reaproveita os elementos que cada página já tem (p ou strong),
-        // assim o visual de cada tela continua o mesmo.
-        const avatar = rodape.querySelector(".user-avatar");
-        const elementoNome = rodape.querySelector(".user-info p, .user-info strong");
-        const elementoCargo = rodape.querySelector(".user-info span");
-
-        const nomeExibido = nome || (usuario ? "Minha conta" : "Visitante");
-        const cargoExibido = usuario ? (cargo || "Funcionário") : "Entrar";
-
-        if (avatar) {
-            avatar.textContent = nomeExibido.charAt(0).toUpperCase();
-        }
-
-        if (elementoNome) {
-            elementoNome.textContent = nomeExibido;
-        }
-
-        if (elementoCargo) {
-            elementoCargo.textContent = cargoExibido;
-        }
-
-        adicionarEstilosConta();
-
-        rodape.classList.add("conta-botao");
-        rodape.setAttribute("role", "button");
-        rodape.setAttribute("tabindex", "0");
-        rodape.setAttribute("title", "Trocar de conta");
-        rodape.setAttribute(
-            "aria-label",
-            usuario
-                ? `Conta de ${nomeExibido}, ${cargoExibido}. Clique para trocar de conta`
-                : "Entrar em uma conta"
-        );
-
-        const icone = document.createElement("span");
-
-        icone.className = "conta-botao-icone";
-        icone.setAttribute("aria-hidden", "true");
-
-        icone.innerHTML = `
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                <path d="M6.99 11 3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/>
-            </svg>
-        `;
-
-        rodape.appendChild(icone);
-
-        rodape.addEventListener("click", () => trocarConta(rodape, nome, cargo));
-
-        rodape.addEventListener("keydown", (event) => {
-
-            if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                trocarConta(rodape, nome, cargo);
-            }
-        });
-    }
-
-    // ======================================================
-    // INICIALIZAÇÃO
-    // ======================================================
-
-    garantirMenuFuncionarios();
-    configurarContaAtual();
 })();
