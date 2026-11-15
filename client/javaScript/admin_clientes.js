@@ -1,4 +1,4 @@
-const API_CLIENTE = "http://localhost:8080/api/cliente";
+const API_CLIENTE = "/api/cliente";
 let tokenCsrf = null;
 let headerNameCsrf = null;
 let preparacaoCsrf = null;
@@ -9,37 +9,40 @@ async function obterCsrf() {
   }
 
   if (!preparacaoCsrf) {
-    preparacaoCsrf = fetch("http://localhost:8080/api/auth/csrf", {
+    preparacaoCsrf = fetch("/api/auth/csrf", {
       credentials: "include",
-    }).then(async (resposta) => {
-      if (!resposta.ok) {
-        throw new Error(
-          "Não foi possível obter o token CSRF. Atualize a página e autentique-se novamente.",
-        );
-      }
+    })
+      .then(async (resposta) => {
+        if (!resposta.ok) {
+          throw new Error(
+            "Não foi possível obter o token CSRF. Atualize a página e autentique-se novamente.",
+          );
+        }
 
-      const dados = await resposta.json();
+        const dados = await resposta.json();
 
-      if (!dados?.token) {
-        throw new Error(
-          "O servidor não retornou um token CSRF válido. Atualize a página.",
-        );
-      }
+        if (!dados?.token) {
+          throw new Error(
+            "O servidor não retornou um token CSRF válido. Atualize a página.",
+          );
+        }
 
-      tokenCsrf = dados.token;
-      headerNameCsrf = dados.headerName || "X-CSRF-TOKEN";
+        tokenCsrf = dados.token;
+        headerNameCsrf = dados.headerName || "X-CSRF-TOKEN";
 
-      return {
-        token: tokenCsrf,
-        headerName: headerNameCsrf,
-      };
-    }).catch((erro) => {
-      tokenCsrf = null;
-      headerNameCsrf = null;
-      throw erro;
-    }).finally(() => {
-      preparacaoCsrf = null;
-    });
+        return {
+          token: tokenCsrf,
+          headerName: headerNameCsrf,
+        };
+      })
+      .catch((erro) => {
+        tokenCsrf = null;
+        headerNameCsrf = null;
+        throw erro;
+      })
+      .finally(() => {
+        preparacaoCsrf = null;
+      });
   }
 
   return preparacaoCsrf;
@@ -96,7 +99,8 @@ function renderizarClientes(lista) {
             </tr>
         `;
 
-    return;''
+    return;
+    ("");
   }
 
   lista.forEach((cliente) => {
@@ -104,9 +108,9 @@ function renderizarClientes(lista) {
 
     const cpfFormatado = formatarCPF(cliente.cpf);
 
-     console.log("Objeto completo:", cliente);
+    console.log("Objeto completo:", cliente);
 
-    const aprovado =  cliente.contaAprovada === true;
+    const aprovado = cliente.contaAprovada === true;
 
     linha.innerHTML = `
             <td>
@@ -296,66 +300,66 @@ function escaparHTML(texto) {
 // =========================================================
 
 function mostrarNotificacao(mensagem, tipo = "sucesso") {
-    let container = document.querySelector(".toast-container");
+  let container = document.querySelector(".toast-container");
 
-    if (!container) {
-        container = document.createElement("div");
-        container.className = "toast-container";
-        container.setAttribute("aria-live", "polite");
-        container.setAttribute("aria-atomic", "false");
-        document.body.appendChild(container);
-    }
+  if (!container) {
+    container = document.createElement("div");
+    container.className = "toast-container";
+    container.setAttribute("aria-live", "polite");
+    container.setAttribute("aria-atomic", "false");
+    document.body.appendChild(container);
+  }
 
-    const toast = document.createElement("div");
-    toast.className = `toast ${tipo}`;
+  const toast = document.createElement("div");
+  toast.className = `toast ${tipo}`;
 
-    const icones = {
-        sucesso: "✓",
-        erro: "!",
-        aviso: "!"
-    };
+  const icones = {
+    sucesso: "✓",
+    erro: "!",
+    aviso: "!",
+  };
 
-    const icone = document.createElement("span");
-    icone.className = "toast-icone";
-    icone.textContent = icones[tipo] || "✓";
-    icone.setAttribute("aria-hidden", "true");
+  const icone = document.createElement("span");
+  icone.className = "toast-icone";
+  icone.textContent = icones[tipo] || "✓";
+  icone.setAttribute("aria-hidden", "true");
 
-    const texto = document.createElement("span");
-    texto.className = "toast-mensagem";
-    texto.textContent = mensagem;
+  const texto = document.createElement("span");
+  texto.className = "toast-mensagem";
+  texto.textContent = mensagem;
 
-    const fechar = document.createElement("button");
-    fechar.className = "toast-fechar";
-    fechar.type = "button";
-    fechar.textContent = "×";
-    fechar.setAttribute("aria-label", "Fechar notificação");
+  const fechar = document.createElement("button");
+  fechar.className = "toast-fechar";
+  fechar.type = "button";
+  fechar.textContent = "×";
+  fechar.setAttribute("aria-label", "Fechar notificação");
 
-    toast.append(icone, texto, fechar);
-    container.appendChild(toast);
+  toast.append(icone, texto, fechar);
+  container.appendChild(toast);
 
-    let removido = false;
+  let removido = false;
 
-    function removerNotificacao() {
-        if (removido) return;
-        removido = true;
+  function removerNotificacao() {
+    if (removido) return;
+    removido = true;
 
-        toast.classList.add("toast-saindo");
+    toast.classList.add("toast-saindo");
 
-        setTimeout(() => {
-            toast.remove();
+    setTimeout(() => {
+      toast.remove();
 
-            if (container.children.length === 0) {
-                container.remove();
-            }
-        }, 250);
-    }
+      if (container.children.length === 0) {
+        container.remove();
+      }
+    }, 250);
+  }
 
-    const temporizador = setTimeout(removerNotificacao, 3500);
+  const temporizador = setTimeout(removerNotificacao, 3500);
 
-    fechar.addEventListener("click", () => {
-        clearTimeout(temporizador);
-        removerNotificacao();
-    });
+  fechar.addEventListener("click", () => {
+    clearTimeout(temporizador);
+    removerNotificacao();
+  });
 }
 
 // ==========================================

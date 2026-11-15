@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE_URL = "http://localhost:8080/api";
+  const API_BASE_URL = "/api";
   const ICONE_PADRAO = "../img/medicamentos_icon.png";
 
   let todosProdutos = [];
@@ -387,19 +387,20 @@
       }
     }
 
-        // Filtro por tipo de medicamento
+    // Filtro por tipo de medicamento
     if (tipoMedicamentoSelecionado === "receita") {
-        produtos = produtos.filter((produto) =>
-            produto.necessitaReceita === true ||
-            produto.necessitaReceita === 1
-        );
+      produtos = produtos.filter(
+        (produto) =>
+          produto.necessitaReceita === true || produto.necessitaReceita === 1,
+      );
     }
 
     if (tipoMedicamentoSelecionado === "controlado") {
-        produtos = produtos.filter((produto) =>
-            produto.medicamentoControlado === true ||
-            produto.medicamentoControlado === 1
-        );
+      produtos = produtos.filter(
+        (produto) =>
+          produto.medicamentoControlado === true ||
+          produto.medicamentoControlado === 1,
+      );
     }
 
     const minimo = obterValorPreco(document.querySelector("#precoMin"));
@@ -464,8 +465,6 @@
       );
     }
 
-    
-
     produtosExibidos = produtos;
 
     atualizarQuantidade(produtos.length);
@@ -514,9 +513,9 @@
     const receita =
       produto.necessitaReceita === true || produto.necessitaReceita === 1;
 
-      const controlado =
-    produto.medicamentoControlado === true ||
-    produto.medicamentoControlado === 1;
+    const controlado =
+      produto.medicamentoControlado === true ||
+      produto.medicamentoControlado === 1;
 
     return `
       <article
@@ -525,13 +524,15 @@
         style="cursor:pointer"
       >
         <div class="product-image-container">
-          ${receita
+          ${
+            receita
               ? `<span class="badge-prescription">EXIGE RECEITA</span>`
-              : ""}
+              : ""
+          }
 
-          ${controlado
-              ? `<span class="badge-controlado">CONTROLADO</span>`
-              : ""}
+          ${
+            controlado ? `<span class="badge-controlado">CONTROLADO</span>` : ""
+          }
 
           ${temPromocao ? `<span class="badge-promocao">PROMOÇÃO</span>` : ""}
 
@@ -584,7 +585,7 @@
 
   function adicionarEventosProdutos(container) {
     container.querySelectorAll("[data-produto-id]").forEach((card) => {
-            const botaoFav = card.querySelector(".btn-fav");
+      const botaoFav = card.querySelector(".btn-fav");
 
       if (botaoFav) {
         botaoFav.addEventListener("click", async (event) => {
@@ -595,7 +596,6 @@
         });
       }
       const botaoCarrinho = card.querySelector(".btn-add-cart");
-    
 
       if (botaoCarrinho) {
         botaoCarrinho.addEventListener("click", async (event) => {
@@ -690,7 +690,6 @@
       removerNotificacao();
     });
   }
-
 
   async function alternarFavorito(idProduto, botao) {
     botao.disabled = true;
@@ -854,11 +853,11 @@
     }
 
     if (tipoMedicamentoSelecionado === "receita") {
-    filtros.push("Exige receita médica");
+      filtros.push("Exige receita médica");
     }
 
     if (tipoMedicamentoSelecionado === "controlado") {
-        filtros.push("Medicamento controlado");
+      filtros.push("Medicamento controlado");
     }
 
     container.innerHTML = filtros
@@ -911,33 +910,28 @@
       ?.addEventListener("click", limparFiltros);
 
     document
-    .querySelector("#filtroReceita")
-    ?.addEventListener("change", (event) => {
-        tipoMedicamentoSelecionado = event.target.checked
-            ? "receita"
-            : null;
+      .querySelector("#filtroReceita")
+      ?.addEventListener("change", (event) => {
+        tipoMedicamentoSelecionado = event.target.checked ? "receita" : null;
 
         if (event.target.checked) {
-            document.querySelector("#filtroControlado").checked = false;
+          document.querySelector("#filtroControlado").checked = false;
         }
 
         aplicarFiltros();
-    });
+      });
 
     document
-        .querySelector("#filtroControlado")
-        ?.addEventListener("change", (event) => {
-            tipoMedicamentoSelecionado = event.target.checked
-                ? "controlado"
-                : null;
+      .querySelector("#filtroControlado")
+      ?.addEventListener("change", (event) => {
+        tipoMedicamentoSelecionado = event.target.checked ? "controlado" : null;
 
-            if (event.target.checked) {
-                document.querySelector("#filtroReceita").checked = false;
-            }
+        if (event.target.checked) {
+          document.querySelector("#filtroReceita").checked = false;
+        }
 
-            aplicarFiltros();
-        });
-                
+        aplicarFiltros();
+      });
   }
 
   function executarBusca() {
