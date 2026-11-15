@@ -1,10 +1,10 @@
-const API_CARRINHO = "http://localhost:8080/api/carrinho";
+const API_CARRINHO = "/api/carrinho";
 
-const API_PRODUTO = "http://localhost:8080/api/produto";
+const API_PRODUTO = "/api/produto";
 
-const API_PEDIDO = "http://localhost:8080/api/pedido";
+const API_PEDIDO = "/api/pedido";
 
-const API_AUTH = "http://localhost:8080/api/auth";
+const API_AUTH = "/api/auth";
 
 const STORAGE_USUARIO = "usuarioLogado";
 
@@ -74,17 +74,18 @@ const VALOR_FRETE_ENTREGA = 10;
 // RECEITAS
 // =========================================================
 
-
 function isRestrito(item) {
   return (
-    item.medicamentoControlado === true || item.medicamentoControlado === 1 ||
-    item.necessitaReceita === true || item.necessitaReceita === 1
+    item.medicamentoControlado === true ||
+    item.medicamentoControlado === 1 ||
+    item.necessitaReceita === true ||
+    item.necessitaReceita === 1
   );
 }
 
 async function verificarReceitaAprovada() {
   try {
-    const res = await fetch(`http://localhost:8080/api/receita/cliente/${ID_CLIENTE}`, {
+    const res = await fetch(`/api/receita/cliente/${ID_CLIENTE}`, {
       credentials: "include",
     });
     if (!res.ok) return false;
@@ -201,16 +202,16 @@ async function prepararCsrf() {
 // VOLTAR PARA O CARRINHO
 // =========================================================
 
-if(btnVoltarParaCarrinhoTopo) {
-  btnVoltarParaCarrinhoTopo.addEventListener("click", voltarParaCarrinho)
+if (btnVoltarParaCarrinhoTopo) {
+  btnVoltarParaCarrinhoTopo.addEventListener("click", voltarParaCarrinho);
 }
 
-if(btnVoltarParaCarrinhoMain) {
-  btnVoltarParaCarrinhoMain.addEventListener("click", voltarParaCarrinho)
+if (btnVoltarParaCarrinhoMain) {
+  btnVoltarParaCarrinhoMain.addEventListener("click", voltarParaCarrinho);
 }
 
-function voltarParaCarrinho(){
-  window.location.href = "carrinho.html"
+function voltarParaCarrinho() {
+  window.location.href = "carrinho.html";
 }
 
 // =========================================================
@@ -356,13 +357,12 @@ async function renderizarCheckout() {
           produto.medicamentoControlado === true ||
           produto.medicamentoControlado === 1,
         necessitaReceita:
-          produto.necessitaReceita === true ||
-          produto.necessitaReceita === 1,
+          produto.necessitaReceita === true || produto.necessitaReceita === 1,
       };
     }),
   );
 
-    receitaAprovada = await verificarReceitaAprovada();
+  receitaAprovada = await verificarReceitaAprovada();
 
   itensAguardando = itensComProduto.filter(
     (item) => isRestrito(item) && !receitaAprovada,
@@ -377,7 +377,8 @@ async function renderizarCheckout() {
 
   if (listaRevisao) {
     listaRevisao.innerHTML =
-      aviso + (carrinhoItens.map(criarItemRevisao).join("") ||
+      aviso +
+      (carrinhoItens.map(criarItemRevisao).join("") ||
         '<li class="checkout-vazio">Nenhum item disponível para compra agora.</li>');
   }
 
@@ -424,7 +425,6 @@ function criarItemRevisao(item) {
 // RESUMO
 // =========================================================
 
-
 function atualizarResumo() {
   const subtotal = calcularSubtotal();
   const frete = calcularFrete();
@@ -436,9 +436,7 @@ function atualizarResumo() {
 
   if (descontoEl) {
     descontoEl.textContent =
-      desconto > 0
-        ? `-${formatarPreco(desconto)}`
-        : formatarPreco(0);
+      desconto > 0 ? `-${formatarPreco(desconto)}` : formatarPreco(0);
   }
 
   if (freteEl) {
@@ -455,7 +453,6 @@ function atualizarResumo() {
     totalEl.textContent = formatarPreco(total);
   }
 }
-
 
 // =========================================================
 // ENTREGA
@@ -548,9 +545,6 @@ function configurarConfirmacao() {
 // =========================================================
 
 function abrirModalConfirmacao() {
-  
-  
-
   if (!carrinhoItens.length) {
     alert("Seu carrinho está vazio.");
 
@@ -776,8 +770,6 @@ async function finalizarPedido(modal) {
 
     return;
   }
-
- 
 
   btn.disabled = true;
 
@@ -1018,7 +1010,6 @@ function calcularSubtotal() {
   }, 0);
 }
 
-
 function calcularFrete() {
   if (tipoEntrega !== "entrega") {
     return 0;
@@ -1028,7 +1019,6 @@ function calcularFrete() {
 
   return subtotal >= 80 ? 0 : VALOR_FRETE_ENTREGA;
 }
-
 
 function calcularTotal() {
   return Math.max(0, calcularSubtotal() - desconto + calcularFrete());

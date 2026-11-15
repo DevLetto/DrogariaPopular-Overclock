@@ -1,14 +1,25 @@
 {
   "redirects": [
-    { "source": "/", "destination": "/paginas/index.html" }
+    {
+      "source": "/",
+      "destination": "/paginas/index.html"
+    }
   ],
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://drogariapopular-overclock-production.up.railway.app" }
+    {
+      "source": "/api/:path*",
+      "destination": "https://drogariapopular-overclock-production.up.railway.app/api/:path*"
+    }
   ],
   "headers": [
     {
       "source": "/api/:path*",
-      "headers": [{ "key": "x-vercel-enable-rewrite-caching", "value": "0" }]
+      "headers": [
+        {
+          "key": "x-vercel-enable-rewrite-caching",
+          "value": "0"
+        }
+      ]
     }
   ]
 }

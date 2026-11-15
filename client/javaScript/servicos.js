@@ -1,145 +1,80 @@
 (function () {
+  const API_BASE_URL = "/api";
 
-  const API_BASE_URL =
-    "http://localhost:8080/api";
+  const API_SERVICO = `${API_BASE_URL}/servico`;
 
-  const API_SERVICO =
-    `${API_BASE_URL}/servico`;
-
-  const API_LOJA =
-    `${API_BASE_URL}/loja`;
-
+  const API_LOJA = `${API_BASE_URL}/loja`;
 
   let servicos = [];
 
   let lojas = [];
 
-
   // =========================================================
   // INICIALIZAÇÃO
   // =========================================================
 
-  document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-      inicializar();
-
-    }
-  );
-
+  document.addEventListener("DOMContentLoaded", () => {
+    inicializar();
+  });
 
   async function inicializar() {
-
     mostrarCarregando();
 
     await carregarDados();
-
   }
-
 
   // =========================================================
   // API
   // =========================================================
 
   async function fetchJson(url) {
-
-    const resposta =
-      await fetch(url);
-
+    const resposta = await fetch(url);
 
     if (!resposta.ok) {
-
-      throw new Error(
-        `Erro ${resposta.status} ao acessar ${url}`
-      );
-
+      throw new Error(`Erro ${resposta.status} ao acessar ${url}`);
     }
 
-
     return resposta.json();
-
   }
-
 
   // =========================================================
   // CARREGAR SERVIÇOS E LOJAS
   // =========================================================
 
   async function carregarDados() {
-
     try {
-
-      const [
-        servicosApi,
-        lojasApi
-      ] = await Promise.all([
-
+      const [servicosApi, lojasApi] = await Promise.all([
         fetchJson(API_SERVICO),
 
-        fetchJson(API_LOJA)
-
+        fetchJson(API_LOJA),
       ]);
 
+      servicos = Array.isArray(servicosApi) ? servicosApi : [];
 
-      servicos =
-        Array.isArray(servicosApi)
-          ? servicosApi
-          : [];
+      lojas = Array.isArray(lojasApi) ? lojasApi : [];
 
+      console.log("Serviços carregados:", servicos);
 
-      lojas =
-        Array.isArray(lojasApi)
-          ? lojasApi
-          : [];
-
-
-      console.log(
-        "Serviços carregados:",
-        servicos
-      );
-
-
-      console.log(
-        "Lojas carregadas:",
-        lojas
-      );
-
+      console.log("Lojas carregadas:", lojas);
 
       renderizarServicos();
-
-
     } catch (erro) {
-
-      console.error(
-        "Erro ao carregar serviços:",
-        erro
-      );
-
+      console.error("Erro ao carregar serviços:", erro);
 
       mostrarErro();
-
     }
-
   }
-
 
   // =========================================================
   // CARREGANDO
   // =========================================================
 
   function mostrarCarregando() {
-
-    const container =
-      document.querySelector(
-        "#servicosGrid"
-      );
-
+    const container = document.querySelector("#servicosGrid");
 
     if (!container) {
       return;
     }
-
 
     container.innerHTML = `
 
@@ -158,38 +93,22 @@
       </div>
 
     `;
-
   }
-
 
   // =========================================================
   // RENDERIZAR
   // =========================================================
 
   function renderizarServicos() {
-
-    const container =
-      document.querySelector(
-        "#servicosGrid"
-      );
-
+    const container = document.querySelector("#servicosGrid");
 
     if (!container) {
-
-      console.warn(
-        "Container #servicosGrid não encontrado."
-      );
+      console.warn("Container #servicosGrid não encontrado.");
 
       return;
-
     }
 
-
-    if (
-      !Array.isArray(servicos) ||
-      servicos.length === 0
-    ) {
-
+    if (!Array.isArray(servicos) || servicos.length === 0) {
       container.innerHTML = `
 
         <div
@@ -213,63 +132,29 @@
       `;
 
       return;
-
     }
 
-
-    container.innerHTML =
-      servicos
-        .map(
-          criarCardServico
-        )
-        .join("");
-
+    container.innerHTML = servicos.map(criarCardServico).join("");
 
     adicionarEventos();
-
   }
-
 
   // =========================================================
   // CARD DE SERVIÇO
   // =========================================================
 
-  function criarCardServico(
-    servico,
-    indice
-  ) {
+  function criarCardServico(servico, indice) {
+    const id = servico.id ?? servico.idServico;
 
-    const id =
-      servico.id ??
-      servico.idServico;
+    const nome = servico.nome ?? "Serviço";
 
+    const descricao = servico.descricao ?? "Descrição não informada.";
 
-    const nome =
-      servico.nome ??
-      "Serviço";
+    const valor = Number(servico.valor || 0);
 
+    const loja = encontrarLoja(servico.idLoja);
 
-    const descricao =
-      servico.descricao ??
-      "Descrição não informada.";
-
-
-    const valor =
-      Number(
-        servico.valor || 0
-      );
-
-
-    const loja =
-      encontrarLoja(
-        servico.idLoja
-      );
-
-
-    const nomeLoja =
-      loja?.nome ||
-      null;
-
+    const nomeLoja = loja?.nome || null;
 
     /*
      * Como o backend atualmente não possui
@@ -280,17 +165,9 @@
      * Os ícones abaixo são apenas visuais.
      */
 
-    const icone =
-      obterIconeServico(
-        nome
-      );
+    const icone = obterIconeServico(nome);
 
-
-    const classeIcone =
-      indice % 2 === 0
-        ? "bg-primaria"
-        : "bg-secundaria";
-
+    const classeIcone = indice % 2 === 0 ? "bg-primaria" : "bg-secundaria";
 
     return `
 
@@ -337,19 +214,11 @@
           <span
             class="
               preco
-              ${
-                valor === 0
-                  ? "destaque-verde"
-                  : ""
-              }
+              ${valor === 0 ? "destaque-verde" : ""}
             "
           >
 
-            ${
-              valor === 0
-                ? "Gratuito"
-                : formatarPreco(valor)
-            }
+            ${valor === 0 ? "Gratuito" : formatarPreco(valor)}
 
           </span>
 
@@ -369,237 +238,116 @@
       </article>
 
     `;
-
   }
-
 
   // =========================================================
   // ENCONTRAR LOJA
   // =========================================================
 
-  function encontrarLoja(
-    idLoja
-  ) {
-
+  function encontrarLoja(idLoja) {
     if (!idLoja) {
       return null;
     }
 
+    return lojas.find((loja) => {
+      const id = loja.id ?? loja.idLoja;
 
-    return lojas.find(
-      (loja) => {
-
-        const id =
-          loja.id ??
-          loja.idLoja;
-
-        return (
-          String(id) ===
-          String(idLoja)
-        );
-
-      }
-    );
-
+      return String(id) === String(idLoja);
+    });
   }
-
 
   // =========================================================
   // ÍCONE DO SERVIÇO
   // =========================================================
 
-  function obterIconeServico(
-    nome
-  ) {
+  function obterIconeServico(nome) {
+    const texto = String(nome).toLowerCase();
 
-    const texto =
-      String(nome)
-        .toLowerCase();
-
-
-    if (
-      texto.includes("inje")
-    ) {
-
+    if (texto.includes("inje")) {
       return "../img/injecao_icon.png";
-
     }
 
-
-    if (
-      texto.includes("press")
-    ) {
-
+    if (texto.includes("press")) {
       return "../img/estetoscopio_icon.png";
-
     }
 
-
-    if (
-      texto.includes("glic")
-    ) {
-
+    if (texto.includes("glic")) {
       return "../img/check_icon.png";
-
     }
 
-
-    if (
-      texto.includes("colesterol")
-    ) {
-
+    if (texto.includes("colesterol")) {
       return "../img/check_icon.png";
-
     }
 
-
-    if (
-      texto.includes("orelha") ||
-      texto.includes("fura")
-    ) {
-
+    if (texto.includes("orelha") || texto.includes("fura")) {
       return "../img/servicos_icon.png";
-
     }
 
-
-    if (
-      texto.includes("farmac")
-    ) {
-
+    if (texto.includes("farmac")) {
       return "../img/coracao_icon.png";
-
     }
-
 
     return "../img/servicos_icon.png";
-
   }
-
 
   // =========================================================
   // EVENTOS
   // =========================================================
 
   function adicionarEventos() {
+    const botoes = document.querySelectorAll("[data-detalhes]");
 
-    const botoes =
-      document.querySelectorAll(
-        "[data-detalhes]"
-      );
+    botoes.forEach((botao) => {
+      botao.addEventListener("click", (event) => {
+        event.stopPropagation();
 
+        const card = botao.closest(".servico-card");
 
-    botoes.forEach(
-      (botao) => {
+        if (!card) {
+          return;
+        }
 
-        botao.addEventListener(
-          "click",
-          (event) => {
+        const id = card.dataset.servicoId;
 
-            event.stopPropagation();
+        if (!id) {
+          return;
+        }
 
-
-            const card =
-              botao.closest(
-                ".servico-card"
-              );
-
-
-            if (!card) {
-              return;
-            }
-
-
-            const id =
-              card.dataset.servicoId;
-
-
-            if (!id) {
-              return;
-            }
-
-
-            abrirDetalhes(id);
-
-          }
-        );
-
-      }
-    );
-
+        abrirDetalhes(id);
+      });
+    });
   }
-
 
   // =========================================================
   // DETALHES
   // =========================================================
 
-  async function abrirDetalhes(
-    id
-  ) {
-
+  async function abrirDetalhes(id) {
     try {
+      const servico = await fetchJson(`${API_SERVICO}/${id}`);
 
-      const servico =
-        await fetchJson(
-          `${API_SERVICO}/${id}`
-        );
-
-
-      mostrarModal(
-        servico
-      );
-
-
+      mostrarModal(servico);
     } catch (erro) {
+      console.error("Erro ao buscar detalhes do serviço:", erro);
 
-      console.error(
-        "Erro ao buscar detalhes do serviço:",
-        erro
-      );
-
-
-      alert(
-        "Não foi possível carregar os detalhes do serviço."
-      );
-
+      alert("Não foi possível carregar os detalhes do serviço.");
     }
-
   }
-
 
   // =========================================================
   // MODAL
   // =========================================================
 
-  function mostrarModal(
-    servico
-  ) {
-
+  function mostrarModal(servico) {
     fecharModal();
 
+    const valor = Number(servico.valor || 0);
 
-    const valor =
-      Number(
-        servico.valor || 0
-      );
+    const loja = encontrarLoja(servico.idLoja);
 
+    const overlay = document.createElement("div");
 
-    const loja =
-      encontrarLoja(
-        servico.idLoja
-      );
-
-
-    const overlay =
-      document.createElement(
-        "div"
-      );
-
-
-    overlay.className =
-      "modal-overlay";
-
+    overlay.className = "modal-overlay";
 
     overlay.innerHTML = `
 
@@ -613,10 +361,7 @@
         <div class="modal-header">
 
           <h2 id="tituloModalServico">
-            ${escaparHTML(
-              servico.nome ||
-              "Serviço"
-            )}
+            ${escaparHTML(servico.nome || "Serviço")}
           </h2>
 
 
@@ -638,9 +383,7 @@
           <p>
             ${
               servico.descricao
-                ? escaparHTML(
-                    servico.descricao
-                  )
+                ? escaparHTML(servico.descricao)
                 : "Descrição não informada."
             }
           </p>
@@ -660,11 +403,7 @@
             </strong>
 
             <span>
-              ${
-                valor === 0
-                  ? "Gratuito"
-                  : formatarPreco(valor)
-              }
+              ${valor === 0 ? "Gratuito" : formatarPreco(valor)}
             </span>
 
 
@@ -676,10 +415,7 @@
                   </strong>
 
                   <span>
-                    ${escaparHTML(
-                      loja.nome ||
-                      "Não informado"
-                    )}
+                    ${escaparHTML(loja.nome || "Não informado")}
                   </span>
                 `
                 : ""
@@ -707,201 +443,98 @@
 
     `;
 
+    document.body.appendChild(overlay);
 
-    document.body.appendChild(
-      overlay
-    );
-
-    document.body.style.overflow = "hidden";  
-
+    document.body.style.overflow = "hidden";
 
     // =======================================================
     // FECHAR
     // =======================================================
 
-    const btnFechar =
-      overlay.querySelector(
-        ".modal-fechar"
-      );
+    const btnFechar = overlay.querySelector(".modal-fechar");
 
+    const btnFecharModal = overlay.querySelector(".btn-fechar-modal");
 
-    const btnFecharModal =
-      overlay.querySelector(
-        ".btn-fechar-modal"
-      );
+    btnFechar.addEventListener("click", fecharModal);
 
+    btnFecharModal.addEventListener("click", fecharModal);
 
-    btnFechar.addEventListener(
-      "click",
-      fecharModal
-    );
-
-
-    btnFecharModal.addEventListener(
-      "click",
-      fecharModal
-    );
-
-
-    overlay.addEventListener(
-      "click",
-      (event) => {
-
-        if (
-          event.target ===
-          overlay
-        ) {
-
-          fecharModal();
-
-        }
-
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) {
+        fecharModal();
       }
-    );
+    });
 
-
-    document.addEventListener(
-      "keydown",
-      fecharComEscape
-    );
-
+    document.addEventListener("keydown", fecharComEscape);
   }
-
 
   // =========================================================
   // FECHAR MODAL
   // =========================================================
 
   function fecharModal() {
-
-    const modal =
-      document.querySelector(
-        ".modal-overlay"
-      );
-
+    const modal = document.querySelector(".modal-overlay");
 
     if (modal) {
-
       modal.remove();
-
     }
 
     document.body.style.overflow = "";
 
-
-    document.removeEventListener(
-      "keydown",
-      fecharComEscape
-    );
-
+    document.removeEventListener("keydown", fecharComEscape);
   }
 
-
-  function fecharComEscape(
-    event
-  ) {
-
-    if (
-      event.key === "Escape"
-    ) {
-
+  function fecharComEscape(event) {
+    if (event.key === "Escape") {
       fecharModal();
-
     }
-
   }
-
 
   // =========================================================
   // PREÇO
   // =========================================================
 
-  function formatarPreco(
-    valor
-  ) {
-
-    return Number(valor || 0)
-      .toLocaleString(
-        "pt-BR",
-        {
-          style: "currency",
-          currency: "BRL"
-        }
-      );
-
+  function formatarPreco(valor) {
+    return Number(valor || 0).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
   }
-
 
   // =========================================================
   // ESCAPAR HTML
   // =========================================================
 
-  function escaparHTML(
-    valor
-  ) {
+  function escaparHTML(valor) {
+    const div = document.createElement("div");
 
-    const div =
-      document.createElement(
-        "div"
-      );
-
-
-    div.textContent =
-      valor ?? "";
-
+    div.textContent = valor ?? "";
 
     return div.innerHTML;
-
   }
-
 
   // =========================================================
   // ESCAPAR ATRIBUTO
   // =========================================================
 
-  function escaparAtributo(
-    valor
-  ) {
-
-    return String(
-      valor ?? ""
-    )
-      .replace(
-        /&/g,
-        "&amp;"
-      )
-      .replace(
-        /"/g,
-        "&quot;"
-      )
-      .replace(
-        /</g,
-        "&lt;"
-      )
-      .replace(
-        />/g,
-        "&gt;"
-      );
-
+  function escaparAtributo(valor) {
+    return String(valor ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
   }
-
 
   // =========================================================
   // ERRO
   // =========================================================
 
   function mostrarErro() {
-
-    const container =
-      document.querySelector(
-        "#servicosGrid"
-      );
-
+    const container = document.querySelector("#servicosGrid");
 
     if (!container) {
       return;
     }
-
 
     container.innerHTML = `
 
@@ -937,28 +570,14 @@
 
     `;
 
-
-    const botao =
-      document.querySelector(
-        "#btnTentarNovamente"
-      );
-
+    const botao = document.querySelector("#btnTentarNovamente");
 
     if (botao) {
+      botao.addEventListener("click", () => {
+        mostrarCarregando();
 
-      botao.addEventListener(
-        "click",
-        () => {
-
-          mostrarCarregando();
-
-          carregarDados();
-
-        }
-      );
-
+        carregarDados();
+      });
     }
-
   }
-
 })();

@@ -1,4 +1,4 @@
-const API_AUTH = "http://localhost:8080/api/auth";
+const API_AUTH = "/api/auth";
 
 // Para onde cada cargo vai depois de entrar.
 // Cargo que não estiver aqui NÃO entra no painel (ex.: cliente).

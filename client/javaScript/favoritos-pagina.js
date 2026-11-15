@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE_URL = "http://localhost:8080/api";
+  const API_BASE_URL = "/api";
   const ICONE_PADRAO = "../img/medicamentos_icon.png";
 
   const grid = document.getElementById("gridFavoritos");
@@ -285,9 +285,7 @@
     if (!contador) return;
 
     contador.textContent =
-      quantidade === null
-        ? ""
-        : `${quantidade} produto(s) favorito(s)`;
+      quantidade === null ? "" : `${quantidade} produto(s) favorito(s)`;
   }
 
   // ---------------------------------------------------------

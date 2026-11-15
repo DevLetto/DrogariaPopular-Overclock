@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8080/api/auth";
+const API_BASE = "/api/auth";
 
 function showTab(tab) {
   const isLogin = tab === "login";
@@ -10,9 +10,10 @@ function showTab(tab) {
     : "flex";
   document.getElementById("tabLogin").classList.toggle("active", isLogin);
   document.getElementById("tabCadastro").classList.toggle("active", !isLogin);
-  document.getElementById("tabLogin").classList.toggle("activeLogin", isLogin)
-  document.getElementById("tabCadastro").classList.toggle("activeCadastro", !isLogin);
-
+  document.getElementById("tabLogin").classList.toggle("activeLogin", isLogin);
+  document
+    .getElementById("tabCadastro")
+    .classList.toggle("activeCadastro", !isLogin);
 }
 
 document.querySelectorAll(".toggle-visibility").forEach((btn) => {
@@ -20,7 +21,10 @@ document.querySelectorAll(".toggle-visibility").forEach((btn) => {
     const input = btn.parentElement.querySelector("input");
     const mostrarSenha = input.type === "password";
     input.type = mostrarSenha ? "text" : "password";
-    btn.setAttribute("aria-label", mostrarSenha ? "Ocultar senha" : "Mostrar senha");
+    btn.setAttribute(
+      "aria-label",
+      mostrarSenha ? "Ocultar senha" : "Mostrar senha",
+    );
     btn.setAttribute("aria-pressed", String(mostrarSenha));
     btn.querySelector(".material-symbols-outlined").textContent = mostrarSenha
       ? "visibility_off"
@@ -62,7 +66,7 @@ async function chamarApi(caminho, corpo) {
 }
 
 async function prepararCsrf() {
-  await fetch("http://localhost:8080/api/auth/csrf", { credentials: "include" });
+  await fetch("/api/auth/csrf", { credentials: "include" });
 }
 
 // ---------------- LOGIN ----------------
@@ -92,13 +96,15 @@ formLogin.addEventListener("submit", async (e) => {
 
     // Admin vai direto pro painel de produtos; o resto cai na home
     window.location.href =
-      usuario.role === "ROLE_ADMINISTRADOR" ? "admin_produtos.html" : "index.html";
+      usuario.role === "ROLE_ADMINISTRADOR"
+        ? "admin_produtos.html"
+        : "index.html";
   } catch (err) {
     mostrarErro("loginError", err.message);
   } finally {
     submitBtn.disabled = false;
   }
-}); 
+});
 
 // ---------------- CADASTRO ----------------
 

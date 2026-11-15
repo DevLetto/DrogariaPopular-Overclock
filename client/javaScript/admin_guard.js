@@ -16,171 +16,161 @@
  * pessoa não pode usar.
  */
 (function () {
+  const API_AUTH = "/api/auth";
+  const PAGINA_LOGIN = "admin_login.html";
+  const PAGINA_LOJA = "index.html";
 
-    const API_AUTH = "http://localhost:8080/api/auth";
-    const PAGINA_LOGIN = "admin_login.html";
-    const PAGINA_LOJA = "index.html";
+  const ADMIN = "ROLE_ADMINISTRADOR";
+  const ATENDENTE = "ROLE_ATENDENTE";
+  const FARMACEUTICO = "ROLE_FARMACEUTICO";
+  const ESTOQUE = "ROLE_FUNCIONARIO_ESTOQUE_LOGISTICA";
 
-    const ADMIN = "ROLE_ADMINISTRADOR";
-    const ATENDENTE = "ROLE_ATENDENTE";
-    const FARMACEUTICO = "ROLE_FARMACEUTICO";
-    const ESTOQUE = "ROLE_FUNCIONARIO_ESTOQUE_LOGISTICA";
+  // ------------------------------------------------------
+  // QUEM PODE ABRIR CADA PÁGINA (espelha o SecurityConfig)
+  // Página admin que não estiver aqui -> só administrador.
+  // ------------------------------------------------------
+  const PERMISSOES = {
+    "admin_dashboard.html": [ADMIN],
+    "admin_produtos.html": [ADMIN, ESTOQUE],
+    "admin_pedidos.html": [ADMIN, ATENDENTE],
+    "admin_receitas.html": [ADMIN, FARMACEUTICO],
+    "admin_promocoes.html": [ADMIN],
+    "admin_categorias.html": [ADMIN],
+    "admin_clientes.html": [ADMIN],
+    "admin_funcionarios.html": [ADMIN],
+    "admin_lojas.html": [ADMIN],
+    "admin_servicos.html": [ADMIN],
+  };
+
+  // Página inicial de cada cargo (tem que estar liberada para ele acima!)
+  const PAGINA_INICIAL = {
+    [ADMIN]: "admin_produtos.html",
+    [ATENDENTE]: "admin_pedidos.html",
+    [FARMACEUTICO]: "admin_receitas.html",
+    [ESTOQUE]: "admin_produtos.html",
+  };
+
+  const pagina = location.pathname.split("/").pop() || "";
+
+  // ------------------------------------------------------
+  // 1) ESCONDE A PÁGINA ATÉ CONFIRMAR O ACESSO
+  // ------------------------------------------------------
+  const estiloOculto = document.createElement("style");
+
+  estiloOculto.id = "admin-guard-oculta";
+  estiloOculto.textContent = "html { visibility: hidden !important; }";
+
+  document.documentElement.appendChild(estiloOculto);
+
+  verificarAcesso();
+
+  // ------------------------------------------------------
+  // 2) PERGUNTA AO SERVIDOR
+  // ------------------------------------------------------
+  async function verificarAcesso() {
+    let resposta;
+
+    try {
+      resposta = await fetch(`${API_AUTH}/me`, { credentials: "include" });
+    } catch (erro) {
+      // Servidor fora do ar: não dá pra saber quem é a pessoa
+      mostrarErroDeConexao();
+      return;
+    }
+
+    // Sem sessão (o back responde 401 ou 403 para anônimo)
+    if (resposta.status === 401 || resposta.status === 403) {
+      localStorage.removeItem("usuarioLogado");
+
+      irPara(PAGINA_LOGIN);
+      return;
+    }
+
+    if (!resposta.ok) {
+      mostrarErroDeConexao();
+      return;
+    }
+
+    const usuario = await resposta.json();
 
     // ------------------------------------------------------
-    // QUEM PODE ABRIR CADA PÁGINA (espelha o SecurityConfig)
-    // Página admin que não estiver aqui -> só administrador.
+    // 3) CARGO PODE ABRIR ESTA PÁGINA?
     // ------------------------------------------------------
-    const PERMISSOES = {
-        "admin_dashboard.html": [ADMIN],
-        "admin_produtos.html": [ADMIN, ESTOQUE],
-        "admin_pedidos.html": [ADMIN, ATENDENTE],
-        "admin_receitas.html": [ADMIN, FARMACEUTICO],
-        "admin_promocoes.html": [ADMIN],
-        "admin_categorias.html": [ADMIN],
-        "admin_clientes.html": [ADMIN],
-        "admin_funcionarios.html": [ADMIN],
-        "admin_lojas.html": [ADMIN],
-        "admin_servicos.html": [ADMIN]
-    };
+    const permitidos = PERMISSOES[pagina] ?? [ADMIN];
 
-    // Página inicial de cada cargo (tem que estar liberada para ele acima!)
-    const PAGINA_INICIAL = {
-        [ADMIN]: "admin_produtos.html",
-        [ATENDENTE]: "admin_pedidos.html",
-        [FARMACEUTICO]: "admin_receitas.html",
-        [ESTOQUE]: "admin_produtos.html"
-    };
+    if (!permitidos.includes(usuario.role)) {
+      const destino = PAGINA_INICIAL[usuario.role];
 
-    const pagina = location.pathname.split("/").pop() || "";
-
-    // ------------------------------------------------------
-    // 1) ESCONDE A PÁGINA ATÉ CONFIRMAR O ACESSO
-    // ------------------------------------------------------
-    const estiloOculto = document.createElement("style");
-
-    estiloOculto.id = "admin-guard-oculta";
-    estiloOculto.textContent = "html { visibility: hidden !important; }";
-
-    document.documentElement.appendChild(estiloOculto);
-
-    verificarAcesso();
-
-    // ------------------------------------------------------
-    // 2) PERGUNTA AO SERVIDOR
-    // ------------------------------------------------------
-    async function verificarAcesso() {
-
-        let resposta;
-
-        try {
-
-            resposta = await fetch(`${API_AUTH}/me`, { credentials: "include" });
-
-        } catch (erro) {
-
-            // Servidor fora do ar: não dá pra saber quem é a pessoa
-            mostrarErroDeConexao();
-            return;
-        }
-
-        // Sem sessão (o back responde 401 ou 403 para anônimo)
-        if (resposta.status === 401 || resposta.status === 403) {
-
-            localStorage.removeItem("usuarioLogado");
-
-            irPara(PAGINA_LOGIN);
-            return;
-        }
-
-        if (!resposta.ok) {
-            mostrarErroDeConexao();
-            return;
-        }
-
-        const usuario = await resposta.json();
-
-        // ------------------------------------------------------
-        // 3) CARGO PODE ABRIR ESTA PÁGINA?
-        // ------------------------------------------------------
-        const permitidos = PERMISSOES[pagina] ?? [ADMIN];
-
-        if (!permitidos.includes(usuario.role)) {
-
-            const destino = PAGINA_INICIAL[usuario.role];
-
-            // Cliente (ou cargo desconhecido) não tem página no painel
-            if (!destino || destino === pagina) {
-
-                sessionStorage.setItem(
-                    "avisoAcesso",
-                    "Essa conta não tem acesso ao painel."
-                );
-
-                irPara(PAGINA_LOJA);
-                return;
-            }
-
-            sessionStorage.setItem(
-                "avisoAcesso",
-                "Você não tem permissão para acessar essa página."
-            );
-
-            irPara(destino);
-            return;
-        }
-
-        // ------------------------------------------------------
-        // 4) LIBERADO
-        // ------------------------------------------------------
-        try {
-            localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
-        } catch (_) {
-            // sem localStorage: segue sem ele
-        }
-
-        window.__usuarioAdmin = usuario;
-
-        document.dispatchEvent(
-            new CustomEvent("admin-usuario-pronto", { detail: usuario })
+      // Cliente (ou cargo desconhecido) não tem página no painel
+      if (!destino || destino === pagina) {
+        sessionStorage.setItem(
+          "avisoAcesso",
+          "Essa conta não tem acesso ao painel.",
         );
 
-        estiloOculto.remove();
+        irPara(PAGINA_LOJA);
+        return;
+      }
 
-        quandoCorpoExistir(mostrarAvisoPendente);
-    }
+      sessionStorage.setItem(
+        "avisoAcesso",
+        "Você não tem permissão para acessar essa página.",
+      );
 
-    function irPara(destino) {
-        // replace: o botão "voltar" do navegador não cai de novo na página bloqueada
-        location.replace(destino);
+      irPara(destino);
+      return;
     }
 
     // ------------------------------------------------------
-    // AVISOS NA TELA
+    // 4) LIBERADO
     // ------------------------------------------------------
-    function quandoCorpoExistir(funcao) {
-
-        if (document.body) {
-            funcao();
-        } else {
-            document.addEventListener("DOMContentLoaded", funcao, { once: true });
-        }
+    try {
+      localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
+    } catch (_) {
+      // sem localStorage: segue sem ele
     }
 
-    function mostrarAvisoPendente() {
+    window.__usuarioAdmin = usuario;
 
-        const texto = sessionStorage.getItem("avisoAcesso");
+    document.dispatchEvent(
+      new CustomEvent("admin-usuario-pronto", { detail: usuario }),
+    );
 
-        sessionStorage.removeItem("avisoAcesso");
+    estiloOculto.remove();
 
-        if (!texto) {
-            return;
-        }
+    quandoCorpoExistir(mostrarAvisoPendente);
+  }
 
-        const aviso = document.createElement("div");
+  function irPara(destino) {
+    // replace: o botão "voltar" do navegador não cai de novo na página bloqueada
+    location.replace(destino);
+  }
 
-        aviso.textContent = texto;
+  // ------------------------------------------------------
+  // AVISOS NA TELA
+  // ------------------------------------------------------
+  function quandoCorpoExistir(funcao) {
+    if (document.body) {
+      funcao();
+    } else {
+      document.addEventListener("DOMContentLoaded", funcao, { once: true });
+    }
+  }
 
-        aviso.style.cssText = `
+  function mostrarAvisoPendente() {
+    const texto = sessionStorage.getItem("avisoAcesso");
+
+    sessionStorage.removeItem("avisoAcesso");
+
+    if (!texto) {
+      return;
+    }
+
+    const aviso = document.createElement("div");
+
+    aviso.textContent = texto;
+
+    aviso.style.cssText = `
             position: fixed;
             top: 24px;
             right: 24px;
@@ -194,19 +184,17 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
         `;
 
-        document.body.appendChild(aviso);
+    document.body.appendChild(aviso);
 
-        setTimeout(() => aviso.remove(), 4500);
-    }
+    setTimeout(() => aviso.remove(), 4500);
+  }
 
-    function mostrarErroDeConexao() {
+  function mostrarErroDeConexao() {
+    quandoCorpoExistir(() => {
+      const painel = document.createElement("div");
 
-        quandoCorpoExistir(() => {
-
-            const painel = document.createElement("div");
-
-            // visibility: visible funciona mesmo com o <html> escondido
-            painel.style.cssText = `
+      // visibility: visible funciona mesmo com o <html> escondido
+      painel.style.cssText = `
                 visibility: visible;
                 position: fixed;
                 inset: 0;
@@ -223,7 +211,7 @@
                 text-align: center;
             `;
 
-            painel.innerHTML = `
+      painel.innerHTML = `
                 <strong style="font-size: 20px;">
                     Não foi possível verificar o seu acesso
                 </strong>
@@ -246,9 +234,11 @@
                 </button>
             `;
 
-            painel.querySelector("button").addEventListener("click", () => location.reload());
+      painel
+        .querySelector("button")
+        .addEventListener("click", () => location.reload());
 
-            document.body.appendChild(painel);
-        });
-    }
+      document.body.appendChild(painel);
+    });
+  }
 })();

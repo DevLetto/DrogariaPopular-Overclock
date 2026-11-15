@@ -5,11 +5,11 @@
 const backBtn = document.getElementById("btnVoltarALoja");
 
 if (backBtn) {
-    backBtn.addEventListener("click", voltar);
+  backBtn.addEventListener("click", voltar);
 }
 
 function voltar() {
-    window.location.href = "index.html";
+  window.location.href = "index.html";
 }
 
 // ======================================================
@@ -19,35 +19,37 @@ function voltar() {
 // ======================================================
 
 (function garantirMenuFuncionarios() {
+  if (
+    document.querySelector('.sidebar-menu a[href="admin_funcionarios.html"]')
+  ) {
+    return;
+  }
 
-    if (document.querySelector('.sidebar-menu a[href="admin_funcionarios.html"]')) {
-        return;
-    }
+  const rotulo = [
+    ...document.querySelectorAll(".sidebar-menu .menu-label"),
+  ].find((el) => el.textContent.trim().toUpperCase().startsWith("PESSOAS"));
 
-    const rotulo = [...document.querySelectorAll(".sidebar-menu .menu-label")]
-        .find((el) => el.textContent.trim().toUpperCase().startsWith("PESSOAS"));
+  const lista = rotulo?.nextElementSibling;
 
-    const lista = rotulo?.nextElementSibling;
+  if (!lista || lista.tagName !== "UL") {
+    return;
+  }
 
-    if (!lista || lista.tagName !== "UL") {
-        return;
-    }
+  const item = document.createElement("li");
 
-    const item = document.createElement("li");
-
-    item.innerHTML = `
+  item.innerHTML = `
         <a href="admin_funcionarios.html">
             <img src="../img/usuario_icon.png" alt="" class="sidebar-icon">
             Funcionários
         </a>
     `;
 
-    // Logo depois de "Clientes"
-    if (lista.firstElementChild) {
-        lista.firstElementChild.after(item);
-    } else {
-        lista.appendChild(item);
-    }
+  // Logo depois de "Clientes"
+  if (lista.firstElementChild) {
+    lista.firstElementChild.after(item);
+  } else {
+    lista.appendChild(item);
+  }
 })();
 
 // ======================================================
@@ -59,102 +61,99 @@ function voltar() {
 // ======================================================
 
 (function configurarBotaoConta() {
+  const API_AUTH = "/api/auth";
+  const PAGINA_LOGIN = "admin_login.html";
 
-    const API_AUTH = "http://localhost:8080/api/auth";
-    const PAGINA_LOGIN = "admin_login.html";
+  const CARGOS = {
+    ROLE_ADMINISTRADOR: "Administrador",
+    ROLE_FARMACEUTICO: "Farmacêutico",
+    ROLE_ATENDENTE: "Atendente",
+    ROLE_FUNCIONARIO_ESTOQUE_LOGISTICA: "Estoque e logística",
+  };
 
-    const CARGOS = {
-        ROLE_ADMINISTRADOR: "Administrador",
-        ROLE_FARMACEUTICO: "Farmacêutico",
-        ROLE_ATENDENTE: "Atendente",
-        ROLE_FUNCIONARIO_ESTOQUE_LOGISTICA: "Estoque e logística"
-    };
+  const rodape = document.querySelector(".sidebar-footer");
 
-    const rodape = document.querySelector(".sidebar-footer");
+  if (!rodape) {
+    return;
+  }
 
-    if (!rodape) {
-        return;
+  const avatar = rodape.querySelector(".user-avatar");
+  const info = rodape.querySelector(".user-info");
+  const titulo = info?.querySelector("p, strong");
+  const subtitulo = info?.querySelector("span");
+
+  // Estado atual (atualizado por renderizar)
+  let usuario = null;
+  let nome = "";
+  let cargo = "";
+
+  function lerUsuarioSalvo() {
+    try {
+      return JSON.parse(localStorage.getItem("usuarioLogado") || "null");
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function rotuloCargo(valor) {
+    if (!valor) {
+      return "Sem cargo";
     }
 
-    const avatar = rodape.querySelector(".user-avatar");
-    const info = rodape.querySelector(".user-info");
-    const titulo = info?.querySelector("p, strong");
-    const subtitulo = info?.querySelector("span");
-
-    // Estado atual (atualizado por renderizar)
-    let usuario = null;
-    let nome = "";
-    let cargo = "";
-
-    function lerUsuarioSalvo() {
-
-        try {
-            return JSON.parse(localStorage.getItem("usuarioLogado") || "null");
-        } catch (_) {
-            return null;
-        }
+    if (CARGOS[valor]) {
+      return CARGOS[valor];
     }
 
-    function rotuloCargo(valor) {
+    const limpo = String(valor)
+      .replace(/^ROLE_/, "")
+      .replaceAll("_", " ")
+      .toLowerCase();
 
-        if (!valor) {
-            return "Sem cargo";
-        }
+    return limpo.charAt(0).toUpperCase() + limpo.slice(1);
+  }
 
-        if (CARGOS[valor]) {
-            return CARGOS[valor];
-        }
+  function renderizar(dados) {
+    usuario = dados || null;
 
-        const limpo = String(valor)
-            .replace(/^ROLE_/, "")
-            .replaceAll("_", " ")
-            .toLowerCase();
+    const role =
+      usuario?.role ?? usuario?.perfil ?? usuario?.tipoFuncionario ?? "";
 
-        return limpo.charAt(0).toUpperCase() + limpo.slice(1);
+    nome = usuario
+      ? (usuario.nome ?? usuario.nomeCompleto ?? usuario.email ?? "Usuário")
+      : "Visitante";
+
+    cargo = usuario ? rotuloCargo(role) : "Entrar";
+
+    if (avatar) {
+      avatar.textContent = nome.trim().charAt(0).toUpperCase() || "?";
     }
 
-    function renderizar(dados) {
-
-        usuario = dados || null;
-
-        const role = usuario?.role ?? usuario?.perfil ?? usuario?.tipoFuncionario ?? "";
-
-        nome = usuario
-            ? (usuario.nome ?? usuario.nomeCompleto ?? usuario.email ?? "Usuário")
-            : "Visitante";
-
-        cargo = usuario ? rotuloCargo(role) : "Entrar";
-
-        if (avatar) {
-            avatar.textContent = nome.trim().charAt(0).toUpperCase() || "?";
-        }
-
-        if (titulo) {
-            titulo.textContent = nome;
-        }
-
-        if (subtitulo) {
-            subtitulo.textContent = cargo;
-        }
-
-        rodape.setAttribute(
-            "title",
-            usuario ? `Trocar de conta (${nome})` : "Entrar"
-        );
+    if (titulo) {
+      titulo.textContent = nome;
     }
 
-    // -------- vira botão --------
+    if (subtitulo) {
+      subtitulo.textContent = cargo;
+    }
 
-    rodape.classList.add("conta-botao");
-    rodape.setAttribute("role", "button");
-    rodape.setAttribute("tabindex", "0");
+    rodape.setAttribute(
+      "title",
+      usuario ? `Trocar de conta (${nome})` : "Entrar",
+    );
+  }
 
-    const icone = document.createElement("span");
+  // -------- vira botão --------
 
-    icone.className = "conta-trocar";
-    icone.setAttribute("aria-hidden", "true");
+  rodape.classList.add("conta-botao");
+  rodape.setAttribute("role", "button");
+  rodape.setAttribute("tabindex", "0");
 
-    icone.innerHTML = `
+  const icone = document.createElement("span");
+
+  icone.className = "conta-trocar";
+  icone.setAttribute("aria-hidden", "true");
+
+  icone.innerHTML = `
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round">
@@ -165,101 +164,89 @@ function voltar() {
         </svg>
     `;
 
-    rodape.appendChild(icone);
+  rodape.appendChild(icone);
 
-    adicionarEstilos();
+  adicionarEstilos();
 
-    // Primeiro com o que já existe; depois o guard confirma com o servidor
-    renderizar(window.__usuarioAdmin ?? lerUsuarioSalvo());
+  // Primeiro com o que já existe; depois o guard confirma com o servidor
+  renderizar(window.__usuarioAdmin ?? lerUsuarioSalvo());
 
-    document.addEventListener("admin-usuario-pronto", (event) => {
-        renderizar(event.detail);
-    });
+  document.addEventListener("admin-usuario-pronto", (event) => {
+    renderizar(event.detail);
+  });
 
-    rodape.addEventListener("click", trocarConta);
+  rodape.addEventListener("click", trocarConta);
 
-    rodape.addEventListener("keydown", (event) => {
+  rodape.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      trocarConta();
+    }
+  });
 
-        if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            trocarConta();
-        }
-    });
+  // -------- ação --------
 
-    // -------- ação --------
+  let trocando = false;
 
-    let trocando = false;
-
-    async function trocarConta() {
-
-        if (trocando) {
-            return;
-        }
-
-        trocando = true;
-
-        rodape.classList.add("conta-trocando");
-
-        if (usuario) {
-            // Só para a tela de login mostrar "você saiu da conta de ..."
-            sessionStorage.setItem(
-                "contaAnterior",
-                JSON.stringify({ nome, cargo })
-            );
-        }
-
-        await encerrarSessao();
-
-        window.location.href = PAGINA_LOGIN;
+  async function trocarConta() {
+    if (trocando) {
+      return;
     }
 
-    async function encerrarSessao() {
+    trocando = true;
 
-        // Se o servidor demorar, não prende a pessoa na tela
-        const controle = new AbortController();
-        const limite = setTimeout(() => controle.abort(), 4000);
+    rodape.classList.add("conta-trocando");
 
-        try {
-
-            const resposta = await fetch(`${API_AUTH}/csrf`, {
-                credentials: "include",
-                signal: controle.signal
-            });
-
-            const csrf = await resposta.json();
-
-            await fetch(`${API_AUTH}/logout`, {
-                method: "POST",
-                credentials: "include",
-                signal: controle.signal,
-                headers: {
-                    [csrf.headerName || "X-CSRF-TOKEN"]: csrf.token
-                }
-            });
-
-        } catch (erro) {
-
-            console.warn("Não foi possível encerrar a sessão no servidor:", erro);
-
-        } finally {
-
-            clearTimeout(limite);
-
-            localStorage.removeItem("usuarioLogado");
-        }
+    if (usuario) {
+      // Só para a tela de login mostrar "você saiu da conta de ..."
+      sessionStorage.setItem("contaAnterior", JSON.stringify({ nome, cargo }));
     }
 
-    function adicionarEstilos() {
+    await encerrarSessao();
 
-        if (document.getElementById("estilos-conta-botao")) {
-            return;
-        }
+    window.location.href = PAGINA_LOGIN;
+  }
 
-        const style = document.createElement("style");
+  async function encerrarSessao() {
+    // Se o servidor demorar, não prende a pessoa na tela
+    const controle = new AbortController();
+    const limite = setTimeout(() => controle.abort(), 4000);
 
-        style.id = "estilos-conta-botao";
+    try {
+      const resposta = await fetch(`${API_AUTH}/csrf`, {
+        credentials: "include",
+        signal: controle.signal,
+      });
 
-        style.textContent = `
+      const csrf = await resposta.json();
+
+      await fetch(`${API_AUTH}/logout`, {
+        method: "POST",
+        credentials: "include",
+        signal: controle.signal,
+        headers: {
+          [csrf.headerName || "X-CSRF-TOKEN"]: csrf.token,
+        },
+      });
+    } catch (erro) {
+      console.warn("Não foi possível encerrar a sessão no servidor:", erro);
+    } finally {
+      clearTimeout(limite);
+
+      localStorage.removeItem("usuarioLogado");
+    }
+  }
+
+  function adicionarEstilos() {
+    if (document.getElementById("estilos-conta-botao")) {
+      return;
+    }
+
+    const style = document.createElement("style");
+
+    style.id = "estilos-conta-botao";
+
+    style.textContent = `
 
             .sidebar-footer.conta-botao {
                 cursor: pointer;
@@ -306,6 +293,6 @@ function voltar() {
             }
         `;
 
-        document.head.appendChild(style);
-    }
+    document.head.appendChild(style);
+  }
 })();

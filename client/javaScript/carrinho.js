@@ -1,19 +1,12 @@
-const API_CARRINHO =
-  "http://localhost:8080/api/carrinho";
+const API_CARRINHO = "/api/carrinho";
 
-const API_PRODUTO =
-  "http://localhost:8080/api/produto";
+const API_PRODUTO = "/api/produto";
 
-const STORAGE_USUARIO =
-  "usuarioLogado";
+const STORAGE_USUARIO = "usuarioLogado";
 
-const STORAGE_CHECKOUT =
-  "checkoutCarrinho";
+const STORAGE_CHECKOUT = "checkoutCarrinho";
 
-const API_RECEITA = "http://localhost:8080/api/receita";
-
-
-
+const API_RECEITA = "/api/receita";
 
 /*
  * =========================================================
@@ -24,28 +17,12 @@ const API_RECEITA = "http://localhost:8080/api/receita";
 let clienteLogado = null;
 
 try {
-
-  clienteLogado =
-    JSON.parse(
-      localStorage.getItem(
-        STORAGE_USUARIO
-      )
-    );
-
+  clienteLogado = JSON.parse(localStorage.getItem(STORAGE_USUARIO));
 } catch (erro) {
-
-  console.error(
-    "Erro ao ler usuarioLogado:",
-    erro
-  );
-
+  console.error("Erro ao ler usuarioLogado:", erro);
 }
 
-
-const ID_CLIENTE =
-  clienteLogado?.idCliente ??
-  clienteLogado?.idUsuario;
-
+const ID_CLIENTE = clienteLogado?.idCliente ?? clienteLogado?.idUsuario;
 
 /*
  * =========================================================
@@ -53,66 +30,27 @@ const ID_CLIENTE =
  * =========================================================
  */
 
-const listaComprarEl =
-  document.querySelector(
-    ".lista-comprar-agora"
-  );
+const listaComprarEl = document.querySelector(".lista-comprar-agora");
 
-const listaControladosEl =
-  document.querySelector(
-    ".lista-medicamentos-controlados"
-  );
+const listaControladosEl = document.querySelector(
+  ".lista-medicamentos-controlados",
+);
 
+const qtdComprarEl = document.getElementById("quantidadeComprar");
 
+const subtotalEl = document.querySelector(".subtotal p:last-child");
 
+const descontoEl = document.querySelector(".desconto p:last-child");
 
+const totalEl = document.querySelector(".total-txt-div p:last-child");
 
-const qtdComprarEl =
-  document.getElementById(
-    "quantidadeComprar"
-  );
+const esvaziarBtn = document.querySelector(".esvazia-carrinho");
 
+const btnContinuarCheckout = document.getElementById("btnContinuarCheckout");
 
+const btnIrCheckoutTopo = document.getElementById("btnIrCheckoutTopo");
 
-
-
-const subtotalEl =
-  document.querySelector(
-    ".subtotal p:last-child"
-  );
-
-
-const descontoEl =
-  document.querySelector(
-    ".desconto p:last-child"
-  );
-
-
-const totalEl =
-  document.querySelector(
-    ".total-txt-div p:last-child"
-  );
-
-
-const esvaziarBtn =
-  document.querySelector(
-    ".esvazia-carrinho"
-  );
-
-
-const btnContinuarCheckout =
-  document.getElementById(
-    "btnContinuarCheckout"
-  );
-
-
-const btnIrCheckoutTopo =
-  document.getElementById(
-    "btnIrCheckoutTopo"
-  );
-
-  const btnContinuarComprando = document.getElementById("btnContinuarComprando");
-
+const btnContinuarComprando = document.getElementById("btnContinuarComprando");
 
 /*
  * =========================================================
@@ -126,7 +64,6 @@ let descontoAtual = 0;
 
 let receitas = [];
 
-
 /*
  * =========================================================
  * CSRF
@@ -134,28 +71,17 @@ let receitas = [];
  */
 
 function csrfHeaders() {
-
-  const token =
-    document.cookie
-      .split("; ")
-      .find(
-        (cookie) =>
-          cookie.startsWith(
-            "XSRF-TOKEN="
-          )
-      )
-      ?.split("=")[1];
-
+  const token = document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith("XSRF-TOKEN="))
+    ?.split("=")[1];
 
   return token
     ? {
-        "X-XSRF-TOKEN":
-          decodeURIComponent(token)
+        "X-XSRF-TOKEN": decodeURIComponent(token),
       }
     : {};
-
 }
-
 
 /*
  * =========================================================
@@ -164,9 +90,7 @@ function csrfHeaders() {
  */
 
 async function carregarCarrinho() {
-
   if (!ID_CLIENTE) {
-
     listaComprarEl.innerHTML =
       '<p class="carrinho-vazio">Faça login para ver o carrinho.</p>';
     if (listaControladosEl) {
@@ -174,179 +98,96 @@ async function carregarCarrinho() {
         '<p class="carrinho-vazio">Não há medicamentos controlados nesta sessão.</p>';
     }
 
-
     if (qtdComprarEl) {
-
-      qtdComprarEl.textContent =
-        "Para comprar agora (0 itens)";
-
+      qtdComprarEl.textContent = "Para comprar agora (0 itens)";
     }
-
-
-    
-
 
     atualizarResumo([]);
 
     return;
-
   }
 
-
   try {
-
-    const res =
-      await fetch(
-        `${API_CARRINHO}/${ID_CLIENTE}`,
-        {
-          credentials: "include",
-          headers: csrfHeaders()
-        }
-      );
-
+    const res = await fetch(`${API_CARRINHO}/${ID_CLIENTE}`, {
+      credentials: "include",
+      headers: csrfHeaders(),
+    });
 
     if (!res.ok) {
-
-      if (
-        res.status === 401 ||
-        res.status === 403
-      ) {
-
-        throw new Error(
-          "Sessão expirada. Faça login novamente."
-        );
-
+      if (res.status === 401 || res.status === 403) {
+        throw new Error("Sessão expirada. Faça login novamente.");
       }
 
-
-      throw new Error(
-        "Erro ao buscar carrinho"
-      );
-
+      throw new Error("Erro ao buscar carrinho");
     }
 
-
-    const itensRaw =
-      await res.json();
-
+    const itensRaw = await res.json();
 
     if (!Array.isArray(itensRaw)) {
-
       carrinhoItens = [];
 
       renderizarCarrinho();
 
       return;
-
     }
 
+    carrinhoItens = await Promise.all(
+      itensRaw.map(async (item) => {
+        let produto = {};
 
-    carrinhoItens =
-      await Promise.all(
+        try {
+          const resProduto = await fetch(`${API_PRODUTO}/${item.idProduto}`);
 
-        itensRaw.map(
-          async (item) => {
-
-            let produto = {};
-
-
-            try {
-
-              const resProduto =
-                await fetch(
-                  `${API_PRODUTO}/${item.idProduto}`
-                );
-
-
-              if (resProduto.ok) {
-
-                produto =
-                  await resProduto.json();
-
-              }
-
-            } catch (erro) {
-
-              console.error(
-                "Erro ao buscar produto:",
-                item.idProduto,
-                erro
-              );
-
-            }
-
-
-            return {
-
-              id:
-                item.id,
-
-              idProduto:
-                item.idProduto,
-
-              quantidade:
-                Number(
-                  item.quantidade || 0
-                ),
-
-              nomeProduto:
-                produto.nomeProduto ||
-                "Produto indisponível",
-
-              precoProduto:
-                Number(
-                  produto.precoProduto ?? 0
-                ),
-
-              imagemURL:
-                produto.imagemURL ||
-                null,
-
-              medicamentoControlado:
-                produto.medicamentoControlado === true ||
-                produto.medicamentoControlado === 1,
-
-              necessitaReceita:
-                produto.necessitaReceita === true ||
-                produto.necessitaReceita === 1
-
-            };
-
+          if (resProduto.ok) {
+            produto = await resProduto.json();
           }
-        )
+        } catch (erro) {
+          console.error("Erro ao buscar produto:", item.idProduto, erro);
+        }
 
-      );
+        return {
+          id: item.id,
 
+          idProduto: item.idProduto,
 
-       await carregarReceitas();
-       renderizarCarrinho();
+          quantidade: Number(item.quantidade || 0),
 
+          nomeProduto: produto.nomeProduto || "Produto indisponível",
 
+          precoProduto: Number(produto.precoProduto ?? 0),
+
+          imagemURL: produto.imagemURL || null,
+
+          medicamentoControlado:
+            produto.medicamentoControlado === true ||
+            produto.medicamentoControlado === 1,
+
+          necessitaReceita:
+            produto.necessitaReceita === true || produto.necessitaReceita === 1,
+        };
+      }),
+    );
+
+    await carregarReceitas();
+    renderizarCarrinho();
   } catch (err) {
-
     console.error(err);
 
-
-    listaComprarEl.innerHTML =
-      `<p class="carrinho-vazio">
+    listaComprarEl.innerHTML = `<p class="carrinho-vazio">
         ${escaparHTML(err.message)}
       </p>`;
     if (listaControladosEl) {
       listaControladosEl.innerHTML =
         '<p class="carrinho-vazio">Não foi possível carregar os medicamentos controlados.</p>';
     }
-
   }
-
 }
-
 
 /*
  * =========================================================
  * RENDERIZAR
  * =========================================================
  */
-
 
 function renderizarCarrinho() {
   const produtosComuns = carrinhoItens.filter(
@@ -368,10 +209,9 @@ function renderizarCarrinho() {
   );
 
   if (qtdComprarEl) {
-    qtdComprarEl.textContent =
-      `Para comprar agora (${comprarAgora.length} ${
-        comprarAgora.length === 1 ? "item" : "itens"
-      })`;
+    qtdComprarEl.textContent = `Para comprar agora (${comprarAgora.length} ${
+      comprarAgora.length === 1 ? "item" : "itens"
+    })`;
   }
 
   listaComprarEl.innerHTML =
@@ -380,8 +220,7 @@ function renderizarCarrinho() {
 
   if (listaControladosEl) {
     listaControladosEl.innerHTML =
-      medicamentosControlados.map(criarItemHTML).join("") ||
-      '';
+      medicamentosControlados.map(criarItemHTML).join("") || "";
   }
 
   const containerControlados = document.getElementById("containerControlados");
@@ -389,13 +228,12 @@ function renderizarCarrinho() {
     containerControlados.style.display =
       medicamentosControlados.length > 0 ? "" : "none";
   }
-  renderizarReceitas(); 
+  renderizarReceitas();
 
   document.querySelectorAll(".item").forEach(bindItemEvents);
 
   atualizarResumo(comprarAgora);
 }
-
 
 /*
  * =========================================================
@@ -403,12 +241,12 @@ function renderizarCarrinho() {
  * =========================================================
  */
 
-if(btnContinuarComprando){
-  btnContinuarComprando.addEventListener("click", voltarParaCompras)
+if (btnContinuarComprando) {
+  btnContinuarComprando.addEventListener("click", voltarParaCompras);
 }
 
-function voltarParaCompras(){
-  window.location.href ="index.html"
+function voltarParaCompras() {
+  window.location.href = "index.html";
 }
 
 /*
@@ -423,27 +261,23 @@ function criarItemHTML(item) {
     item.medicamentoControlado === 1 ||
     item.necessitaReceita === true ||
     item.necessitaReceita === 1;
-    const motivoRestricao = produtoRestrito
+  const motivoRestricao = produtoRestrito
     ? "Exige receita aprovada para entrar no pedido."
     : "";
 
-  const iconeOuImagem =
-    item.imagemURL
-
-      ? `
+  const iconeOuImagem = item.imagemURL
+    ? `
         <img
           src="${escaparAtributo(item.imagemURL)}"
           alt="${escaparAtributo(item.nomeProduto)}"
           onerror="this.onerror=null; this.src='../img/medicamentos_icon.png';"
         />
       `
-
-      : `
+    : `
         <span class="material-symbols-outlined">
           medication
         </span>
       `;
-
 
   return `
 
@@ -511,10 +345,7 @@ function criarItemHTML(item) {
 
         <p class="item-preco-total">
 
-          ${formatarPreco(
-            item.precoProduto *
-            item.quantidade
-          )}
+          ${formatarPreco(item.precoProduto * item.quantidade)}
 
         </p>
 
@@ -536,9 +367,7 @@ function criarItemHTML(item) {
     </div>
 
   `;
-
 }
-
 
 /*
  * =========================================================
@@ -547,105 +376,42 @@ function criarItemHTML(item) {
  */
 
 function bindItemEvents(itemEl) {
+  const idProduto = Number(itemEl.dataset.idProduto);
 
-  const idProduto =
-    Number(
-      itemEl.dataset.idProduto
-    );
+  const qtdSpan = itemEl.querySelector(".qtd-valor");
 
+  const botaoMais = itemEl.querySelector(".mais");
 
-  const qtdSpan =
-    itemEl.querySelector(
-      ".qtd-valor"
-    );
+  const botaoMenos = itemEl.querySelector(".menos");
 
-
-  const botaoMais =
-    itemEl.querySelector(
-      ".mais"
-    );
-
-
-  const botaoMenos =
-    itemEl.querySelector(
-      ".menos"
-    );
-
-
-  const botaoRemover =
-    itemEl.querySelector(
-      ".remover-btn"
-    );
-
+  const botaoRemover = itemEl.querySelector(".remover-btn");
 
   if (botaoMais) {
-
-    botaoMais.addEventListener(
-      "click",
-      () => {
-
-        atualizarItem(
-          idProduto,
-          1
-        );
-
-      }
-    );
-
+    botaoMais.addEventListener("click", () => {
+      atualizarItem(idProduto, 1);
+    });
   }
-
 
   if (botaoMenos) {
+    botaoMenos.addEventListener("click", () => {
+      const novaQtd = Number(qtdSpan.textContent) - 1;
 
-    botaoMenos.addEventListener(
-      "click",
-      () => {
+      if (novaQtd <= 0) {
+        deletarItem(idProduto);
 
-        const novaQtd =
-          Number(
-            qtdSpan.textContent
-          ) - 1;
-
-
-        if (novaQtd <= 0) {
-
-          deletarItem(
-            idProduto
-          );
-
-          return;
-
-        }
-
-
-        atualizarItem(
-          idProduto,
-          -1
-        );
-
+        return;
       }
-    );
 
+      atualizarItem(idProduto, -1);
+    });
   }
-
 
   if (botaoRemover) {
-
-    botaoRemover.addEventListener(
-      "click",
-      () => {
-
-        deletarItem(
-          idProduto
-        );
-
-      }
-    );
-
+    botaoRemover.addEventListener("click", () => {
+      deletarItem(idProduto);
+    });
   }
-
 }
-
 
 /*
  * =========================================================
@@ -653,77 +419,39 @@ function bindItemEvents(itemEl) {
  * =========================================================
  */
 
-async function atualizarItem(
-  idProduto,
-  quantidade
-) {
-
+async function atualizarItem(idProduto, quantidade) {
   try {
+    const res = await fetch(`${API_CARRINHO}/${ID_CLIENTE}/${idProduto}`, {
+      method: "PUT",
 
-    const res =
-      await fetch(
-        `${API_CARRINHO}/${ID_CLIENTE}/${idProduto}`,
-        {
-          method: "PUT",
+      credentials: "include",
 
-          credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
 
-          headers: {
-            "Content-Type":
-              "application/json",
+        ...csrfHeaders(),
+      },
 
-            ...csrfHeaders()
-          },
+      body: JSON.stringify({
+        quantidade: quantidade,
 
-          body: JSON.stringify({
-
-            quantidade:
-              quantidade,
-
-            salvoParaDepois:
-              0
-
-          })
-
-        }
-      );
-
+        salvoParaDepois: 0,
+      }),
+    });
 
     if (!res.ok) {
+      const erro = await res.json().catch(() => ({}));
 
-      const erro =
-        await res
-          .json()
-          .catch(
-            () => ({})
-          );
-
-
-      throw new Error(
-        erro.mensagem ||
-        "Erro ao atualizar item"
-      );
-
+      throw new Error(erro.mensagem || "Erro ao atualizar item");
     }
 
-
     await carregarCarrinho();
-
-
   } catch (err) {
-
     console.error(err);
 
-
-    alert(
-      err.message ||
-      "Erro ao atualizar item do carrinho."
-    );
-
+    alert(err.message || "Erro ao atualizar item do carrinho.");
   }
-
 }
-
 
 /*
  * =========================================================
@@ -731,53 +459,27 @@ async function atualizarItem(
  * =========================================================
  */
 
-async function deletarItem(
-  idProduto
-) {
-
+async function deletarItem(idProduto) {
   try {
+    const res = await fetch(`${API_CARRINHO}/${ID_CLIENTE}/${idProduto}`, {
+      method: "DELETE",
 
-    const res =
-      await fetch(
-        `${API_CARRINHO}/${ID_CLIENTE}/${idProduto}`,
-        {
-          method: "DELETE",
+      credentials: "include",
 
-          credentials: "include",
-
-          headers:
-            csrfHeaders()
-
-        }
-      );
-
+      headers: csrfHeaders(),
+    });
 
     if (!res.ok) {
-
-      throw new Error(
-        "Erro ao remover item do carrinho"
-      );
-
+      throw new Error("Erro ao remover item do carrinho");
     }
 
-
     await carregarCarrinho();
-
-
   } catch (err) {
-
     console.error(err);
 
-
-    alert(
-      err.message ||
-      "Erro ao remover item do carrinho."
-    );
-
+    alert(err.message || "Erro ao remover item do carrinho.");
   }
-
 }
-
 
 /*
  * =========================================================
@@ -786,66 +488,37 @@ async function deletarItem(
  */
 
 async function esvaziarCarrinho() {
-
   if (!carrinhoItens.length) {
-
     return;
-
   }
 
-
   try {
+    for (const item of carrinhoItens) {
+      const res = await fetch(
+        `${API_CARRINHO}/${ID_CLIENTE}/${item.idProduto}`,
+        {
+          method: "DELETE",
 
-    for (
-      const item
-      of carrinhoItens
-    ) {
+          credentials: "include",
 
-      const res =
-        await fetch(
-          `${API_CARRINHO}/${ID_CLIENTE}/${item.idProduto}`,
-          {
-            method: "DELETE",
-
-            credentials: "include",
-
-            headers:
-              csrfHeaders()
-
-          }
-        );
-
+          headers: csrfHeaders(),
+        },
+      );
 
       if (!res.ok) {
-
-        throw new Error(
-          "Erro ao esvaziar o carrinho"
-        );
-
+        throw new Error("Erro ao esvaziar o carrinho");
       }
-
     }
-
 
     descontoAtual = 0;
 
     await carregarCarrinho();
-
-
   } catch (err) {
-
     console.error(err);
 
-
-    alert(
-      err.message ||
-      "Erro ao esvaziar o carrinho."
-    );
-
+    alert(err.message || "Erro ao esvaziar o carrinho.");
   }
-
 }
-
 
 /*
  * =========================================================
@@ -853,75 +526,29 @@ async function esvaziarCarrinho() {
  * =========================================================
  */
 
-function atualizarResumo(
-  comprarAgora
-) {
+function atualizarResumo(comprarAgora) {
+  const subtotal = comprarAgora.reduce((acc, item) => {
+    return acc + Number(item.precoProduto || 0) * Number(item.quantidade || 0);
+  }, 0);
 
-  const subtotal =
-    comprarAgora.reduce(
-      (acc, item) => {
+  const desconto = Number(descontoAtual || 0);
 
-        return (
-          acc +
-          Number(
-            item.precoProduto || 0
-          ) *
-          Number(
-            item.quantidade || 0
-          )
-        );
-
-      },
-      0
-    );
-
-
-  const desconto =
-    Number(
-      descontoAtual || 0
-    );
-
-
-  const total =
-    Math.max(
-      0,
-      subtotal - desconto
-    );
-
+  const total = Math.max(0, subtotal - desconto);
 
   if (subtotalEl) {
-
-    subtotalEl.textContent =
-      `${formatarPreco(subtotal)} (${comprarAgora.length} ${
-        comprarAgora.length === 1
-          ? "item"
-          : "itens"
-      })`;
-
+    subtotalEl.textContent = `${formatarPreco(subtotal)} (${comprarAgora.length} ${
+      comprarAgora.length === 1 ? "item" : "itens"
+    })`;
   }
-
 
   if (descontoEl) {
-
-    descontoEl.textContent =
-      formatarPreco(
-        desconto
-      );
-
+    descontoEl.textContent = formatarPreco(desconto);
   }
-
 
   if (totalEl) {
-
-    totalEl.textContent =
-      formatarPreco(
-        total
-      );
-
+    totalEl.textContent = formatarPreco(total);
   }
-
 }
-
 
 /*
  * =========================================================
@@ -930,38 +557,32 @@ function atualizarResumo(
  */
 
 function irParaCheckout() {
-  const temReceitaAprovada = receitas.some(
-    (r) => String(r.status).toUpperCase().includes("APROV"),
+  const temReceitaAprovada = receitas.some((r) =>
+    String(r.status).toUpperCase().includes("APROV"),
   );
 
   const comprarAgora = carrinhoItens.filter(
-    (item) => !(item.medicamentoControlado || item.necessitaReceita) || temReceitaAprovada,
+    (item) =>
+      !(item.medicamentoControlado || item.necessitaReceita) ||
+      temReceitaAprovada,
   );
 
   if (comprarAgora.length === 0) {
-    alert("Nenhum item disponível para compra. Controlados exigem receita aprovada.");
+    alert(
+      "Nenhum item disponível para compra. Controlados exigem receita aprovada.",
+    );
     return;
   }
-
 
   /*
    * Salva uma cópia local para
    * o checkout ter acesso imediato.
    */
 
-  sessionStorage.setItem(
-    STORAGE_CHECKOUT,
-    JSON.stringify(
-      comprarAgora
-    )
-  );
+  sessionStorage.setItem(STORAGE_CHECKOUT, JSON.stringify(comprarAgora));
 
-
-  window.location.href =
-    "checkout.html";
-
+  window.location.href = "checkout.html";
 }
-
 
 /*
  * =========================================================
@@ -1046,7 +667,9 @@ async function enviarReceita(arquivo) {
 
     if (!res.ok) {
       const erro = await res.json().catch(() => ({}));
-      throw new Error(erro.mensagem || `Erro ao enviar receita (${res.status}).`);
+      throw new Error(
+        erro.mensagem || `Erro ao enviar receita (${res.status}).`,
+      );
     }
 
     await carregarReceitas();
@@ -1079,55 +702,28 @@ if (btnAnexarReceita && inputReceita) {
  * =========================================================
  */
 
-const btnCupom =
-  document.querySelector(
-    "#btnAplicarCupom"
-  );
+const btnCupom = document.querySelector("#btnAplicarCupom");
 
-
-const inputCupom =
-  document.querySelector(
-    "#inputCupom"
-  );
-
+const inputCupom = document.querySelector("#inputCupom");
 
 if (btnCupom) {
+  btnCupom.addEventListener("click", () => {
+    const cupom = inputCupom?.value?.trim()?.toUpperCase();
 
-  btnCupom.addEventListener(
-    "click",
-    () => {
+    if (!cupom) {
+      alert("Digite um cupom.");
 
-      const cupom =
-        inputCupom?.value
-          ?.trim()
-          ?.toUpperCase();
-
-
-      if (!cupom) {
-
-        alert(
-          "Digite um cupom."
-        );
-
-        return;
-
-      }
-
-
-      /*
-       * Ainda não existe endpoint
-       * de cupom informado.
-       */
-
-      alert(
-        "A aplicação de cupons será integrada ao backend."
-      );
-
+      return;
     }
-  );
 
+    /*
+     * Ainda não existe endpoint
+     * de cupom informado.
+     */
+
+    alert("A aplicação de cupons será integrada ao backend.");
+  });
 }
-
 
 /*
  * =========================================================
@@ -1136,14 +732,8 @@ if (btnCupom) {
  */
 
 if (btnContinuarCheckout) {
-
-  btnContinuarCheckout.addEventListener(
-    "click",
-    irParaCheckout
-  );
-
+  btnContinuarCheckout.addEventListener("click", irParaCheckout);
 }
-
 
 /*
  * =========================================================
@@ -1152,14 +742,8 @@ if (btnContinuarCheckout) {
  */
 
 if (btnIrCheckoutTopo) {
-
-  btnIrCheckoutTopo.addEventListener(
-    "click",
-    irParaCheckout
-  );
-
+  btnIrCheckoutTopo.addEventListener("click", irParaCheckout);
 }
-
 
 /*
  * =========================================================
@@ -1168,35 +752,18 @@ if (btnIrCheckoutTopo) {
  */
 
 if (esvaziarBtn) {
-
-  esvaziarBtn.addEventListener(
-    "click",
-    () => {
-
-      if (!carrinhoItens.length) {
-
-        return;
-
-      }
-
-
-      const confirmar =
-        confirm(
-          "Tem certeza que deseja esvaziar o carrinho?"
-        );
-
-
-      if (confirmar) {
-
-        esvaziarCarrinho();
-
-      }
-
+  esvaziarBtn.addEventListener("click", () => {
+    if (!carrinhoItens.length) {
+      return;
     }
-  );
 
+    const confirmar = confirm("Tem certeza que deseja esvaziar o carrinho?");
+
+    if (confirmar) {
+      esvaziarCarrinho();
+    }
+  });
 }
-
 
 /*
  * =========================================================
@@ -1204,68 +771,28 @@ if (esvaziarBtn) {
  * =========================================================
  */
 
-function formatarPreco(
-  valor
-) {
-
-  return Number(
-    valor || 0
-  ).toLocaleString(
-    "pt-BR",
-    {
-      style: "currency",
-      currency: "BRL"
-    }
-  );
-
+function formatarPreco(valor) {
+  return Number(valor || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 }
 
+function escaparHTML(valor) {
+  const div = document.createElement("div");
 
-function escaparHTML(
-  valor
-) {
-
-  const div =
-    document.createElement(
-      "div"
-    );
-
-
-  div.textContent =
-    valor ?? "";
-
+  div.textContent = valor ?? "";
 
   return div.innerHTML;
-
 }
 
-
-function escaparAtributo(
-  valor
-) {
-
-  return String(
-    valor ?? ""
-  )
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    );
-
+function escaparAtributo(valor) {
+  return String(valor ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
-
 
 /*
  * =========================================================

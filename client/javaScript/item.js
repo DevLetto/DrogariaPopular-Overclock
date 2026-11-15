@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE_URL = "http://localhost:8080/api";
+  const API_BASE_URL = "/api";
 
   // Esse arquivo existe (é o mesmo ícone usado no produtos.js e no menu).
   // O antigo ../img/produto_placeholder.png NÃO existe, e era isso que
@@ -198,10 +198,10 @@
 
     return Boolean(
       inicio &&
-        fim &&
-        inicio <= hoje &&
-        fim >= hoje &&
-        obterIdProdutoPromocao(promocao) != null,
+      fim &&
+      inicio <= hoje &&
+      fim >= hoje &&
+      obterIdProdutoPromocao(promocao) != null,
     );
   }
 

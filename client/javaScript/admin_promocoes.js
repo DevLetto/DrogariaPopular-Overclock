@@ -1,18 +1,18 @@
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "/api";
 
 const estado = {
-    promocoes: [],
-    produtos: []
+  promocoes: [],
+  produtos: [],
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    inicializar();
+  inicializar();
 });
 
 async function inicializar() {
-    configurarEventos();
-    await carregarProdutos();
-    await carregarPromocoes();
+  configurarEventos();
+  await carregarProdutos();
+  await carregarPromocoes();
 }
 
 /* ================================
@@ -20,15 +20,11 @@ async function inicializar() {
 ================================ */
 
 function configurarEventos() {
-    const botaoNovaPromocao =
-        document.querySelector("#btnNovaPromocao");
+  const botaoNovaPromocao = document.querySelector("#btnNovaPromocao");
 
-    if (botaoNovaPromocao) {
-        botaoNovaPromocao.addEventListener(
-            "click",
-            () => abrirFormulario()
-        );
-    }
+  if (botaoNovaPromocao) {
+    botaoNovaPromocao.addEventListener("click", () => abrirFormulario());
+  }
 }
 
 /* ================================
@@ -36,48 +32,41 @@ function configurarEventos() {
 ================================ */
 
 async function requisicao(endpoint, opcoes = {}) {
-    const resposta = await window.AdminCsrf.fetch(
-        `${API_BASE_URL}${endpoint}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-                ...(opcoes.headers || {})
-            },
-            ...opcoes
-        }
-    );
+  const resposta = await window.AdminCsrf.fetch(`${API_BASE_URL}${endpoint}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...(opcoes.headers || {}),
+    },
+    ...opcoes,
+  });
 
-    if (!resposta.ok) {
-        let mensagem = `Erro HTTP ${resposta.status}`;
-
-        try {
-            const erro = await resposta.json();
-
-            mensagem =
-                erro.message ||
-                erro.mensagem ||
-                erro.error ||
-                mensagem;
-        } catch (_) {}
-
-        throw new Error(mensagem);
-    }
-
-    if (resposta.status === 204) {
-        return null;
-    }
-
-    const texto = await resposta.text();
-
-    if (!texto) {
-        return null;
-    }
+  if (!resposta.ok) {
+    let mensagem = `Erro HTTP ${resposta.status}`;
 
     try {
-        return JSON.parse(texto);
-    } catch (_) {
-        return texto;
-    }
+      const erro = await resposta.json();
+
+      mensagem = erro.message || erro.mensagem || erro.error || mensagem;
+    } catch (_) {}
+
+    throw new Error(mensagem);
+  }
+
+  if (resposta.status === 204) {
+    return null;
+  }
+
+  const texto = await resposta.text();
+
+  if (!texto) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(texto);
+  } catch (_) {
+    return texto;
+  }
 }
 
 /* ================================
@@ -85,26 +74,18 @@ async function requisicao(endpoint, opcoes = {}) {
 ================================ */
 
 async function carregarProdutos() {
-    try {
-        const produtos =
-            await requisicao("/produto");
+  try {
+    const produtos = await requisicao("/produto");
 
-        estado.produtos =
-            Array.isArray(produtos)
-                ? produtos
-                : [];
+    estado.produtos = Array.isArray(produtos) ? produtos : [];
+  } catch (erro) {
+    console.error("Erro ao carregar produtos:", erro);
 
-    } catch (erro) {
-        console.error(
-            "Erro ao carregar produtos:",
-            erro
-        );
-
-        mostrarToast(
-            `Não foi possível carregar os produtos: ${erro.message}`,
-            "erro"
-        );
-    }
+    mostrarToast(
+      `Não foi possível carregar os produtos: ${erro.message}`,
+      "erro",
+    );
+  }
 }
 
 /* ================================
@@ -112,28 +93,20 @@ async function carregarProdutos() {
 ================================ */
 
 async function carregarPromocoes() {
-    try {
-        const promocoes =
-            await requisicao("/promocao");
+  try {
+    const promocoes = await requisicao("/promocao");
 
-        estado.promocoes =
-            Array.isArray(promocoes)
-                ? promocoes
-                : [];
+    estado.promocoes = Array.isArray(promocoes) ? promocoes : [];
 
-        renderizarTabela();
+    renderizarTabela();
+  } catch (erro) {
+    console.error("Erro ao carregar promoções:", erro);
 
-    } catch (erro) {
-        console.error(
-            "Erro ao carregar promoções:",
-            erro
-        );
-
-        mostrarToast(
-            `Não foi possível carregar as promoções: ${erro.message}`,
-            "erro"
-        );
-    }
+    mostrarToast(
+      `Não foi possível carregar as promoções: ${erro.message}`,
+      "erro",
+    );
+  }
 }
 
 /* ================================
@@ -141,19 +114,16 @@ async function carregarPromocoes() {
 ================================ */
 
 function renderizarTabela() {
-    const tabela =
-        document.querySelector(
-            "#tabelaPromocoes"
-        );
+  const tabela = document.querySelector("#tabelaPromocoes");
 
-    if (!tabela) {
-        return;
-    }
+  if (!tabela) {
+    return;
+  }
 
-    tabela.innerHTML = "";
+  tabela.innerHTML = "";
 
-    if (estado.promocoes.length === 0) {
-        tabela.innerHTML = `
+  if (estado.promocoes.length === 0) {
+    tabela.innerHTML = `
             <tr>
                 <td
                     colspan="7"
@@ -164,19 +134,16 @@ function renderizarTabela() {
             </tr>
         `;
 
-        return;
-    }
+    return;
+  }
 
-    estado.promocoes.forEach(
-        (promocao) => {
-            const linha =
-                criarLinhaPromocao(promocao);
+  estado.promocoes.forEach((promocao) => {
+    const linha = criarLinhaPromocao(promocao);
 
-            tabela.appendChild(linha);
-        }
-    );
+    tabela.appendChild(linha);
+  });
 
-    adicionarEventosTabela();
+  adicionarEventosTabela();
 }
 
 /* ================================
@@ -184,45 +151,27 @@ function renderizarTabela() {
 ================================ */
 
 function criarLinhaPromocao(promocao) {
-    const tr =
-        document.createElement("tr");
+  const tr = document.createElement("tr");
 
-    const produto =
-        promocao.produto;
+  const produto = promocao.produto;
 
-    const nomeProduto =
-        produto?.nomeProduto ||
-        promocao.nomeProduto ||
-        "Produto";
+  const nomeProduto = produto?.nomeProduto || promocao.nomeProduto || "Produto";
 
-    const precoOriginal =
-        obterPrecoOriginal(produto);
+  const precoOriginal = obterPrecoOriginal(produto);
 
-    const precoPromocional =
-        Number(
-            promocao.precoPromocional || 0
-        );
+  const precoPromocional = Number(promocao.precoPromocional || 0);
 
-    const desconto =
-        calcularDesconto(
-            precoOriginal,
-            precoPromocional
-        );
+  const desconto = calcularDesconto(precoOriginal, precoPromocional);
 
-    const dataFim =
-        promocao.dataFim;
+  const dataFim = promocao.dataFim;
 
-    const status =
-        obterStatusPromocao(promocao);
+  const status = obterStatusPromocao(promocao);
 
-    const classeStatus =
-        obterClasseStatusPromocao(status);
+  const classeStatus = obterClasseStatusPromocao(status);
 
-    const idPromocao =
-        promocao.idPromocao ??
-        promocao.id;
+  const idPromocao = promocao.idPromocao ?? promocao.id;
 
-    tr.innerHTML = `
+  tr.innerHTML = `
         <td>
             <strong>
                 ${escaparHTML(nomeProduto)}
@@ -282,7 +231,7 @@ function criarLinhaPromocao(promocao) {
         </td>
     `;
 
-    return tr;
+  return tr;
 }
 
 /* ================================
@@ -290,43 +239,25 @@ function criarLinhaPromocao(promocao) {
 ================================ */
 
 function adicionarEventosTabela() {
-    const botoesEditar =
-        document.querySelectorAll(
-            ".btn-editar-promocao"
-        );
+  const botoesEditar = document.querySelectorAll(".btn-editar-promocao");
 
-    botoesEditar.forEach(
-        (botao) => {
-            botao.addEventListener(
-                "click",
-                async () => {
-                    const id =
-                        botao.dataset.id;
+  botoesEditar.forEach((botao) => {
+    botao.addEventListener("click", async () => {
+      const id = botao.dataset.id;
 
-                    await editarPromocao(id);
-                }
-            );
-        }
-    );
+      await editarPromocao(id);
+    });
+  });
 
-    const botoesExcluir =
-        document.querySelectorAll(
-            ".btn-excluir-promocao"
-        );
+  const botoesExcluir = document.querySelectorAll(".btn-excluir-promocao");
 
-    botoesExcluir.forEach(
-        (botao) => {
-            botao.addEventListener(
-                "click",
-                async () => {
-                    const id =
-                        botao.dataset.id;
+  botoesExcluir.forEach((botao) => {
+    botao.addEventListener("click", async () => {
+      const id = botao.dataset.id;
 
-                    await excluirPromocao(id);
-                }
-            );
-        }
-    );
+      await excluirPromocao(id);
+    });
+  });
 }
 
 /* ================================
@@ -334,52 +265,36 @@ function adicionarEventosTabela() {
 ================================ */
 
 function abrirFormulario(promocao = null) {
-    const modalExistente =
-        document.querySelector(
-            ".modal-overlay"
-        );
+  const modalExistente = document.querySelector(".modal-overlay");
 
-    if (modalExistente) {
-        modalExistente.remove();
-    }
+  if (modalExistente) {
+    modalExistente.remove();
+  }
 
-    const editando =
-        promocao !== null;
+  const editando = promocao !== null;
 
-    const produtoSelecionado =
-        promocao?.produto?.idProduto ??
-        promocao?.produto?.id ??
-        promocao?.idProduto ??
-        "";
+  const produtoSelecionado =
+    promocao?.produto?.idProduto ??
+    promocao?.produto?.id ??
+    promocao?.idProduto ??
+    "";
 
-    const dataInicio =
-        promocao?.dataInicio || "";
+  const dataInicio = promocao?.dataInicio || "";
 
-    const dataFim =
-        promocao?.dataFim || "";
+  const dataFim = promocao?.dataFim || "";
 
-    const precoPromocional =
-        promocao?.precoPromocional ?? "";
+  const precoPromocional = promocao?.precoPromocional ?? "";
 
-    const opcoesProdutos =
-        estado.produtos.map(
-            (produto) => {
-                const id =
-                    produto.idProduto ??
-                    produto.id;
+  const opcoesProdutos = estado.produtos
+    .map((produto) => {
+      const id = produto.idProduto ?? produto.id;
 
-                const nome =
-                    produto.nomeProduto ||
-                    produto.nome ||
-                    "Produto";
+      const nome = produto.nomeProduto || produto.nome || "Produto";
 
-                const selecionado =
-                    String(id) ===
-                    String(produtoSelecionado)
-                        ? "selected"
-                        : "";
+      const selecionado =
+        String(id) === String(produtoSelecionado) ? "selected" : "";
 
-                return `
+      return `
                     <option
                         value="${id}"
                         ${selecionado}
@@ -387,32 +302,26 @@ function abrirFormulario(promocao = null) {
                         ${escaparHTML(nome)}
                     </option>
                 `;
-            }
-        ).join("");
+    })
+    .join("");
 
-    /*
-     * O elemento principal já é o overlay.
-     * Não criamos outro .modal-overlay dentro dele.
-     */
+  /*
+   * O elemento principal já é o overlay.
+   * Não criamos outro .modal-overlay dentro dele.
+   */
 
-    const modal =
-        document.createElement("div");
+  const modal = document.createElement("div");
 
-    modal.className =
-        "modal-overlay";
+  modal.className = "modal-overlay";
 
-    modal.innerHTML = `
+  modal.innerHTML = `
         <div class="modal">
 
             <div class="modal-header">
 
                 <div>
                     <h2>
-                        ${
-                            editando
-                                ? "Editar promoção"
-                                : "Nova promoção"
-                        }
+                        ${editando ? "Editar promoção" : "Nova promoção"}
                     </h2>
 
                     <span>
@@ -517,11 +426,7 @@ function abrirFormulario(promocao = null) {
                         type="submit"
                         class="btn-primary"
                     >
-                        ${
-                            editando
-                                ? "Salvar alterações"
-                                : "Criar promoção"
-                        }
+                        ${editando ? "Salvar alterações" : "Criar promoção"}
                     </button>
 
                 </div>
@@ -531,188 +436,115 @@ function abrirFormulario(promocao = null) {
         </div>
     `;
 
-    document.body.appendChild(modal);
+  document.body.appendChild(modal);
 
-    /* ================================
+  /* ================================
        FECHAR MODAL
     ================================= */
 
-    const fechar =
-        modal.querySelector(
-            ".modal-fechar"
-        );
+  const fechar = modal.querySelector(".modal-fechar");
 
-    const cancelar =
-        modal.querySelector(
-            ".btn-cancelar"
-        );
+  const cancelar = modal.querySelector(".btn-cancelar");
 
-    fechar.addEventListener(
-        "click",
-        () => modal.remove()
-    );
+  fechar.addEventListener("click", () => modal.remove());
 
-    cancelar.addEventListener(
-        "click",
-        () => modal.remove()
-    );
+  cancelar.addEventListener("click", () => modal.remove());
 
-    /*
-     * Clicar no fundo fecha.
-     * Clicar dentro do .modal não fecha.
-     */
+  /*
+   * Clicar no fundo fecha.
+   * Clicar dentro do .modal não fecha.
+   */
 
-    modal.addEventListener(
-        "click",
-        (event) => {
-            if (
-                event.target === modal
-            ) {
-                modal.remove();
-            }
-        }
-    );
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      modal.remove();
+    }
+  });
 
-    /* ================================
+  /* ================================
        FORMULÁRIO
     ================================= */
 
-    const form =
-        modal.querySelector(
-            "#formPromocao"
-        );
+  const form = modal.querySelector("#formPromocao");
 
-    form.addEventListener(
-        "submit",
-        async (event) => {
-            event.preventDefault();
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-            const idProduto =
-                Number(
-                    form.querySelector(
-                        "#promocaoProduto"
-                    ).value
-                );
+    const idProduto = Number(form.querySelector("#promocaoProduto").value);
 
-            const preco =
-                Number(
-                    form.querySelector(
-                        "#promocaoPreco"
-                    ).value
-                );
+    const preco = Number(form.querySelector("#promocaoPreco").value);
 
-            const inicio =
-                form.querySelector(
-                    "#promocaoInicio"
-                ).value;
+    const inicio = form.querySelector("#promocaoInicio").value;
 
-            const fim =
-                form.querySelector(
-                    "#promocaoFim"
-                ).value;
+    const fim = form.querySelector("#promocaoFim").value;
 
-            if (!idProduto) {
-                mostrarToast(
-                    "Selecione um produto.",
-                    "erro"
-                );
-                return;
-            }
+    if (!idProduto) {
+      mostrarToast("Selecione um produto.", "erro");
+      return;
+    }
 
-            if (!preco || preco <= 0) {
-                mostrarToast(
-                    "Informe um preço promocional válido.",
-                    "erro"
-                );
-                return;
-            }
+    if (!preco || preco <= 0) {
+      mostrarToast("Informe um preço promocional válido.", "erro");
+      return;
+    }
 
-            if (!inicio || !fim) {
-                mostrarToast(
-                    "Informe as datas da promoção.",
-                    "erro"
-                );
-                return;
-            }
+    if (!inicio || !fim) {
+      mostrarToast("Informe as datas da promoção.", "erro");
+      return;
+    }
 
-            if (fim < inicio) {
-                mostrarToast(
-                    "A data de término não pode ser anterior à data de início.",
-                    "erro"
-                );
-                return;
-            }
+    if (fim < inicio) {
+      mostrarToast(
+        "A data de término não pode ser anterior à data de início.",
+        "erro",
+      );
+      return;
+    }
 
-            const dados = {
-                precoPromocional: preco,
-                dataInicio: inicio,
-                dataFim: fim,
-                idProduto: idProduto
-            };
+    const dados = {
+      precoPromocional: preco,
+      dataInicio: inicio,
+      dataFim: fim,
+      idProduto: idProduto,
+    };
 
-            const botao =
-                form.querySelector(
-                    "button[type='submit']"
-                );
+    const botao = form.querySelector("button[type='submit']");
 
-            try {
-                botao.disabled = true;
+    try {
+      botao.disabled = true;
 
-                if (editando) {
+      if (editando) {
+        await requisicao(`/promocao/${promocao.idPromocao ?? promocao.id}`, {
+          method: "PUT",
+          body: JSON.stringify(dados),
+        });
 
-                    await requisicao(
-                        `/promocao/${promocao.idPromocao ?? promocao.id}`,
-                        {
-                            method: "PUT",
-                            body: JSON.stringify(dados)
-                        }
-                    );
+        mostrarToast("Promoção atualizada com sucesso!", "sucesso");
+      } else {
+        await requisicao("/promocao", {
+          method: "POST",
+          body: JSON.stringify(dados),
+        });
 
-                    mostrarToast(
-                        "Promoção atualizada com sucesso!",
-                        "sucesso"
-                    );
+        mostrarToast("Promoção criada com sucesso!", "sucesso");
+      }
 
-                } else {
+      modal.remove();
 
-                    await requisicao(
-                        "/promocao",
-                        {
-                            method: "POST",
-                            body: JSON.stringify(dados)
-                        }
-                    );
+      await carregarPromocoes();
+    } catch (erro) {
+      console.error("Erro ao salvar promoção:", erro);
 
-                    mostrarToast(
-                        "Promoção criada com sucesso!",
-                        "sucesso"
-                    );
-                }
-
-                modal.remove();
-
-                await carregarPromocoes();
-
-            } catch (erro) {
-
-                console.error(
-                    "Erro ao salvar promoção:",
-                    erro
-                );
-
-                mostrarToast(
-                    `Não foi possível salvar a promoção: ${erro.message}`,
-                    "erro"
-                );
-
-            } finally {
-
-                if (botao) {
-                    botao.disabled = false;
-                }
-            }
-        }
-    );
+      mostrarToast(
+        `Não foi possível salvar a promoção: ${erro.message}`,
+        "erro",
+      );
+    } finally {
+      if (botao) {
+        botao.disabled = false;
+      }
+    }
+  });
 }
 
 /* ================================
@@ -720,26 +552,18 @@ function abrirFormulario(promocao = null) {
 ================================ */
 
 async function editarPromocao(id) {
-    try {
-        const promocao =
-            await requisicao(
-                `/promocao/${id}`
-            );
+  try {
+    const promocao = await requisicao(`/promocao/${id}`);
 
-        abrirFormulario(promocao);
+    abrirFormulario(promocao);
+  } catch (erro) {
+    console.error("Erro ao buscar promoção:", erro);
 
-    } catch (erro) {
-
-        console.error(
-            "Erro ao buscar promoção:",
-            erro
-        );
-
-        mostrarToast(
-            `Não foi possível carregar a promoção: ${erro.message}`,
-            "erro"
-        );
-    }
+    mostrarToast(
+      `Não foi possível carregar a promoção: ${erro.message}`,
+      "erro",
+    );
+  }
 }
 
 /* ================================
@@ -747,43 +571,28 @@ async function editarPromocao(id) {
 ================================ */
 
 async function excluirPromocao(id) {
-    const confirmar =
-        confirm(
-            "Tem certeza que deseja excluir esta promoção?"
-        );
+  const confirmar = confirm("Tem certeza que deseja excluir esta promoção?");
 
-    if (!confirmar) {
-        return;
-    }
+  if (!confirmar) {
+    return;
+  }
 
-    try {
+  try {
+    await requisicao(`/promocao/${id}`, {
+      method: "DELETE",
+    });
 
-        await requisicao(
-            `/promocao/${id}`,
-            {
-                method: "DELETE"
-            }
-        );
+    mostrarToast("Promoção excluída com sucesso!", "sucesso");
 
-        mostrarToast(
-            "Promoção excluída com sucesso!",
-            "sucesso"
-        );
+    await carregarPromocoes();
+  } catch (erro) {
+    console.error("Erro ao excluir promoção:", erro);
 
-        await carregarPromocoes();
-
-    } catch (erro) {
-
-        console.error(
-            "Erro ao excluir promoção:",
-            erro
-        );
-
-        mostrarToast(
-            `Não foi possível excluir a promoção: ${erro.message}`,
-            "erro"
-        );
-    }
+    mostrarToast(
+      `Não foi possível excluir a promoção: ${erro.message}`,
+      "erro",
+    );
+  }
 }
 
 /* ================================
@@ -791,55 +600,39 @@ async function excluirPromocao(id) {
 ================================ */
 
 function obterStatusPromocao(promocao) {
-    const hoje =
-        new Date();
+  const hoje = new Date();
 
-    hoje.setHours(
-        0,
-        0,
-        0,
-        0
-    );
+  hoje.setHours(0, 0, 0, 0);
 
-    const inicio =
-        converterDataLocal(
-            promocao.dataInicio
-        );
+  const inicio = converterDataLocal(promocao.dataInicio);
 
-    const fim =
-        converterDataLocal(
-            promocao.dataFim
-        );
+  const fim = converterDataLocal(promocao.dataFim);
 
-    if (!inicio || !fim) {
-        return "Indefinida";
-    }
+  if (!inicio || !fim) {
+    return "Indefinida";
+  }
 
-    if (hoje < inicio) {
-        return "Agendada";
-    }
+  if (hoje < inicio) {
+    return "Agendada";
+  }
 
-    if (hoje > fim) {
-        return "Expirada";
-    }
+  if (hoje > fim) {
+    return "Expirada";
+  }
 
-    return "Ativa";
+  return "Ativa";
 }
 
 function obterClasseStatusPromocao(status) {
-    const mapa = {
-        "Ativa":
-            "status-promo-ativa",
+  const mapa = {
+    Ativa: "status-promo-ativa",
 
-        "Expirada":
-            "status-promo-expirada",
+    Expirada: "status-promo-expirada",
 
-        "Agendada":
-            "status-promo-agendada"
-    };
+    Agendada: "status-promo-agendada",
+  };
 
-    return mapa[status] ||
-        "status-promo-expirada";
+  return mapa[status] || "status-promo-expirada";
 }
 
 /* ================================
@@ -847,41 +640,21 @@ function obterClasseStatusPromocao(status) {
 ================================ */
 
 function obterPrecoOriginal(produto) {
-    if (!produto) {
-        return 0;
-    }
+  if (!produto) {
+    return 0;
+  }
 
-    return Number(
-        produto.precoProduto ??
-        produto.preco ??
-        produto.valor ??
-        0
-    );
+  return Number(produto.precoProduto ?? produto.preco ?? produto.valor ?? 0);
 }
 
-function calcularDesconto(
-    precoOriginal,
-    precoPromocional
-) {
-    if (
-        precoOriginal <= 0 ||
-        precoPromocional >= precoOriginal
-    ) {
-        return 0;
-    }
+function calcularDesconto(precoOriginal, precoPromocional) {
+  if (precoOriginal <= 0 || precoPromocional >= precoOriginal) {
+    return 0;
+  }
 
-    const desconto =
-        (
-            1 -
-            (
-                precoPromocional /
-                precoOriginal
-            )
-        ) * 100;
+  const desconto = (1 - precoPromocional / precoOriginal) * 100;
 
-    return Math.round(
-        desconto
-    );
+  return Math.round(desconto);
 }
 
 /* ================================
@@ -889,44 +662,33 @@ function calcularDesconto(
 ================================ */
 
 function converterDataLocal(valor) {
-    if (!valor) {
-        return null;
-    }
+  if (!valor) {
+    return null;
+  }
 
-    const partes =
-        String(valor).split("-");
+  const partes = String(valor).split("-");
 
-    if (partes.length !== 3) {
-        return null;
-    }
+  if (partes.length !== 3) {
+    return null;
+  }
 
-    const ano =
-        Number(partes[0]);
+  const ano = Number(partes[0]);
 
-    const mes =
-        Number(partes[1]) - 1;
+  const mes = Number(partes[1]) - 1;
 
-    const dia =
-        Number(partes[2]);
+  const dia = Number(partes[2]);
 
-    return new Date(
-        ano,
-        mes,
-        dia
-    );
+  return new Date(ano, mes, dia);
 }
 
 function formatarDataCurta(valor) {
-    const data =
-        converterDataLocal(valor);
+  const data = converterDataLocal(valor);
 
-    if (!data) {
-        return "-";
-    }
+  if (!data) {
+    return "-";
+  }
 
-    return data.toLocaleDateString(
-        "pt-BR"
-    );
+  return data.toLocaleDateString("pt-BR");
 }
 
 /* ================================
@@ -934,56 +696,38 @@ function formatarDataCurta(valor) {
 ================================ */
 
 function formatarMoeda(valor) {
-    return Number(valor || 0)
-        .toLocaleString(
-            "pt-BR",
-            {
-                style: "currency",
-                currency: "BRL"
-            }
-        );
+  return Number(valor || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 }
 
 function escaparHTML(valor) {
-    const div =
-        document.createElement("div");
+  const div = document.createElement("div");
 
-    div.textContent =
-        valor ?? "";
+  div.textContent = valor ?? "";
 
-    return div.innerHTML;
+  return div.innerHTML;
 }
 
 /* ================================
    TOAST
 ================================ */
 
-function mostrarToast(
-    mensagem,
-    tipo = "sucesso"
-) {
-    const toastExistente =
-        document.querySelector(
-            ".toast-promocao"
-        );
+function mostrarToast(mensagem, tipo = "sucesso") {
+  const toastExistente = document.querySelector(".toast-promocao");
 
-    if (toastExistente) {
-        toastExistente.remove();
-    }
+  if (toastExistente) {
+    toastExistente.remove();
+  }
 
-    const toast =
-        document.createElement("div");
+  const toast = document.createElement("div");
 
-    toast.className =
-        `toast-promocao ${tipo}`;
+  toast.className = `toast-promocao ${tipo}`;
 
-    toast.textContent =
-        mensagem;
+  toast.textContent = mensagem;
 
-    document.body.appendChild(toast);
+  document.body.appendChild(toast);
 
-    setTimeout(
-        () => toast.remove(),
-        3500
-    );
+  setTimeout(() => toast.remove(), 3500);
 }

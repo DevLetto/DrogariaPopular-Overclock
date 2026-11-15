@@ -16,316 +16,235 @@
  * GET    /api/promocao
  */
 
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "/api";
 let tokenCsrf = null;
 let headerNameCsrf = null;
 let preparacaoCsrf = null;
 
 async function obterCsrf() {
-    if (tokenCsrf && headerNameCsrf) {
-        return { token: tokenCsrf, headerName: headerNameCsrf };
-    }
+  if (tokenCsrf && headerNameCsrf) {
+    return { token: tokenCsrf, headerName: headerNameCsrf };
+  }
 
-    if (!preparacaoCsrf) {
-        preparacaoCsrf = fetch(
-            `${API_BASE_URL}/auth/csrf`,
-            { credentials: "include" }
-        ).then(async (resposta) => {
-            if (!resposta.ok) {
-                throw new Error(
-                    "Não foi possível obter o token CSRF. Atualize a página e autentique-se novamente."
-                );
-            }
+  if (!preparacaoCsrf) {
+    preparacaoCsrf = fetch(`${API_BASE_URL}/auth/csrf`, {
+      credentials: "include",
+    })
+      .then(async (resposta) => {
+        if (!resposta.ok) {
+          throw new Error(
+            "Não foi possível obter o token CSRF. Atualize a página e autentique-se novamente.",
+          );
+        }
 
-            const dados = await resposta.json();
+        const dados = await resposta.json();
 
-            if (!dados?.token) {
-                throw new Error(
-                    "O servidor não retornou um token CSRF válido. Atualize a página."
-                );
-            }
+        if (!dados?.token) {
+          throw new Error(
+            "O servidor não retornou um token CSRF válido. Atualize a página.",
+          );
+        }
 
-            tokenCsrf = dados.token;
-            headerNameCsrf = dados.headerName || "X-CSRF-TOKEN";
+        tokenCsrf = dados.token;
+        headerNameCsrf = dados.headerName || "X-CSRF-TOKEN";
 
-            return {
-                token: tokenCsrf,
-                headerName: headerNameCsrf
-            };
-        }).catch((erro) => {
-            tokenCsrf = null;
-            headerNameCsrf = null;
-            throw erro;
-        }).finally(() => {
-            preparacaoCsrf = null;
-        });
-    }
+        return {
+          token: tokenCsrf,
+          headerName: headerNameCsrf,
+        };
+      })
+      .catch((erro) => {
+        tokenCsrf = null;
+        headerNameCsrf = null;
+        throw erro;
+      })
+      .finally(() => {
+        preparacaoCsrf = null;
+      });
+  }
 
-    return preparacaoCsrf;
+  return preparacaoCsrf;
 }
 
 async function prepararOpcoesCsrf(opcoes) {
-    const metodo = String(opcoes.method || "GET").toUpperCase();
+  const metodo = String(opcoes.method || "GET").toUpperCase();
 
-    if (!["POST", "PUT", "DELETE"].includes(metodo)) {
-        return opcoes;
-    }
+  if (!["POST", "PUT", "DELETE"].includes(metodo)) {
+    return opcoes;
+  }
 
-    const csrf = await obterCsrf();
+  const csrf = await obterCsrf();
 
-    return {
-        ...opcoes,
-        headers: {
-            ...(opcoes.headers || {}),
-            [csrf.headerName]: csrf.token
-        }
-    };
+  return {
+    ...opcoes,
+    headers: {
+      ...(opcoes.headers || {}),
+      [csrf.headerName]: csrf.token,
+    },
+  };
 }
 
 const state = {
-    produtos: [],
-    categorias: [],
-    estoques: [],
-    promocoes: [],
-    filtro: "todos",
-    busca: ""
+  produtos: [],
+  categorias: [],
+  estoques: [],
+  promocoes: [],
+  filtro: "todos",
+  busca: "",
 };
 
 document.addEventListener("DOMContentLoaded", inicializar);
 
 async function inicializar() {
-    configurarEventos();
-    await carregarDados();
+  configurarEventos();
+  await carregarDados();
 }
 
 function configurarEventos() {
+  document
+    .getElementById("btn-novo-produto")
+    .addEventListener("click", () => abrirModalProduto());
 
-    document
-        .getElementById("btn-novo-produto")
-        .addEventListener("click", () => abrirModalProduto());
+  document.getElementById("input-busca").addEventListener("input", (event) => {
+    state.busca = event.target.value.trim().toLowerCase();
 
-    document
-        .getElementById("input-busca")
-        .addEventListener("input", (event) => {
+    renderizarTabela();
+  });
 
-            state.busca = event.target.value
-                .trim()
-                .toLowerCase();
-
-            renderizarTabela();
-        });
-
-    document
+  document.querySelectorAll(".filter-pills .pill").forEach((botao) => {
+    botao.addEventListener("click", () => {
+      document
         .querySelectorAll(".filter-pills .pill")
-        .forEach((botao) => {
+        .forEach((b) => b.classList.remove("active"));
 
-            botao.addEventListener("click", () => {
+      botao.classList.add("active");
 
-                document
-                    .querySelectorAll(".filter-pills .pill")
-                    .forEach((b) => b.classList.remove("active"));
+      state.filtro = botao.dataset.filtro;
 
-                botao.classList.add("active");
-
-                state.filtro = botao.dataset.filtro;
-
-                renderizarTabela();
-            });
-        });
+      renderizarTabela();
+    });
+  });
 }
 
 async function carregarDados() {
+  setLoading(true);
 
-    setLoading(true);
+  try {
+    const [produtos, categorias, estoques, promocoes] =
+      await Promise.allSettled([
+        requisicao("/produto"),
 
-    try {
+        requisicao("/categoria"),
 
-        const [
-            produtos,
-            categorias,
-            estoques,
-            promocoes
-        ] = await Promise.allSettled([
+        requisicao("/estoque"),
 
-            requisicao("/produto"),
+        carregarPromocoes(),
+      ]);
 
-            requisicao("/categoria"),
+    state.produtos =
+      produtos.status === "fulfilled" && Array.isArray(produtos.value)
+        ? produtos.value
+        : [];
 
-            requisicao("/estoque"),
+    state.categorias =
+      categorias.status === "fulfilled" && Array.isArray(categorias.value)
+        ? categorias.value
+        : [];
 
-            carregarPromocoes()
-        ]);
+    state.estoques =
+      estoques.status === "fulfilled" && Array.isArray(estoques.value)
+        ? estoques.value
+        : [];
 
-        state.produtos =
-            produtos.status === "fulfilled" &&
-            Array.isArray(produtos.value)
-                ? produtos.value
-                : [];
+    state.promocoes =
+      promocoes.status === "fulfilled" && Array.isArray(promocoes.value)
+        ? promocoes.value
+        : [];
 
-        state.categorias =
-            categorias.status === "fulfilled" &&
-            Array.isArray(categorias.value)
-                ? categorias.value
-                : [];
-
-        state.estoques =
-            estoques.status === "fulfilled" &&
-            Array.isArray(estoques.value)
-                ? estoques.value
-                : [];
-
-        state.promocoes =
-            promocoes.status === "fulfilled" &&
-            Array.isArray(promocoes.value)
-                ? promocoes.value
-                : [];
-
-        if (estoques.status === "rejected") {
-            console.warn(
-                "Não foi possível carregar o estoque:",
-                estoques.reason.message
-            );
-        }
-
-        renderizarTudo();
-
-        if (
-            produtos.status === "rejected" ||
-            categorias.status === "rejected"
-        ) {
-            const erro =
-                produtos.status === "rejected"
-                    ? produtos.reason
-                    : categorias.reason;
-
-            console.error(
-                "Erro ao carregar produtos ou categorias:",
-                erro
-            );
-
-            if (produtos.status === "rejected") {
-                mostrarErroTabela(erro.message);
-            }
-
-            mostrarMensagem(
-                "Não foi possível carregar todos os dados.",
-                "erro"
-            );
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Erro ao carregar dados:",
-            error
-        );
-
-        mostrarErroTabela(error.message);
-
-        mostrarMensagem(
-            "Não foi possível carregar os produtos.",
-            "erro"
-        );
-
-    } finally {
-
-        setLoading(false);
+    if (estoques.status === "rejected") {
+      console.warn(
+        "Não foi possível carregar o estoque:",
+        estoques.reason.message,
+      );
     }
+
+    renderizarTudo();
+
+    if (produtos.status === "rejected" || categorias.status === "rejected") {
+      const erro =
+        produtos.status === "rejected" ? produtos.reason : categorias.reason;
+
+      console.error("Erro ao carregar produtos ou categorias:", erro);
+
+      if (produtos.status === "rejected") {
+        mostrarErroTabela(erro.message);
+      }
+
+      mostrarMensagem("Não foi possível carregar todos os dados.", "erro");
+    }
+  } catch (error) {
+    console.error("Erro ao carregar dados:", error);
+
+    mostrarErroTabela(error.message);
+
+    mostrarMensagem("Não foi possível carregar os produtos.", "erro");
+  } finally {
+    setLoading(false);
+  }
 }
 
 async function carregarPromocoes() {
+  try {
+    const resposta = await requisicao("/promocao");
 
-    try {
+    return Array.isArray(resposta) ? resposta : [];
+  } catch (error) {
+    console.warn("Não foi possível carregar promoções:", error);
 
-        const resposta =
-            await requisicao("/promocao");
-
-        return Array.isArray(resposta)
-            ? resposta
-            : [];
-
-    } catch (error) {
-
-        console.warn(
-            "Não foi possível carregar promoções:",
-            error
-        );
-
-        return [];
-    }
+    return [];
+  }
 }
 
 function renderizarTudo() {
+  renderizarTabela();
 
-    renderizarTabela();
-
-    atualizarResumo();
+  atualizarResumo();
 }
-    
+
 function renderizarTabela() {
+  const tbody = document.getElementById("produtos-tbody");
 
-    const tbody =
-        document.getElementById("produtos-tbody");
+  const produtosFiltrados = state.produtos.filter((produto) => {
+    const estoque = obterEstoqueProduto(produto.idProduto);
 
-    const produtosFiltrados =
-        state.produtos.filter((produto) => {
+    const status = obterStatusEstoque(estoque);
 
-            const estoque =
-                obterEstoqueProduto(
-                    produto.idProduto
-                );
+    const textoBusca = [
+      produto.nomeProduto,
 
-            const status =
-                obterStatusEstoque(estoque);
+      obterNomeCategoria(produto.idCategoria, produto.categoria),
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
 
-            const textoBusca = [
+    const correspondeBusca = !state.busca || textoBusca.includes(state.busca);
 
-                produto.nomeProduto,
+    let correspondeFiltro = true;
 
-                obterNomeCategoria(
-                    produto.idCategoria,
-                    produto.categoria
-                )
+    if (state.filtro === "estoque") {
+      correspondeFiltro = estoque && estoque.quantidade > 0;
+    } else if (state.filtro === "baixo") {
+      correspondeFiltro = status === "baixo";
+    } else if (state.filtro === "esgotado") {
+      correspondeFiltro = status === "esgotado";
+    }
 
-            ]
-                .filter(Boolean)
-                .join(" ")
-                .toLowerCase();
+    return correspondeBusca && correspondeFiltro;
+  });
 
-            const correspondeBusca =
-                !state.busca ||
-                textoBusca.includes(state.busca);
-
-            let correspondeFiltro = true;
-
-            if (state.filtro === "estoque") {
-
-                correspondeFiltro =
-                    estoque &&
-                    estoque.quantidade > 0;
-            }
-
-            else if (state.filtro === "baixo") {
-
-                correspondeFiltro =
-                    status === "baixo";
-            }
-
-            else if (state.filtro === "esgotado") {
-
-                correspondeFiltro =
-                    status === "esgotado";
-            }
-
-            return (
-                correspondeBusca &&
-                correspondeFiltro
-            );
-        });
-
-    if (produtosFiltrados.length === 0) {
-
-        tbody.innerHTML = `
+  if (produtosFiltrados.length === 0) {
+    tbody.innerHTML = `
             <tr>
                 <td colspan="6" style="text-align:center;">
                     Nenhum produto encontrado.
@@ -333,94 +252,56 @@ function renderizarTabela() {
             </tr>
         `;
 
-        return;
-    }
+    return;
+  }
 
-    tbody.innerHTML =
-        produtosFiltrados
-            .map((produto) =>
-                criarLinhaProduto(produto)
-            )
-            .join("");
+  tbody.innerHTML = produtosFiltrados
+    .map((produto) => criarLinhaProduto(produto))
+    .join("");
 
-    tbody
-        .querySelectorAll("[data-acao='editar']")
-        .forEach((botao) => {
+  tbody.querySelectorAll("[data-acao='editar']").forEach((botao) => {
+    botao.addEventListener("click", () => {
+      abrirModalProduto(Number(botao.dataset.id));
+    });
+  });
 
-            botao.addEventListener(
-                "click",
-                () => {
-
-                    abrirModalProduto(
-                        Number(botao.dataset.id)
-                    );
-                }
-            );
-        });
-
-    tbody
-        .querySelectorAll("[data-acao='excluir']")
-        .forEach((botao) => {
-
-            botao.addEventListener(
-                "click",
-                () => {
-
-                    excluirProduto(
-                        Number(botao.dataset.id)
-                    );
-                }
-            );
-        });
+  tbody.querySelectorAll("[data-acao='excluir']").forEach((botao) => {
+    botao.addEventListener("click", () => {
+      excluirProduto(Number(botao.dataset.id));
+    });
+  });
 }
 
 function criarLinhaProduto(produto) {
+  const estoque = obterEstoqueProduto(produto.idProduto);
 
-    const estoque =
-        obterEstoqueProduto(
-            produto.idProduto
-        );
+  const quantidade = estoque?.quantidade ?? 0;
 
-    const quantidade =
-        estoque?.quantidade ?? 0;
+  const status = obterStatusEstoque(estoque);
 
-    const status =
-        obterStatusEstoque(estoque);
+  const categoria = obterNomeCategoria(produto.idCategoria, produto.categoria);
 
-    const categoria =
-        obterNomeCategoria(
-            produto.idCategoria,
-            produto.categoria
-        );
+  const descricao = obterDescricaoProduto(produto);
 
-    const descricao =
-        obterDescricaoProduto(produto);
+  const imagem = produto.imagemURL || "../img/medicamentos_icon.png";
 
-    const imagem =
-        produto.imagemURL ||
-        "../img/medicamentos_icon.png";
+  const statusTexto = {
+    ativo: "Ativo",
 
-    const statusTexto = {
+    baixo: "Estoque baixo",
 
-        ativo: "Ativo",
+    esgotado: "Esgotado",
+  }[status];
 
-        baixo: "Estoque baixo",
+  const statusClasse = {
+    ativo: "status-ativo",
 
-        esgotado: "Esgotado"
+    baixo: "status-baixo",
 
-    }[status];
+    esgotado: "status-esgotado",
+  }[status];
 
-    const statusClasse = {
-
-        ativo: "status-ativo",
-
-        baixo: "status-baixo",
-
-        esgotado: "status-esgotado"
-
-    }[status];
-
-    return `
+  return `
 
         <tr>
 
@@ -439,10 +320,7 @@ function criarLinhaProduto(produto) {
                 <div class="product-info">
 
                     <strong>
-                        ${escaparHtml(
-                            produto.nomeProduto ||
-                            "Sem nome"
-                        )}
+                        ${escaparHtml(produto.nomeProduto || "Sem nome")}
                     </strong>
 
                     <span>
@@ -458,9 +336,7 @@ function criarLinhaProduto(produto) {
             </td>
 
             <td>
-                ${formatarMoeda(
-                    produto.precoProduto
-                )}
+                ${formatarMoeda(produto.precoProduto)}
             </td>
 
             <td>
@@ -517,222 +393,111 @@ function criarLinhaProduto(produto) {
 }
 
 function atualizarResumo() {
+  const total = state.produtos.length;
 
-    const total =
-        state.produtos.length;
+  const baixo = state.produtos.filter((produto) => {
+    const estoque = obterEstoqueProduto(produto.idProduto);
 
-    const baixo =
-        state.produtos.filter((produto) => {
+    return obterStatusEstoque(estoque) === "baixo";
+  }).length;
 
-            const estoque =
-                obterEstoqueProduto(
-                    produto.idProduto
-                );
+  const esgotados = state.produtos.filter((produto) => {
+    const estoque = obterEstoqueProduto(produto.idProduto);
 
-            return (
-                obterStatusEstoque(estoque) ===
-                "baixo"
-            );
+    return obterStatusEstoque(estoque) === "esgotado";
+  }).length;
 
-        }).length;
+  const idsEmPromocao = new Set(
+    state.promocoes
+      .map((promocao) => extrairIdProdutoPromocao(promocao))
+      .filter((id) => id !== null),
+  );
 
-    const esgotados =
-        state.produtos.filter((produto) => {
+  document.getElementById("total-produtos").textContent = total;
 
-            const estoque =
-                obterEstoqueProduto(
-                    produto.idProduto
-                );
+  document.getElementById("estoque-baixo").textContent = baixo;
 
-            return (
-                obterStatusEstoque(estoque) ===
-                "esgotado"
-            );
+  document.getElementById("esgotados").textContent = esgotados;
 
-        }).length;
-
-    const idsEmPromocao =
-        new Set(
-
-            state.promocoes
-                .map((promocao) =>
-                    extrairIdProdutoPromocao(
-                        promocao
-                    )
-                )
-                .filter((id) =>
-                    id !== null
-                )
-        );
-
-    document
-        .getElementById("total-produtos")
-        .textContent = total;
-
-    document
-        .getElementById("estoque-baixo")
-        .textContent = baixo;
-
-    document
-        .getElementById("esgotados")
-        .textContent = esgotados;
-
-    document
-        .getElementById("total-promocoes")
-        .textContent =
-            idsEmPromocao.size;
+  document.getElementById("total-promocoes").textContent = idsEmPromocao.size;
 }
 
 function obterEstoqueProduto(idProduto) {
+  return state.estoques.find((estoque) => {
+    const id =
+      estoque.idProduto ?? estoque.produto?.idProduto ?? estoque.produto?.id;
 
-    return state.estoques.find(
-        (estoque) => {
-
-            const id =
-                estoque.idProduto ??
-                estoque.produto?.idProduto ??
-                estoque.produto?.id;
-
-            return (
-                Number(id) ===
-                Number(idProduto)
-            );
-        }
-    );
+    return Number(id) === Number(idProduto);
+  });
 }
 
 function obterStatusEstoque(estoque) {
+  if (!estoque) {
+    return "esgotado";
+  }
 
-    if (!estoque) {
-        return "esgotado";
-    }
+  const quantidade = Number(estoque.quantidade ?? 0);
 
-    const quantidade =
-        Number(
-            estoque.quantidade ?? 0
-        );
+  const minimo = Number(estoque.estoqueMinimo ?? 0);
 
-    const minimo =
-        Number(
-            estoque.estoqueMinimo ?? 0
-        );
+  if (quantidade <= 0) {
+    return "esgotado";
+  }
 
-    if (quantidade <= 0) {
+  if (quantidade <= minimo) {
+    return "baixo";
+  }
 
-        return "esgotado";
-    }
-
-    if (quantidade <= minimo) {
-
-        return "baixo";
-    }
-
-    return "ativo";
+  return "ativo";
 }
 
-function obterNomeCategoria(
-    idCategoria,
-    categoria
-) {
+function obterNomeCategoria(idCategoria, categoria) {
+  if (categoria?.nome) {
+    return categoria.nome;
+  }
 
-    if (categoria?.nome) {
+  if (categoria?.nomeCategoria) {
+    return categoria.nomeCategoria;
+  }
 
-        return categoria.nome;
-    }
+  const id = idCategoria ?? categoria?.idCategoria ?? categoria?.id;
 
-    if (categoria?.nomeCategoria) {
+  const encontrada = state.categorias.find((cat) => {
+    const catId = cat.idCategoria ?? cat.id;
 
-        return categoria.nomeCategoria;
-    }
+    return Number(catId) === Number(id);
+  });
 
-    const id =
-        idCategoria ??
-        categoria?.idCategoria ??
-        categoria?.id;
-
-    const encontrada =
-        state.categorias.find(
-            (cat) => {
-
-                const catId =
-                    cat.idCategoria ??
-                    cat.id;
-
-                return (
-                    Number(catId) ===
-                    Number(id)
-                );
-            }
-        );
-
-    return (
-        encontrada?.nome ??
-        encontrada?.nomeCategoria ??
-        "Sem categoria"
-    );
+  return encontrada?.nome ?? encontrada?.nomeCategoria ?? "Sem categoria";
 }
 
 function obterDescricaoProduto(produto) {
-
-    return (
-
-        produto.descricao ??
-
-        produto.descricaoProduto ??
-
-        produto.apresentacao ??
-
-        ""
-    );
+  return (
+    produto.descricao ?? produto.descricaoProduto ?? produto.apresentacao ?? ""
+  );
 }
 
-function extrairIdProdutoPromocao(
-    promocao
-) {
-
-    return (
-
-        promocao.idProduto ??
-
-        promocao.produto?.idProduto ??
-
-        promocao.produto?.id ??
-
-        null
-    );
+function extrairIdProdutoPromocao(promocao) {
+  return (
+    promocao.idProduto ??
+    promocao.produto?.idProduto ??
+    promocao.produto?.id ??
+    null
+  );
 }
 
-async function abrirModalProduto(
-    idProduto = null
-) {
+async function abrirModalProduto(idProduto = null) {
+  const produto = idProduto
+    ? state.produtos.find((p) => Number(p.idProduto) === Number(idProduto))
+    : null;
 
-    const produto =
-        idProduto
+  const estoque = produto ? obterEstoqueProduto(produto.idProduto) : null;
 
-            ? state.produtos.find(
-                (p) =>
-                    Number(p.idProduto) ===
-                    Number(idProduto)
-            )
+  const modal = document.createElement("div");
 
-            : null;
+  modal.id = "modal-produto";
 
-    const estoque =
-        produto
-
-            ? obterEstoqueProduto(
-                produto.idProduto
-            )
-
-            : null;
-
-    const modal =
-        document.createElement("div");
-
-    modal.id =
-        "modal-produto";
-
-    modal.innerHTML = `
+  modal.innerHTML = `
 
         <div class="modal-overlay">
 
@@ -743,18 +508,14 @@ async function abrirModalProduto(
                     <div>
 
                         <h2>
-                            ${
-                                produto
-                                    ? "Editar produto"
-                                    : "Novo produto"
-                            }
+                            ${produto ? "Editar produto" : "Novo produto"}
                         </h2>
 
                         <p>
                             ${
-                                produto
-                                    ? "Altere os dados do produto."
-                                    : "Cadastre um novo produto."
+                              produto
+                                ? "Altere os dados do produto."
+                                : "Cadastre um novo produto."
                             }
                         </p>
 
@@ -786,7 +547,7 @@ async function abrirModalProduto(
                                 type="text"
                                 required
                                 value="${escaparAtributo(
-                                    produto?.nomeProduto ?? ""
+                                  produto?.nomeProduto ?? "",
                                 )}"
                             >
 
@@ -805,9 +566,7 @@ async function abrirModalProduto(
                                 step="0.01"
                                 min="0"
                                 required
-                                value="${
-                                    produto?.precoProduto ?? ""
-                                }"
+                                value="${produto?.precoProduto ?? ""}"
                             >
 
                         </div>
@@ -828,42 +587,35 @@ async function abrirModalProduto(
                                 </option>
 
                                 ${state.categorias
-                                    .map((categoria) => {
+                                  .map((categoria) => {
+                                    const id =
+                                      categoria.idCategoria ?? categoria.id;
 
-                                        const id =
-                                            categoria.idCategoria ??
-                                            categoria.id;
+                                    const nome =
+                                      categoria.nome ??
+                                      categoria.nomeCategoria ??
+                                      "Sem nome";
 
-                                        const nome =
-                                            categoria.nome ??
-                                            categoria.nomeCategoria ??
-                                            "Sem nome";
+                                    const selecionada =
+                                      Number(id) ===
+                                      Number(
+                                        produto?.idCategoria ??
+                                          produto?.categoria?.idCategoria ??
+                                          produto?.categoria?.id,
+                                      );
 
-                                        const selecionada =
-                                            Number(id) ===
-                                            Number(
-                                                produto?.idCategoria ??
-                                                produto?.categoria?.idCategoria ??
-                                                produto?.categoria?.id
-                                            );
-
-                                        return `
+                                    return `
 
                                             <option
                                                 value="${id}"
-                                                ${
-                                                    selecionada
-                                                        ? "selected"
-                                                        : ""
-                                                }
+                                                ${selecionada ? "selected" : ""}
                                             >
                                                 ${escaparHtml(nome)}
                                             </option>
 
                                         `;
-
-                                    })
-                                    .join("")}
+                                  })
+                                  .join("")}
 
                             </select>
 
@@ -880,7 +632,7 @@ async function abrirModalProduto(
                                 name="imagemURL"
                                 type="url"
                                 value="${escaparAtributo(
-                                    produto?.imagemURL ?? ""
+                                  produto?.imagemURL ?? "",
                                 )}"
                                 placeholder="https://..."
                             >
@@ -899,9 +651,7 @@ async function abrirModalProduto(
                                 type="number"
                                 min="0"
                                 required
-                                value="${
-                                    estoque?.quantidade ?? 0
-                                }"
+                                value="${estoque?.quantidade ?? 0}"
                             >
 
                         </div>
@@ -918,9 +668,7 @@ async function abrirModalProduto(
                                 type="number"
                                 min="0"
                                 required
-                                value="${
-                                    estoque?.estoqueMinimo ?? 5
-                                }"
+                                value="${estoque?.estoqueMinimo ?? 5}"
                             >
 
                         </div>
@@ -939,12 +687,10 @@ async function abrirModalProduto(
                                 <option
                                     value="0"
                                     ${
-                                        Number(
-                                            produto?.necessitaReceita ??
-                                            0
-                                        ) === 0
-                                            ? "selected"
-                                            : ""
+                                      Number(produto?.necessitaReceita ?? 0) ===
+                                      0
+                                        ? "selected"
+                                        : ""
                                     }
                                 >
                                     Não
@@ -953,12 +699,10 @@ async function abrirModalProduto(
                                 <option
                                     value="1"
                                     ${
-                                        Number(
-                                            produto?.necessitaReceita ??
-                                            0
-                                        ) === 1
-                                            ? "selected"
-                                            : ""
+                                      Number(produto?.necessitaReceita ?? 0) ===
+                                      1
+                                        ? "selected"
+                                        : ""
                                     }
                                 >
                                     Sim
@@ -982,12 +726,11 @@ async function abrirModalProduto(
                                 <option
                                     value="0"
                                     ${
-                                        Number(
-                                            produto?.medicamentoControlado ??
-                                            0
-                                        ) === 0
-                                            ? "selected"
-                                            : ""
+                                      Number(
+                                        produto?.medicamentoControlado ?? 0,
+                                      ) === 0
+                                        ? "selected"
+                                        : ""
                                     }
                                 >
                                     Não
@@ -996,12 +739,11 @@ async function abrirModalProduto(
                                 <option
                                     value="1"
                                     ${
-                                        Number(
-                                            produto?.medicamentoControlado ??
-                                            0
-                                        ) === 1
-                                            ? "selected"
-                                            : ""
+                                      Number(
+                                        produto?.medicamentoControlado ?? 0,
+                                      ) === 1
+                                        ? "selected"
+                                        : ""
                                     }
                                 >
                                     Sim
@@ -1024,7 +766,7 @@ async function abrirModalProduto(
                             type="text"
                             placeholder="Ex.: B1 - Psicotrópico"
                             value="${escaparAtributo(
-                                produto?.categoriaControle ?? ""
+                              produto?.categoriaControle ?? "",
                             )}"
                             >
 
@@ -1066,9 +808,9 @@ async function abrirModalProduto(
                             id="salvar-produto"
                         >
                             ${
-                                produto
-                                    ? "Salvar alterações"
-                                    : "Cadastrar produto"
+                              produto
+                                ? "Salvar alterações"
+                                : "Cadastrar produto"
                             }
                         </button>
 
@@ -1082,471 +824,309 @@ async function abrirModalProduto(
 
     `;
 
-    document.body.appendChild(modal);
+  document.body.appendChild(modal);
 
-    adicionarEstiloModalSeNecessario();
+  adicionarEstiloModalSeNecessario();
 
-    const selectControlado = document.getElementById(
-    "produto-controlado"
-);
+  const selectControlado = document.getElementById("produto-controlado");
 
-const grupoCategoriaControle = document.getElementById(
-    "grupo-categoria-controle"
-);
+  const grupoCategoriaControle = document.getElementById(
+    "grupo-categoria-controle",
+  );
 
-const grupoLimiteQuantidade = document.getElementById(
-    "grupo-limite-quantidade"
-);
+  const grupoLimiteQuantidade = document.getElementById(
+    "grupo-limite-quantidade",
+  );
 
-function atualizarCamposControlado() {
+  function atualizarCamposControlado() {
     const controlado = selectControlado.value === "1";
 
-    grupoCategoriaControle.style.display =
-        controlado ? "flex" : "none";
+    grupoCategoriaControle.style.display = controlado ? "flex" : "none";
 
-    grupoLimiteQuantidade.style.display =
-        controlado ? "flex" : "none";
-}
+    grupoLimiteQuantidade.style.display = controlado ? "flex" : "none";
+  }
 
-selectControlado.addEventListener(
-    "change",
-    atualizarCamposControlado
-);
+  selectControlado.addEventListener("change", atualizarCamposControlado);
 
-atualizarCamposControlado();
+  atualizarCamposControlado();
 
-    const fechar = () =>
-        modal.remove();
+  const fechar = () => modal.remove();
 
-    document
-        .getElementById("fechar-modal")
-        .addEventListener(
-            "click",
-            fechar
-        );
+  document.getElementById("fechar-modal").addEventListener("click", fechar);
 
-    document
-        .getElementById("cancelar-modal")
-        .addEventListener(
-            "click",
-            fechar
-        );
+  document.getElementById("cancelar-modal").addEventListener("click", fechar);
 
-    modal
-        .querySelector(".modal-overlay")
-        .addEventListener(
-            "click",
-            (event) => {
-
-                if (
-                    event.target.classList
-                        .contains("modal-overlay")
-                ) {
-                    fechar();
-                }
-
-            }
-        );
-
-    document
-        .getElementById("form-produto")
-        .addEventListener(
-            "submit",
-            async (event) => {
-
-                event.preventDefault();
-
-                try {
-
-                    await salvarProduto(
-                        idProduto
-                    );
-
-                    fechar();
-
-                    await carregarDados();
-
-                    mostrarMensagem(
-                        idProduto
-                            ? "Produto atualizado com sucesso."
-                            : "Produto cadastrado com sucesso.",
-                        "sucesso"
-                    );
-
-                } catch (error) {
-
-                    console.error(error);
-
-                    mostrarMensagem(
-                        error.message,
-                        "erro"
-                    );
-                }
-            }
-        );
-}
-
-async function salvarProduto(idProduto) {
-
-    const form = document.getElementById("form-produto");
-
-    const nomeProduto = form.nomeProduto.value.trim();
-
-    const precoProduto = Number(form.precoProduto.value);
-
-    const imagemURL = form.imagemURL.value.trim() || null;
-
-    const idCategoria = form.idCategoria.value
-        ? Number(form.idCategoria.value)
-        : null;
-
-    const necessitaReceita = Number(
-        form.necessitaReceita.value
-    ) === 1;
-
-    const medicamentoControlado = Number(
-        form.medicamentoControlado.value
-    ) === 1;
-
-    const categoriaControle = medicamentoControlado
-        ? form.categoriaControle.value.trim()
-        : null;
-
-    const limiteInformado =
-        form.limiteQuantidadePorCliente.value.trim();
-
-    const limiteQuantidadePorCliente =
-        medicamentoControlado && limiteInformado !== ""
-            ? Number(limiteInformado)
-            : null;
-
-    if (!nomeProduto) {
-        throw new Error("Informe o nome do produto.");
+  modal.querySelector(".modal-overlay").addEventListener("click", (event) => {
+    if (event.target.classList.contains("modal-overlay")) {
+      fechar();
     }
+  });
 
-    if (
-        !Number.isFinite(precoProduto) ||
-        precoProduto < 0
-    ) {
-        throw new Error("Informe um preço válido.");
-    }
+  document
+    .getElementById("form-produto")
+    .addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-    if (
-        medicamentoControlado &&
-        !categoriaControle
-    ) {
-        throw new Error(
-            "Informe a categoria de controle do medicamento."
-        );
-    }
+      try {
+        await salvarProduto(idProduto);
 
-    if (
-        limiteQuantidadePorCliente !== null &&
-        (
-            !Number.isInteger(limiteQuantidadePorCliente) ||
-            limiteQuantidadePorCliente <= 0
-        )
-    ) {
-        throw new Error(
-            "Informe um limite de quantidade válido."
-        );
-    }
-
-    const produtoBody = {
-
-        idProduto: idProduto ?? null,
-
-        idCategoria,
-
-        nomeProduto,
-
-        precoProduto,
-
-        imagemURL,
-
-        necessitaReceita,
-
-        medicamentoControlado,
-
-        categoriaControle,
-
-        limiteQuantidadePorCliente
-
-    };
-
-    let produtoSalvo;
-
-    if (idProduto) {
-
-        produtoSalvo = await requisicao(
-            `/produto/${idProduto}`,
-            {
-                method: "PUT",
-                body: JSON.stringify(produtoBody)
-            }
-        );
-
-    } else {
-
-        produtoSalvo = await requisicao(
-            "/produto",
-            {
-                method: "POST",
-                body: JSON.stringify(produtoBody)
-            }
-        );
-
-    }
-
-    const produtoId =
-        produtoSalvo?.idProduto ??
-        produtoSalvo?.id ??
-        idProduto;
-
-    if (!produtoId) {
-        throw new Error(
-            "A API não retornou o ID do produto."
-        );
-    }
-
-    await salvarEstoque(
-        produtoId,
-        Number(form.quantidade.value),
-        Number(form.estoqueMinimo.value)
-    );
-
-    return produtoSalvo;
-}
-
-async function salvarEstoque(
-    idProduto,
-    quantidade,
-    estoqueMinimo
-) {
-
-    if (
-        !Number.isInteger(quantidade) ||
-        quantidade < 0
-    ) {
-
-        throw new Error(
-            "Informe uma quantidade de estoque válida."
-        );
-    }
-
-    if (
-        !Number.isInteger(estoqueMinimo) ||
-        estoqueMinimo < 0
-    ) {
-
-        throw new Error(
-            "Informe um estoque mínimo válido."
-        );
-    }
-
-    const estoqueAtual =
-        obterEstoqueProduto(idProduto);
-
-    const body = {
-
-        quantidade,
-
-        estoqueMinimo,
-
-        idProduto,
-
-        idLoja:
-            estoqueAtual?.idLoja ??
-            estoqueAtual?.loja?.idLoja ??
-            estoqueAtual?.loja?.id ??
-            null
-    };
-
-    if (
-        estoqueAtual?.idEstoque ??
-        estoqueAtual?.id
-    ) {
-
-        const idEstoque =
-            estoqueAtual.idEstoque ??
-            estoqueAtual.id;
-
-        await requisicao(
-            `/estoque/${idEstoque}`,
-            {
-                method: "PUT",
-
-                body:
-                    JSON.stringify(body)
-            }
-        );
-
-    } else {
-
-        await requisicao(
-            "/estoque",
-            {
-                method: "POST",
-
-                body:
-                    JSON.stringify(body)
-            }
-        );
-    }
-}
-
-async function excluirProduto(
-    idProduto
-) {
-
-    const produto =
-        state.produtos.find(
-            (p) =>
-                Number(p.idProduto) ===
-                Number(idProduto)
-        );
-
-    const nome =
-        produto?.nomeProduto ??
-        "este produto";
-
-    const confirmou =
-        confirm(
-            `Tem certeza que deseja excluir "${nome}"?\n\nEssa operação não poderá ser desfeita.`
-        );
-
-    if (!confirmou) {
-
-        return;
-    }
-
-    try {
-
-       const resultado = await requisicao(`/produto/${idProduto}`, { method: "DELETE" });
+        fechar();
 
         await carregarDados();
 
         mostrarMensagem(
-            resultado?.arquivado
-                 ? "Produto removido do catálogo. Ele continua no histórico dos pedidos antigos."
-                : "Produto excluído com sucesso.",
-            "sucesso"
+          idProduto
+            ? "Produto atualizado com sucesso."
+            : "Produto cadastrado com sucesso.",
+          "sucesso",
         );
+      } catch (error) {
+        console.error(error);
 
-    } catch (error) {
-
-        console.error(
-            "Erro ao excluir produto:",
-            error
-        );
-
-        mostrarMensagem(
-            `Não foi possível excluir o produto: ${error.message}`,
-            "erro"
-        );
-    }
+        mostrarMensagem(error.message, "erro");
+      }
+    });
 }
 
-async function requisicao(
-    endpoint,
-    opcoes = {}
-) {
-    const opcoesComCsrf = await prepararOpcoesCsrf(opcoes);
+async function salvarProduto(idProduto) {
+  const form = document.getElementById("form-produto");
 
-    const configuracao = {
+  const nomeProduto = form.nomeProduto.value.trim();
 
-        ...opcoesComCsrf,
-        credentials: "include",
+  const precoProduto = Number(form.precoProduto.value);
 
-        headers: {
+  const imagemURL = form.imagemURL.value.trim() || null;
 
-            "Content-Type":
-                "application/json",
+  const idCategoria = form.idCategoria.value
+    ? Number(form.idCategoria.value)
+    : null;
 
-            ...(opcoesComCsrf.headers || {})
-        }
-    };
+  const necessitaReceita = Number(form.necessitaReceita.value) === 1;
 
-    const resposta =
-        await fetch(
-            `${API_BASE_URL}${endpoint}`,
-            configuracao
-        );
+  const medicamentoControlado = Number(form.medicamentoControlado.value) === 1;
 
-    const texto =
-        await resposta.text();
+  const categoriaControle = medicamentoControlado
+    ? form.categoriaControle.value.trim()
+    : null;
 
-    let dados = null;
+  const limiteInformado = form.limiteQuantidadePorCliente.value.trim();
 
-    if (texto) {
+  const limiteQuantidadePorCliente =
+    medicamentoControlado && limiteInformado !== ""
+      ? Number(limiteInformado)
+      : null;
 
-        try {
+  if (!nomeProduto) {
+    throw new Error("Informe o nome do produto.");
+  }
 
-            dados =
-                JSON.parse(texto);
+  if (!Number.isFinite(precoProduto) || precoProduto < 0) {
+    throw new Error("Informe um preço válido.");
+  }
 
-        } catch {
+  if (medicamentoControlado && !categoriaControle) {
+    throw new Error("Informe a categoria de controle do medicamento.");
+  }
 
-            dados = texto;
-        }
+  if (
+    limiteQuantidadePorCliente !== null &&
+    (!Number.isInteger(limiteQuantidadePorCliente) ||
+      limiteQuantidadePorCliente <= 0)
+  ) {
+    throw new Error("Informe um limite de quantidade válido.");
+  }
+
+  const produtoBody = {
+    idProduto: idProduto ?? null,
+
+    idCategoria,
+
+    nomeProduto,
+
+    precoProduto,
+
+    imagemURL,
+
+    necessitaReceita,
+
+    medicamentoControlado,
+
+    categoriaControle,
+
+    limiteQuantidadePorCliente,
+  };
+
+  let produtoSalvo;
+
+  if (idProduto) {
+    produtoSalvo = await requisicao(`/produto/${idProduto}`, {
+      method: "PUT",
+      body: JSON.stringify(produtoBody),
+    });
+  } else {
+    produtoSalvo = await requisicao("/produto", {
+      method: "POST",
+      body: JSON.stringify(produtoBody),
+    });
+  }
+
+  const produtoId = produtoSalvo?.idProduto ?? produtoSalvo?.id ?? idProduto;
+
+  if (!produtoId) {
+    throw new Error("A API não retornou o ID do produto.");
+  }
+
+  await salvarEstoque(
+    produtoId,
+    Number(form.quantidade.value),
+    Number(form.estoqueMinimo.value),
+  );
+
+  return produtoSalvo;
+}
+
+async function salvarEstoque(idProduto, quantidade, estoqueMinimo) {
+  if (!Number.isInteger(quantidade) || quantidade < 0) {
+    throw new Error("Informe uma quantidade de estoque válida.");
+  }
+
+  if (!Number.isInteger(estoqueMinimo) || estoqueMinimo < 0) {
+    throw new Error("Informe um estoque mínimo válido.");
+  }
+
+  const estoqueAtual = obterEstoqueProduto(idProduto);
+
+  const body = {
+    quantidade,
+
+    estoqueMinimo,
+
+    idProduto,
+
+    idLoja:
+      estoqueAtual?.idLoja ??
+      estoqueAtual?.loja?.idLoja ??
+      estoqueAtual?.loja?.id ??
+      null,
+  };
+
+  if (estoqueAtual?.idEstoque ?? estoqueAtual?.id) {
+    const idEstoque = estoqueAtual.idEstoque ?? estoqueAtual.id;
+
+    await requisicao(`/estoque/${idEstoque}`, {
+      method: "PUT",
+
+      body: JSON.stringify(body),
+    });
+  } else {
+    await requisicao("/estoque", {
+      method: "POST",
+
+      body: JSON.stringify(body),
+    });
+  }
+}
+
+async function excluirProduto(idProduto) {
+  const produto = state.produtos.find(
+    (p) => Number(p.idProduto) === Number(idProduto),
+  );
+
+  const nome = produto?.nomeProduto ?? "este produto";
+
+  const confirmou = confirm(
+    `Tem certeza que deseja excluir "${nome}"?\n\nEssa operação não poderá ser desfeita.`,
+  );
+
+  if (!confirmou) {
+    return;
+  }
+
+  try {
+    const resultado = await requisicao(`/produto/${idProduto}`, {
+      method: "DELETE",
+    });
+
+    await carregarDados();
+
+    mostrarMensagem(
+      resultado?.arquivado
+        ? "Produto removido do catálogo. Ele continua no histórico dos pedidos antigos."
+        : "Produto excluído com sucesso.",
+      "sucesso",
+    );
+  } catch (error) {
+    console.error("Erro ao excluir produto:", error);
+
+    mostrarMensagem(
+      `Não foi possível excluir o produto: ${error.message}`,
+      "erro",
+    );
+  }
+}
+
+async function requisicao(endpoint, opcoes = {}) {
+  const opcoesComCsrf = await prepararOpcoesCsrf(opcoes);
+
+  const configuracao = {
+    ...opcoesComCsrf,
+    credentials: "include",
+
+    headers: {
+      "Content-Type": "application/json",
+
+      ...(opcoesComCsrf.headers || {}),
+    },
+  };
+
+  const resposta = await fetch(`${API_BASE_URL}${endpoint}`, configuracao);
+
+  const texto = await resposta.text();
+
+  let dados = null;
+
+  if (texto) {
+    try {
+      dados = JSON.parse(texto);
+    } catch {
+      dados = texto;
+    }
+  }
+
+  if (!resposta.ok) {
+    if (resposta.status === 403) {
+      tokenCsrf = null;
+      headerNameCsrf = null;
+      throw new Error(
+        "Acesso negado ou sessão CSRF expirada. Atualize a página, autentique-se novamente e tente outra vez.",
+      );
     }
 
-    if (!resposta.ok) {
-        if (resposta.status === 403) {
-            tokenCsrf = null;
-            headerNameCsrf = null;
-            throw new Error(
-                "Acesso negado ou sessão CSRF expirada. Atualize a página, autentique-se novamente e tente outra vez."
-            );
-        }
+    const mensagem =
+      dados?.message ??
+      dados?.erro ??
+      dados?.error ??
+      (typeof dados === "string" ? dados : null) ??
+      `Erro HTTP ${resposta.status}`;
 
-        const mensagem =
+    throw new Error(mensagem);
+  }
 
-            dados?.message ??
-
-            dados?.erro ??
-
-            dados?.error ??
-
-            (
-                typeof dados === "string"
-                    ? dados
-                    : null
-            ) ??
-
-            `Erro HTTP ${resposta.status}`;
-
-        throw new Error(mensagem);
-    }
-
-    return dados;
+  return dados;
 }
 
 function setLoading(loading) {
+  const botao = document.getElementById("btn-novo-produto");
 
-    const botao =
-        document.getElementById(
-            "btn-novo-produto"
-        );
+  if (!botao) {
+    return;
+  }
 
-    if (!botao) {
-
-        return;
-    }
-
-    botao.disabled =
-        loading;
+  botao.disabled = loading;
 }
 
-function mostrarErroTabela(
-    mensagem
-) {
-
-    document
-        .getElementById(
-            "produtos-tbody"
-        )
-        .innerHTML = `
+function mostrarErroTabela(mensagem) {
+  document.getElementById("produtos-tbody").innerHTML = `
 
         <tr>
 
@@ -1565,102 +1145,58 @@ function mostrarErroTabela(
     `;
 }
 
-function mostrarMensagem(
-    texto,
-    tipo
-) {
+function mostrarMensagem(texto, tipo) {
+  let elemento = document.getElementById("admin-toast");
 
-    let elemento =
-        document.getElementById(
-            "admin-toast"
-        );
+  if (!elemento) {
+    elemento = document.createElement("div");
 
-    if (!elemento) {
+    elemento.id = "admin-toast";
 
-        elemento =
-            document.createElement(
-                "div"
-            );
+    document.body.appendChild(elemento);
+  }
 
-        elemento.id =
-            "admin-toast";
+  elemento.className = `admin-toast ${tipo}`;
 
-        document.body.appendChild(
-            elemento
-        );
-    }
+  elemento.textContent = texto;
 
-    elemento.className =
-        `admin-toast ${tipo}`;
+  clearTimeout(mostrarMensagem.timer);
 
-    elemento.textContent =
-        texto;
-
-    clearTimeout(
-        mostrarMensagem.timer
-    );
-
-    mostrarMensagem.timer =
-        setTimeout(
-            () => {
-
-                elemento.remove();
-
-            },
-            3500
-        );
+  mostrarMensagem.timer = setTimeout(() => {
+    elemento.remove();
+  }, 3500);
 }
 
 function formatarMoeda(valor) {
-
-    return Number(
-        valor ?? 0
-    ).toLocaleString(
-        "pt-BR",
-        {
-            style: "currency",
-            currency: "BRL"
-        }
-    );
+  return Number(valor ?? 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 }
 
 function escaparHtml(valor) {
-
-    return String(
-        valor ?? ""
-    )
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+  return String(valor ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function escaparAtributo(valor) {
-
-    return escaparHtml(valor);
+  return escaparHtml(valor);
 }
 
 function adicionarEstiloModalSeNecessario() {
+  if (document.getElementById("admin-produtos-dynamic-style")) {
+    return;
+  }
 
-    if (
-        document.getElementById(
-            "admin-produtos-dynamic-style"
-        )
-    ) {
+  const style = document.createElement("style");
 
-        return;
-    }
+  style.id = "admin-produtos-dynamic-style";
 
-    const style =
-        document.createElement(
-            "style"
-        );
-
-    style.id =
-        "admin-produtos-dynamic-style";
-
-    style.textContent = `
+  style.textContent = `
 
         .modal-overlay {
 
@@ -1903,7 +1439,5 @@ function adicionarEstiloModalSeNecessario() {
 
     `;
 
-    document.head.appendChild(
-        style
-    );
+  document.head.appendChild(style);
 }

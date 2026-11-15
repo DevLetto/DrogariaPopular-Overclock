@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE_URL = "http://localhost:8080/api";
+  const API_BASE_URL = "/api";
   const ICONE_PADRAO = "../img/medicamentos_icon.png";
 
   let produtosCache = [];
@@ -139,10 +139,10 @@
 
     return Boolean(
       inicio &&
-        fim &&
-        inicio <= hoje &&
-        fim >= hoje &&
-        obterIdProdutoPromocao(promocao) != null,
+      fim &&
+      inicio <= hoje &&
+      fim >= hoje &&
+      obterIdProdutoPromocao(promocao) != null,
     );
   }
 
@@ -259,7 +259,8 @@
       const hero = document.querySelector("[data-ofertas-hero]");
 
       if (hero) {
-        hero.innerHTML = "<li><span>Ofertas indisponíveis no momento</span></li>";
+        hero.innerHTML =
+          "<li><span>Ofertas indisponíveis no momento</span></li>";
       }
 
       ajustarBotaoOfertas(false);
@@ -461,7 +462,9 @@
 
     if (!container) return;
 
-    const disponiveis = produtos.filter((produto) => !estaForaDeEstoque(produto));
+    const disponiveis = produtos.filter(
+      (produto) => !estaForaDeEstoque(produto),
+    );
 
     if (disponiveis.length === 0) {
       mostrarErro(container, "Nenhum produto cadastrado ainda.");

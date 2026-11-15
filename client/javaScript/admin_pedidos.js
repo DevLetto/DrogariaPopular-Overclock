@@ -1,74 +1,76 @@
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "/api";
 let tokenCsrf = null;
 let headerNameCsrf = null;
 let preparacaoCsrf = null;
 
 async function obterCsrf() {
-    if (tokenCsrf && headerNameCsrf) {
-        return { token: tokenCsrf, headerName: headerNameCsrf };
-    }
+  if (tokenCsrf && headerNameCsrf) {
+    return { token: tokenCsrf, headerName: headerNameCsrf };
+  }
 
-    if (!preparacaoCsrf) {
-        preparacaoCsrf = fetch(
-            `${API_BASE_URL}/auth/csrf`,
-            { credentials: "include" }
-        ).then(async (resposta) => {
-            if (!resposta.ok) {
-                throw new Error(
-                    "Não foi possível obter o token CSRF. Atualize a página e autentique-se novamente."
-                );
-            }
+  if (!preparacaoCsrf) {
+    preparacaoCsrf = fetch(`${API_BASE_URL}/auth/csrf`, {
+      credentials: "include",
+    })
+      .then(async (resposta) => {
+        if (!resposta.ok) {
+          throw new Error(
+            "Não foi possível obter o token CSRF. Atualize a página e autentique-se novamente.",
+          );
+        }
 
-            const dados = await resposta.json();
+        const dados = await resposta.json();
 
-            if (!dados?.token) {
-                throw new Error(
-                    "O servidor não retornou um token CSRF válido. Atualize a página."
-                );
-            }
+        if (!dados?.token) {
+          throw new Error(
+            "O servidor não retornou um token CSRF válido. Atualize a página.",
+          );
+        }
 
-            tokenCsrf = dados.token;
-            headerNameCsrf = dados.headerName || "X-CSRF-TOKEN";
+        tokenCsrf = dados.token;
+        headerNameCsrf = dados.headerName || "X-CSRF-TOKEN";
 
-            return {
-                token: tokenCsrf,
-                headerName: headerNameCsrf
-            };
-        }).catch((erro) => {
-            tokenCsrf = null;
-            headerNameCsrf = null;
-            throw erro;
-        }).finally(() => {
-            preparacaoCsrf = null;
-        });
-    }
+        return {
+          token: tokenCsrf,
+          headerName: headerNameCsrf,
+        };
+      })
+      .catch((erro) => {
+        tokenCsrf = null;
+        headerNameCsrf = null;
+        throw erro;
+      })
+      .finally(() => {
+        preparacaoCsrf = null;
+      });
+  }
 
-    return preparacaoCsrf;
+  return preparacaoCsrf;
 }
 
 async function prepararOpcoesCsrf(opcoes) {
-    const metodo = String(opcoes.method || "GET").toUpperCase();
+  const metodo = String(opcoes.method || "GET").toUpperCase();
 
-    if (!["POST", "PUT", "DELETE"].includes(metodo)) {
-        return opcoes;
-    }
+  if (!["POST", "PUT", "DELETE"].includes(metodo)) {
+    return opcoes;
+  }
 
-    const csrf = await obterCsrf();
+  const csrf = await obterCsrf();
 
-    return {
-        ...opcoes,
-        headers: {
-            ...(opcoes.headers || {}),
-            [csrf.headerName]: csrf.token
-        }
-    };
+  return {
+    ...opcoes,
+    headers: {
+      ...(opcoes.headers || {}),
+      [csrf.headerName]: csrf.token,
+    },
+  };
 }
 
 const estado = {
-    pedidos: [],
-    clientes: [],
-    filtro: "todos",
-    busca: ""
+  pedidos: [],
+  clientes: [],
+  filtro: "todos",
+  busca: "",
 };
 
 // ======================================================
@@ -76,15 +78,15 @@ const estado = {
 // ======================================================
 
 document.addEventListener("DOMContentLoaded", () => {
-    inicializar();
+  inicializar();
 });
 
 async function inicializar() {
-    configurarEventos();
-    adicionarEstilosPagina();
+  configurarEventos();
+  adicionarEstilosPagina();
 
-    await carregarClientes();
-    await carregarPedidos();
+  await carregarClientes();
+  await carregarPedidos();
 }
 
 // ======================================================
@@ -92,44 +94,35 @@ async function inicializar() {
 // ======================================================
 
 function configurarEventos() {
+  // Busca
+  const campoBusca = document.querySelector(
+    'input[placeholder="Buscar pedido ou cliente..."]',
+  );
 
-    // Busca
-    const campoBusca = document.querySelector(
-        'input[placeholder="Buscar pedido ou cliente..."]'
-    );
+  if (campoBusca) {
+    campoBusca.addEventListener("input", (event) => {
+      estado.busca = event.target.value.toLowerCase().trim();
 
-    if (campoBusca) {
-        campoBusca.addEventListener("input", (event) => {
-
-            estado.busca =
-                event.target.value
-                    .toLowerCase()
-                    .trim();
-
-            renderizarTabela();
-        });
-    }
-
-    // Filtros
-    const botoesFiltro =
-        document.querySelectorAll(".filter-pills .pill");
-
-    botoesFiltro.forEach((botao) => {
-
-        botao.addEventListener("click", () => {
-
-            botoesFiltro.forEach((b) => {
-                b.classList.remove("active");
-            });
-
-            botao.classList.add("active");
-
-            estado.filtro =
-                botao.dataset.filtro || "todos";
-
-            renderizarTabela();
-        });
+      renderizarTabela();
     });
+  }
+
+  // Filtros
+  const botoesFiltro = document.querySelectorAll(".filter-pills .pill");
+
+  botoesFiltro.forEach((botao) => {
+    botao.addEventListener("click", () => {
+      botoesFiltro.forEach((b) => {
+        b.classList.remove("active");
+      });
+
+      botao.classList.add("active");
+
+      estado.filtro = botao.dataset.filtro || "todos";
+
+      renderizarTabela();
+    });
+  });
 }
 
 // ======================================================
@@ -137,66 +130,54 @@ function configurarEventos() {
 // ======================================================
 
 async function requisicao(endpoint, opcoes = {}) {
-    const opcoesComCsrf = await prepararOpcoesCsrf(opcoes);
+  const opcoesComCsrf = await prepararOpcoesCsrf(opcoes);
 
-    const resposta = await fetch(
-        `${API_BASE_URL}${endpoint}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-                ...(opcoesComCsrf.headers || {})
-            },
-            credentials: "include",
-            ...opcoesComCsrf
-        }
-    );
+  const resposta = await fetch(`${API_BASE_URL}${endpoint}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...(opcoesComCsrf.headers || {}),
+    },
+    credentials: "include",
+    ...opcoesComCsrf,
+  });
 
-    if (!resposta.ok) {
-        if (resposta.status === 403) {
-            tokenCsrf = null;
-            headerNameCsrf = null;
-            throw new Error(
-                "Acesso negado ou sessão CSRF expirada. Atualize a página, autentique-se novamente e tente outra vez."
-            );
-        }
-
-        let mensagem =
-            `Erro HTTP ${resposta.status}`;
-
-        try {
-
-            const erro =
-                await resposta.json();
-
-            mensagem =
-                erro.message ||
-                erro.mensagem ||
-                erro.error ||
-                mensagem;
-
-        } catch (_) {
-            // resposta não era JSON
-        }
-
-        throw new Error(mensagem);
+  if (!resposta.ok) {
+    if (resposta.status === 403) {
+      tokenCsrf = null;
+      headerNameCsrf = null;
+      throw new Error(
+        "Acesso negado ou sessão CSRF expirada. Atualize a página, autentique-se novamente e tente outra vez.",
+      );
     }
 
-    if (resposta.status === 204) {
-        return null;
-    }
-
-    const texto =
-        await resposta.text();
-
-    if (!texto) {
-        return null;
-    }
+    let mensagem = `Erro HTTP ${resposta.status}`;
 
     try {
-        return JSON.parse(texto);
+      const erro = await resposta.json();
+
+      mensagem = erro.message || erro.mensagem || erro.error || mensagem;
     } catch (_) {
-        return texto;
+      // resposta não era JSON
     }
+
+    throw new Error(mensagem);
+  }
+
+  if (resposta.status === 204) {
+    return null;
+  }
+
+  const texto = await resposta.text();
+
+  if (!texto) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(texto);
+  } catch (_) {
+    return texto;
+  }
 }
 
 // ======================================================
@@ -204,42 +185,23 @@ async function requisicao(endpoint, opcoes = {}) {
 // ======================================================
 
 async function carregarClientes() {
+  try {
+    const clientes = await requisicao("/cliente");
 
-    try {
-
-        const clientes =
-            await requisicao("/cliente");
-
-        if (Array.isArray(clientes)) {
-
-            estado.clientes = clientes;
-
-        } else if (
-            Array.isArray(clientes?.content)
-        ) {
-
-            estado.clientes =
-                clientes.content;
-
-        } else {
-
-            estado.clientes = [];
-        }
-
-        console.log(
-            "Clientes carregados:",
-            estado.clientes
-        );
-
-    } catch (erro) {
-
-        console.warn(
-            "Não foi possível carregar os clientes:",
-            erro.message
-        );
-
-        estado.clientes = [];
+    if (Array.isArray(clientes)) {
+      estado.clientes = clientes;
+    } else if (Array.isArray(clientes?.content)) {
+      estado.clientes = clientes.content;
+    } else {
+      estado.clientes = [];
     }
+
+    console.log("Clientes carregados:", estado.clientes);
+  } catch (erro) {
+    console.warn("Não foi possível carregar os clientes:", erro.message);
+
+    estado.clientes = [];
+  }
 }
 
 // ======================================================
@@ -247,49 +209,29 @@ async function carregarClientes() {
 // ======================================================
 
 async function carregarPedidos() {
+  try {
+    estado.pedidos = await requisicao("/pedido");
 
-    try {
-
-        estado.pedidos =
-            await requisicao("/pedido");
-
-        if (!Array.isArray(estado.pedidos)) {
-
-            if (
-                Array.isArray(
-                    estado.pedidos?.content
-                )
-            ) {
-
-                estado.pedidos =
-                    estado.pedidos.content;
-
-            } else {
-
-                estado.pedidos = [];
-            }
-        }
-
-        console.log(
-            "Pedidos carregados:",
-            estado.pedidos
-        );
-
-        renderizarTabela();
-        atualizarResumo();
-
-    } catch (erro) {
-
-        console.error(
-            "Erro ao carregar pedidos:",
-            erro
-        );
-
-        mostrarToast(
-            `Não foi possível carregar os pedidos: ${erro.message}`,
-            "erro"
-        );
+    if (!Array.isArray(estado.pedidos)) {
+      if (Array.isArray(estado.pedidos?.content)) {
+        estado.pedidos = estado.pedidos.content;
+      } else {
+        estado.pedidos = [];
+      }
     }
+
+    console.log("Pedidos carregados:", estado.pedidos);
+
+    renderizarTabela();
+    atualizarResumo();
+  } catch (erro) {
+    console.error("Erro ao carregar pedidos:", erro);
+
+    mostrarToast(
+      `Não foi possível carregar os pedidos: ${erro.message}`,
+      "erro",
+    );
+  }
 }
 
 // ======================================================
@@ -297,83 +239,52 @@ async function carregarPedidos() {
 // ======================================================
 
 function renderizarTabela() {
+  const tabela = document.querySelector("tbody");
 
-    const tabela =
-        document.querySelector("tbody");
+  if (!tabela) {
+    return;
+  }
 
-    if (!tabela) {
-        return;
+  const pedidosFiltrados = estado.pedidos.filter((pedido) => {
+    // -----------------------------
+    // BUSCA
+    // -----------------------------
+
+    const id = obterIdPedido(pedido);
+
+    const cliente = obterNomeCliente(pedido);
+
+    const textoBusca = `${id} ${cliente}`.toLowerCase();
+
+    const correspondeBusca = !estado.busca || textoBusca.includes(estado.busca);
+
+    // -----------------------------
+    // FILTRO DE STATUS
+    // -----------------------------
+
+    const status = normalizarStatus(pedido.status);
+
+    let correspondeFiltro = true;
+
+    if (estado.filtro !== "todos") {
+      const mapaFiltro = {
+        preparando: "PREPARANDO",
+
+        caminho: "A_CAMINHO",
+
+        entregue: "ENTREGUE",
+      };
+
+      correspondeFiltro = status === mapaFiltro[estado.filtro];
     }
 
-    const pedidosFiltrados =
-        estado.pedidos.filter((pedido) => {
+    return correspondeBusca && correspondeFiltro;
+  });
 
-            // -----------------------------
-            // BUSCA
-            // -----------------------------
+  tabela.innerHTML = "";
 
-            const id =
-                obterIdPedido(pedido);
-
-            const cliente =
-                obterNomeCliente(pedido);
-
-            const textoBusca =
-                `${id} ${cliente}`.toLowerCase();
-
-            const correspondeBusca =
-                !estado.busca ||
-                textoBusca.includes(
-                    estado.busca
-                );
-
-            // -----------------------------
-            // FILTRO DE STATUS
-            // -----------------------------
-
-            const status =
-                normalizarStatus(
-                    pedido.status
-                );
-
-            let correspondeFiltro = true;
-
-            if (
-                estado.filtro !== "todos"
-            ) {
-
-                const mapaFiltro = {
-
-                    preparando:
-                        "PREPARANDO",
-
-                    caminho:
-                        "A_CAMINHO",
-
-                    entregue:
-                        "ENTREGUE"
-                };
-
-                correspondeFiltro =
-                    status ===
-                    mapaFiltro[
-                        estado.filtro
-                    ];
-            }
-
-            return (
-                correspondeBusca &&
-                correspondeFiltro
-            );
-        });
-
-    tabela.innerHTML = "";
-
-    if (
-        pedidosFiltrados.length === 0
-    ) {
-
-        tabela.innerHTML = `
+  if (pedidosFiltrados.length === 0) {
+    tabela.innerHTML = `
             <tr>
                 <td
                     colspan="6"
@@ -387,20 +298,16 @@ function renderizarTabela() {
             </tr>
         `;
 
-        return;
-    }
+    return;
+  }
 
-    pedidosFiltrados.forEach(
-        (pedido) => {
+  pedidosFiltrados.forEach((pedido) => {
+    const linha = criarLinhaPedido(pedido);
 
-            const linha =
-                criarLinhaPedido(pedido);
+    tabela.appendChild(linha);
+  });
 
-            tabela.appendChild(linha);
-        }
-    );
-
-    adicionarEventosTabela();
+  adicionarEventosTabela();
 }
 
 // ======================================================
@@ -408,34 +315,23 @@ function renderizarTabela() {
 // ======================================================
 
 function criarLinhaPedido(pedido) {
+  const tr = document.createElement("tr");
 
-    const tr =
-        document.createElement("tr");
+  const id = obterIdPedido(pedido);
 
-    const id =
-        obterIdPedido(pedido);
+  const cliente = obterNomeCliente(pedido);
 
-    const cliente =
-        obterNomeCliente(pedido);
+  const entrega = obterFormaEntrega(pedido);
 
-    const entrega =
-        obterFormaEntrega(pedido);
+  const total = obterValorTotal(pedido);
 
-    const total =
-        obterValorTotal(pedido);
+  const status = normalizarStatus(pedido.status);
 
-    const status =
-        normalizarStatus(
-            pedido.status
-        );
+  const statusTexto = obterTextoStatus(status);
 
-    const statusTexto =
-        obterTextoStatus(status);
+  const classeStatus = obterClasseStatus(status);
 
-    const classeStatus =
-        obterClasseStatus(status);
-
-    tr.innerHTML = `
+  tr.innerHTML = `
 
         <td>
             <strong>#${id}</strong>
@@ -465,45 +361,35 @@ function criarLinhaPedido(pedido) {
 
                 <option
                     value="PENDENTE"
-                    ${status === "PENDENTE"
-                        ? "selected"
-                        : ""}
+                    ${status === "PENDENTE" ? "selected" : ""}
                 >
                     Pendente
                 </option>
 
                 <option
                     value="PREPARANDO"
-                    ${status === "PREPARANDO"
-                        ? "selected"
-                        : ""}
+                    ${status === "PREPARANDO" ? "selected" : ""}
                 >
                     Preparando
                 </option>
 
                 <option
                     value="A_CAMINHO"
-                    ${status === "A_CAMINHO"
-                        ? "selected"
-                        : ""}
+                    ${status === "A_CAMINHO" ? "selected" : ""}
                 >
                     A caminho
                 </option>
 
                 <option
                     value="ENTREGUE"
-                    ${status === "ENTREGUE"
-                        ? "selected"
-                        : ""}
+                    ${status === "ENTREGUE" ? "selected" : ""}
                 >
                     Entregue
                 </option>
 
                 <option
                     value="CANCELADO"
-                    ${status === "CANCELADO"
-                        ? "selected"
-                        : ""}
+                    ${status === "CANCELADO" ? "selected" : ""}
                 >
                     Cancelado
                 </option>
@@ -525,7 +411,7 @@ function criarLinhaPedido(pedido) {
         </td>
     `;
 
-    return tr;
+  return tr;
 }
 
 // ======================================================
@@ -533,188 +419,113 @@ function criarLinhaPedido(pedido) {
 // ======================================================
 
 function adicionarEventosTabela() {
+  // -----------------------------
+  // STATUS
+  // -----------------------------
 
-    // -----------------------------
-    // STATUS
-    // -----------------------------
+  const selects = document.querySelectorAll(".status-select");
 
-    const selects =
-        document.querySelectorAll(
-            ".status-select"
-        );
-
-    selects.forEach((select) => {
-
-        select.addEventListener(
-            "change",
-            async () => {
-
-                await mudarStatus(select);
-            }
-        );
+  selects.forEach((select) => {
+    select.addEventListener("change", async () => {
+      await mudarStatus(select);
     });
+  });
 
-    // -----------------------------
-    // DETALHES
-    // -----------------------------
+  // -----------------------------
+  // DETALHES
+  // -----------------------------
 
-    const botoes =
-        document.querySelectorAll(
-            ".btn-detalhes"
-        );
+  const botoes = document.querySelectorAll(".btn-detalhes");
 
-    botoes.forEach((botao) => {
+  botoes.forEach((botao) => {
+    botao.addEventListener("click", async () => {
+      const id = botao.dataset.id;
 
-        botao.addEventListener(
-            "click",
-            async () => {
-
-                const id =
-                    botao.dataset.id;
-
-                await abrirDetalhes(id);
-            }
-        );
+      await abrirDetalhes(id);
     });
+  });
 }
 
 // ======================================================
 // ALTERAR STATUS
 // ======================================================
 
-async function mudarStatus(
-    selectElement
-) {
+async function mudarStatus(selectElement) {
+  const idPedido = selectElement.dataset.id;
 
-    const idPedido =
-        selectElement.dataset.id;
+  const novoStatus = selectElement.value;
 
-    const novoStatus =
-        selectElement.value;
+  if (!idPedido || !novoStatus) {
+    return;
+  }
 
-    if (
-        !idPedido ||
-        !novoStatus
-    ) {
-        return;
+  const statusAnterior = estado.pedidos.find(
+    (pedido) => String(obterIdPedido(pedido)) === String(idPedido),
+  )?.status;
+
+  try {
+    selectElement.disabled = true;
+
+    const pedidoAtualizado = await requisicao(
+      `/pedido/${idPedido}/status?valor=${encodeURIComponent(novoStatus)}`,
+      {
+        method: "PUT",
+      },
+    );
+
+    const indice = estado.pedidos.findIndex(
+      (pedido) => String(obterIdPedido(pedido)) === String(idPedido),
+    );
+
+    if (indice !== -1) {
+      if (pedidoAtualizado) {
+        estado.pedidos[indice] = pedidoAtualizado;
+      } else {
+        estado.pedidos[indice].status = novoStatus;
+      }
     }
 
-    const statusAnterior =
-        estado.pedidos.find(
-            (pedido) =>
-                String(
-                    obterIdPedido(pedido)
-                ) ===
-                String(idPedido)
-        )?.status;
+    atualizarCorStatus(selectElement);
 
-    try {
+    atualizarResumo();
 
-        selectElement.disabled = true;
+    mostrarToast("Status do pedido atualizado!", "sucesso");
+  } catch (erro) {
+    console.error("Erro ao atualizar status:", erro);
 
-        const pedidoAtualizado =
-            await requisicao(
-                `/pedido/${idPedido}/status?valor=${encodeURIComponent(
-                    novoStatus
-                )}`,
-                {
-                    method: "PUT"
-                }
-            );
+    if (statusAnterior) {
+      selectElement.value = normalizarStatus(statusAnterior);
 
-        const indice =
-            estado.pedidos.findIndex(
-                (pedido) =>
-                    String(
-                        obterIdPedido(pedido)
-                    ) ===
-                    String(idPedido)
-            );
-
-        if (indice !== -1) {
-
-            if (pedidoAtualizado) {
-
-                estado.pedidos[indice] =
-                    pedidoAtualizado;
-
-            } else {
-
-                estado.pedidos[
-                    indice
-                ].status =
-                    novoStatus;
-            }
-        }
-
-        atualizarCorStatus(
-            selectElement
-        );
-
-        atualizarResumo();
-
-        mostrarToast(
-            "Status do pedido atualizado!",
-            "sucesso"
-        );
-
-    } catch (erro) {
-
-        console.error(
-            "Erro ao atualizar status:",
-            erro
-        );
-
-        if (statusAnterior) {
-
-            selectElement.value =
-                normalizarStatus(
-                    statusAnterior
-                );
-
-            atualizarCorStatus(
-                selectElement
-            );
-        }
-
-        mostrarToast(
-            `Não foi possível atualizar o status: ${erro.message}`,
-            "erro"
-        );
-
-    } finally {
-
-        selectElement.disabled = false;
+      atualizarCorStatus(selectElement);
     }
+
+    mostrarToast(
+      `Não foi possível atualizar o status: ${erro.message}`,
+      "erro",
+    );
+  } finally {
+    selectElement.disabled = false;
+  }
 }
 
 // ======================================================
 // COR DO STATUS
 // ======================================================
 
-function atualizarCorStatus(
-    selectElement
-) {
+function atualizarCorStatus(selectElement) {
+  selectElement.classList.remove(
+    "pendente",
+    "preparando",
+    "caminho",
+    "entregue",
+    "cancelado",
+  );
 
-    selectElement.classList.remove(
-        "pendente",
-        "preparando",
-        "caminho",
-        "entregue",
-        "cancelado"
-    );
+  const classe = obterClasseStatus(selectElement.value);
 
-    const classe =
-        obterClasseStatus(
-            selectElement.value
-        );
-
-    if (classe) {
-
-        selectElement.classList.add(
-            classe
-        );
-    }
+  if (classe) {
+    selectElement.classList.add(classe);
+  }
 }
 
 // ======================================================
@@ -722,167 +533,94 @@ function atualizarCorStatus(
 // ======================================================
 
 function atualizarResumo() {
+  const pedidos = estado.pedidos;
 
-    const pedidos =
-        estado.pedidos;
+  const hoje = new Date();
 
-    const hoje =
-        new Date();
+  const pedidosHoje = pedidos.filter((pedido) => {
+    const data = obterDataPedido(pedido);
 
-    const pedidosHoje =
-        pedidos.filter(
-            (pedido) => {
+    if (!data) {
+      return false;
+    }
 
-                const data =
-                    obterDataPedido(
-                        pedido
-                    );
-
-                if (!data) {
-                    return false;
-                }
-
-                return (
-                    data.getDate() ===
-                        hoje.getDate() &&
-
-                    data.getMonth() ===
-                        hoje.getMonth() &&
-
-                    data.getFullYear() ===
-                        hoje.getFullYear()
-                );
-            }
-        );
-
-    const novosHoje =
-        pedidosHoje.filter(
-            (pedido) =>
-                normalizarStatus(
-                    pedido.status
-                ) === "PENDENTE"
-        ).length;
-
-    const emPreparo =
-        pedidos.filter(
-            (pedido) =>
-                normalizarStatus(
-                    pedido.status
-                ) === "PREPARANDO"
-        ).length;
-
-    const aCaminho =
-        pedidos.filter(
-            (pedido) =>
-                normalizarStatus(
-                    pedido.status
-                ) === "A_CAMINHO"
-        ).length;
-
-    const entreguesHoje =
-        pedidosHoje.filter(
-            (pedido) =>
-                normalizarStatus(
-                    pedido.status
-                ) === "ENTREGUE"
-        );
-
-    const vendasHoje =
-        entreguesHoje.reduce(
-            (total, pedido) =>
-                total +
-                obterValorTotal(
-                    pedido
-                ),
-            0
-        );
-
-    atualizarCardResumo(
-        "NOVOS HOJE",
-        novosHoje
+    return (
+      data.getDate() === hoje.getDate() &&
+      data.getMonth() === hoje.getMonth() &&
+      data.getFullYear() === hoje.getFullYear()
     );
+  });
 
-    atualizarCardResumo(
-        "EM PREPARO",
-        emPreparo
-    );
+  const novosHoje = pedidosHoje.filter(
+    (pedido) => normalizarStatus(pedido.status) === "PENDENTE",
+  ).length;
 
-    atualizarCardResumo(
-        "A CAMINHO",
-        aCaminho
-    );
+  const emPreparo = pedidos.filter(
+    (pedido) => normalizarStatus(pedido.status) === "PREPARANDO",
+  ).length;
 
-    atualizarCardResumo(
-        "ENTREGUES HOJE",
-        entreguesHoje.length,
-        `${formatarMoeda(vendasHoje)} em vendas`
-    );
+  const aCaminho = pedidos.filter(
+    (pedido) => normalizarStatus(pedido.status) === "A_CAMINHO",
+  ).length;
+
+  const entreguesHoje = pedidosHoje.filter(
+    (pedido) => normalizarStatus(pedido.status) === "ENTREGUE",
+  );
+
+  const vendasHoje = entreguesHoje.reduce(
+    (total, pedido) => total + obterValorTotal(pedido),
+    0,
+  );
+
+  atualizarCardResumo("NOVOS HOJE", novosHoje);
+
+  atualizarCardResumo("EM PREPARO", emPreparo);
+
+  atualizarCardResumo("A CAMINHO", aCaminho);
+
+  atualizarCardResumo(
+    "ENTREGUES HOJE",
+    entreguesHoje.length,
+    `${formatarMoeda(vendasHoje)} em vendas`,
+  );
 }
 
 // ======================================================
 // ATUALIZAR CARD
 // ======================================================
 
-function atualizarCardResumo(
-    titulo,
-    valor,
-    subtitulo = null
-) {
+function atualizarCardResumo(titulo, valor, subtitulo = null) {
+  const elementos = [...document.querySelectorAll("div, section, article")];
 
-    const elementos = [
-        ...document.querySelectorAll(
-            "div, section, article"
-        )
-    ];
+  const elemento = elementos.find(
+    (el) =>
+      el.children.length > 0 &&
+      el.textContent.trim().toUpperCase().includes(titulo),
+  );
 
-    const elemento =
-        elementos.find(
-            (el) =>
-                el.children.length > 0 &&
-                el.textContent
-                    .trim()
-                    .toUpperCase()
-                    .includes(titulo)
-        );
+  if (!elemento) {
+    return;
+  }
 
-    if (!elemento) {
-        return;
+  const numero = elemento.querySelector(
+    ".numero, .valor, .card-numero, strong, h3",
+  );
+
+  if (numero) {
+    numero.textContent = valor;
+  }
+
+  if (subtitulo) {
+    const textos = elemento.querySelectorAll("span, p, small");
+
+    const texto = [...textos].find((el) =>
+      el.textContent.toLowerCase().includes("em vendas"),
+    );
+
+    if (texto) {
+      texto.textContent = subtitulo;
     }
-
-    const numero =
-        elemento.querySelector(
-            ".numero, .valor, .card-numero, strong, h3"
-        );
-
-    if (numero) {
-
-        numero.textContent =
-            valor;
-    }
-
-    if (subtitulo) {
-
-        const textos =
-            elemento.querySelectorAll(
-                "span, p, small"
-            );
-
-        const texto =
-            [...textos].find(
-                (el) =>
-                    el.textContent
-                        .toLowerCase()
-                        .includes(
-                            "em vendas"
-                        )
-            );
-
-        if (texto) {
-
-            texto.textContent =
-                subtitulo;
-        }
-    }
+  }
 }
 
 // ======================================================
@@ -890,112 +628,66 @@ function atualizarCardResumo(
 // ======================================================
 
 async function abrirDetalhes(id) {
+  try {
+    const pedido = await requisicao(`/pedido/${id}`);
 
-    try {
+    criarModalDetalhes(pedido);
+  } catch (erro) {
+    console.error("Erro ao buscar detalhes:", erro);
 
-        const pedido =
-            await requisicao(
-                `/pedido/${id}`
-            );
-
-        criarModalDetalhes(
-            pedido
-        );
-
-    } catch (erro) {
-
-        console.error(
-            "Erro ao buscar detalhes:",
-            erro
-        );
-
-        mostrarToast(
-            `Não foi possível carregar o pedido: ${erro.message}`,
-            "erro"
-        );
-    }
+    mostrarToast(`Não foi possível carregar o pedido: ${erro.message}`, "erro");
+  }
 }
 
 // ======================================================
 // MODAL
 // ======================================================
 
-function criarModalDetalhes(
-    pedido
-) {
+function criarModalDetalhes(pedido) {
+  const modalExistente = document.querySelector(".modal-pedido");
 
-    const modalExistente =
-        document.querySelector(
-            ".modal-pedido"
+  if (modalExistente) {
+    modalExistente.remove();
+  }
+
+  const id = obterIdPedido(pedido);
+
+  const cliente = obterNomeCliente(pedido);
+
+  const status = normalizarStatus(pedido.status);
+
+  const entrega = obterFormaEntrega(pedido);
+
+  const data = obterDataPedido(pedido);
+
+  const frete = Number(pedido.valorFrete || 0);
+
+  const total = obterValorTotal(pedido);
+
+  let itensHTML = "";
+
+  if (Array.isArray(pedido.itens) && pedido.itens.length > 0) {
+    itensHTML = pedido.itens
+      .map((item) => {
+        const produto =
+          item.produto?.nomeProduto ||
+          item.produto?.nome ||
+          item.nomeProduto ||
+          "Produto";
+
+        const quantidade = item.quantidade || 0;
+
+        const preco = Number(
+          item.precoUnitario || item.produto?.precoProduto || 0,
         );
 
-    if (modalExistente) {
-        modalExistente.remove();
-    }
-
-    const id =
-        obterIdPedido(pedido);
-
-    const cliente =
-        obterNomeCliente(pedido);
-
-    const status =
-        normalizarStatus(
-            pedido.status
-        );
-
-    const entrega =
-        obterFormaEntrega(pedido);
-
-    const data =
-        obterDataPedido(pedido);
-
-    const frete =
-        Number(
-            pedido.valorFrete || 0
-        );
-
-    const total =
-        obterValorTotal(pedido);
-
-    let itensHTML = "";
-
-    if (
-        Array.isArray(
-            pedido.itens
-        ) &&
-        pedido.itens.length > 0
-    ) {
-
-        itensHTML =
-            pedido.itens
-                .map((item) => {
-
-                    const produto =
-                        item.produto?.nomeProduto ||
-                        item.produto?.nome ||
-                        item.nomeProduto ||
-                        "Produto";
-
-                    const quantidade =
-                        item.quantidade || 0;
-
-                    const preco =
-                        Number(
-                            item.precoUnitario ||
-                            item.produto?.precoProduto ||
-                            0
-                        );
-
-                    return `
+        return `
                         <div class="item-pedido">
 
                             <div>
 
                                 <strong>
-                                    ${escaparHTML(
-                                        produto
-                                    )}
+                                    ${escaparHTML(produto)}
                                 </strong>
 
                                 <span>
@@ -1005,35 +697,26 @@ function criarModalDetalhes(
                             </div>
 
                             <strong>
-                                ${formatarMoeda(
-                                    preco *
-                                    quantidade
-                                )}
+                                ${formatarMoeda(preco * quantidade)}
                             </strong>
 
                         </div>
                     `;
-                })
-                .join("");
-
-    } else {
-
-        itensHTML = `
+      })
+      .join("");
+  } else {
+    itensHTML = `
             <p>
                 Nenhum item encontrado.
             </p>
         `;
-    }
+  }
 
-    const modal =
-        document.createElement(
-            "div"
-        );
+  const modal = document.createElement("div");
 
-    modal.className =
-        "modal-pedido";
+  modal.className = "modal-pedido";
 
-    modal.innerHTML = `
+  modal.innerHTML = `
 
         <div class="modal-overlay"></div>
 
@@ -1068,9 +751,7 @@ function criarModalDetalhes(
                     <small>STATUS</small>
 
                     <strong>
-                        ${obterTextoStatus(
-                            status
-                        )}
+                        ${obterTextoStatus(status)}
                     </strong>
                 </div>
 
@@ -1078,9 +759,7 @@ function criarModalDetalhes(
                     <small>ENTREGA</small>
 
                     <strong>
-                        ${escaparHTML(
-                            entrega
-                        )}
+                        ${escaparHTML(entrega)}
                     </strong>
                 </div>
 
@@ -1088,13 +767,7 @@ function criarModalDetalhes(
                     <small>DATA</small>
 
                     <strong>
-                        ${
-                            data
-                                ? formatarData(
-                                      data
-                                  )
-                                : "-"
-                        }
+                        ${data ? formatarData(data) : "-"}
                     </strong>
                 </div>
 
@@ -1102,9 +775,7 @@ function criarModalDetalhes(
                     <small>FRETE</small>
 
                     <strong>
-                        ${formatarMoeda(
-                            frete
-                        )}
+                        ${formatarMoeda(frete)}
                     </strong>
                 </div>
 
@@ -1127,9 +798,7 @@ function criarModalDetalhes(
                 </span>
 
                 <strong>
-                    ${formatarMoeda(
-                        total
-                    )}
+                    ${formatarMoeda(total)}
                 </strong>
 
             </div>
@@ -1137,357 +806,224 @@ function criarModalDetalhes(
         </div>
     `;
 
-    document.body.appendChild(
-        modal
-    );
+  document.body.appendChild(modal);
 
-    // Fechar pelo X
-    const fechar =
-        modal.querySelector(
-            ".modal-fechar"
-        );
+  // Fechar pelo X
+  const fechar = modal.querySelector(".modal-fechar");
 
-    fechar.addEventListener(
-        "click",
-        () => modal.remove()
-    );
+  fechar.addEventListener("click", () => modal.remove());
 
-    // Fechar clicando fora
-    const overlay =
-        modal.querySelector(
-            ".modal-overlay"
-        );
+  // Fechar clicando fora
+  const overlay = modal.querySelector(".modal-overlay");
 
-    overlay.addEventListener(
-        "click",
-        () => modal.remove()
-    );
+  overlay.addEventListener("click", () => modal.remove());
 
-    // ESC
-    const fecharESC =
-        (event) => {
+  // ESC
+  const fecharESC = (event) => {
+    if (event.key === "Escape") {
+      modal.remove();
 
-            if (
-                event.key ===
-                "Escape"
-            ) {
+      document.removeEventListener("keydown", fecharESC);
+    }
+  };
 
-                modal.remove();
-
-                document.removeEventListener(
-                    "keydown",
-                    fecharESC
-                );
-            }
-        };
-
-    document.addEventListener(
-        "keydown",
-        fecharESC
-    );
+  document.addEventListener("keydown", fecharESC);
 }
 
 // ======================================================
 // STATUS
 // ======================================================
 
-function normalizarStatus(
-    status
-) {
+function normalizarStatus(status) {
+  if (!status) {
+    return "PENDENTE";
+  }
 
-    if (!status) {
-        return "PENDENTE";
-    }
-
-    return String(status)
-        .trim()
-        .toUpperCase()
-        .replace(
-            /[\s-]+/g,
-            "_"
-        );
+  return String(status)
+    .trim()
+    .toUpperCase()
+    .replace(/[\s-]+/g, "_");
 }
 
-function obterTextoStatus(
-    status
-) {
+function obterTextoStatus(status) {
+  const mapa = {
+    PENDENTE: "Pendente",
 
-    const mapa = {
+    PREPARANDO: "Preparando",
 
-        PENDENTE:
-            "Pendente",
+    A_CAMINHO: "A caminho",
 
-        PREPARANDO:
-            "Preparando",
+    ENTREGUE: "Entregue",
 
-        A_CAMINHO:
-            "A caminho",
+    CANCELADO: "Cancelado",
+  };
 
-        ENTREGUE:
-            "Entregue",
-
-        CANCELADO:
-            "Cancelado"
-    };
-
-    return (
-        mapa[
-            normalizarStatus(status)
-        ] ||
-        status
-    );
+  return mapa[normalizarStatus(status)] || status;
 }
 
-function obterClasseStatus(
-    status
-) {
+function obterClasseStatus(status) {
+  const mapa = {
+    PENDENTE: "pendente",
 
-    const mapa = {
+    PREPARANDO: "preparando",
 
-        PENDENTE:
-            "pendente",
+    A_CAMINHO: "caminho",
 
-        PREPARANDO:
-            "preparando",
+    ENTREGUE: "entregue",
 
-        A_CAMINHO:
-            "caminho",
+    CANCELADO: "cancelado",
+  };
 
-        ENTREGUE:
-            "entregue",
-
-        CANCELADO:
-            "cancelado"
-    };
-
-    return (
-        mapa[
-            normalizarStatus(status)
-        ] ||
-        "pendente"
-    );
+  return mapa[normalizarStatus(status)] || "pendente";
 }
 
 // ======================================================
 // DADOS DO PEDIDO
 // ======================================================
 
-function obterIdPedido(
-    pedido
-) {
-
-    return (
-        pedido.idPedido ??
-        pedido.id ??
-        pedido.pedidoId ??
-        "-"
-    );
+function obterIdPedido(pedido) {
+  return pedido.idPedido ?? pedido.id ?? pedido.pedidoId ?? "-";
 }
 
 // ======================================================
 // NOME DO CLIENTE
 // ======================================================
 
-function obterNomeCliente(
-    pedido
-) {
+function obterNomeCliente(pedido) {
+  // Caso o pedido venha com objeto cliente
+  if (pedido.cliente) {
+    const cliente = pedido.cliente;
 
-    // Caso o pedido venha com objeto cliente
-    if (pedido.cliente) {
+    return (
+      cliente.nomeCompleto ??
+      cliente.nomeCliente ??
+      cliente.nome ??
+      cliente.nomeUsuario ??
+      cliente.usuario?.nome ??
+      cliente.usuario?.nomeCompleto ??
+      "Cliente"
+    );
+  }
 
-        const cliente =
-            pedido.cliente;
+  // Outros formatos possíveis
+  const nomeDireto =
+    pedido.nomeCliente ??
+    pedido.clienteNome ??
+    pedido.nomeCompletoCliente ??
+    pedido.clienteNomeCompleto;
 
-        return (
-            cliente.nomeCompleto ??
-            cliente.nomeCliente ??
-            cliente.nome ??
-            cliente.nomeUsuario ??
-            cliente.usuario?.nome ??
-            cliente.usuario?.nomeCompleto ??
-            "Cliente"
-        );
+  if (nomeDireto) {
+    return nomeDireto;
+  }
+
+  // Caso venha somente o ID
+  const idCliente =
+    pedido.idCliente ?? pedido.clienteId ?? pedido.cliente?.idCliente;
+
+  if (idCliente) {
+    const clienteEncontrado = estado.clientes.find(
+      (cliente) =>
+        String(cliente.idCliente ?? cliente.id) === String(idCliente),
+    );
+
+    if (clienteEncontrado) {
+      return (
+        clienteEncontrado.nome ??
+        clienteEncontrado.nomeCompleto ??
+        clienteEncontrado.nomeCliente ??
+        "Cliente"
+      );
     }
 
-    // Outros formatos possíveis
-    const nomeDireto =
-        pedido.nomeCliente ??
-        pedido.clienteNome ??
-        pedido.nomeCompletoCliente ??
-        pedido.clienteNomeCompleto;
+    return `Cliente #${idCliente}`;
+  }
 
-    if (nomeDireto) {
-        return nomeDireto;
-    }
-
-    // Caso venha somente o ID
-    const idCliente =
-        pedido.idCliente ??
-        pedido.clienteId ??
-        pedido.cliente?.idCliente;
-
-    if (idCliente) {
-
-        const clienteEncontrado =
-            estado.clientes.find(
-                (cliente) =>
-                    String(
-                        cliente.idCliente ??
-                        cliente.id
-                    ) ===
-                    String(idCliente)
-            );
-
-        if (clienteEncontrado) {
-
-            return (
-                clienteEncontrado.nome ??
-                clienteEncontrado.nomeCompleto ??
-                clienteEncontrado.nomeCliente ??
-                "Cliente"
-            );
-        }
-
-        return `Cliente #${idCliente}`;
-    }
-
-    return "Cliente";
+  return "Cliente";
 }
 
 // ======================================================
 // FORMA DE ENTREGA
 // ======================================================
 
-function obterFormaEntrega(
-    pedido
-) {
+function obterFormaEntrega(pedido) {
+  const forma = pedido.formaEntrega ?? pedido.tipoEntrega ?? pedido.entrega;
 
-    const forma =
-        pedido.formaEntrega ??
-        pedido.tipoEntrega ??
-        pedido.entrega;
+  if (!forma) {
+    return "-";
+  }
 
-    if (!forma) {
-        return "-";
-    }
+  const valor = String(forma).toUpperCase();
 
-    const valor =
-        String(forma)
-            .toUpperCase();
+  if (valor.includes("RETIR")) {
+    return "Retirada";
+  }
 
-    if (
-        valor.includes("RETIR")
-    ) {
-        return "Retirada";
-    }
+  if (valor.includes("ENTREG")) {
+    return "Entrega";
+  }
 
-    if (
-        valor.includes("ENTREG")
-    ) {
-        return "Entrega";
-    }
-
-    return forma;
+  return forma;
 }
 
 // ======================================================
 // VALOR TOTAL
 // ======================================================
 
-function obterValorTotal(
-    pedido
-) {
-
-    return Number(
-        pedido.valorTotal ??
-        pedido.total ??
-        0
-    );
+function obterValorTotal(pedido) {
+  return Number(pedido.valorTotal ?? pedido.total ?? 0);
 }
 
 // ======================================================
 // DATA
 // ======================================================
 
-function obterDataPedido(
-    pedido
-) {
+function obterDataPedido(pedido) {
+  const valor = pedido.dataPedido ?? pedido.data ?? pedido.createdAt;
 
-    const valor =
-        pedido.dataPedido ??
-        pedido.data ??
-        pedido.createdAt;
+  if (!valor) {
+    return null;
+  }
 
-    if (!valor) {
-        return null;
-    }
+  const data = new Date(valor);
 
-    const data =
-        new Date(valor);
+  if (Number.isNaN(data.getTime())) {
+    return null;
+  }
 
-    if (
-        Number.isNaN(
-            data.getTime()
-        )
-    ) {
-        return null;
-    }
-
-    return data;
+  return data;
 }
 
 // ======================================================
 // FORMATAÇÃO
 // ======================================================
 
-function formatarMoeda(
-    valor
-) {
-
-    return Number(
-        valor || 0
-    ).toLocaleString(
-        "pt-BR",
-        {
-            style: "currency",
-            currency: "BRL"
-        }
-    );
+function formatarMoeda(valor) {
+  return Number(valor || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 }
 
-function formatarData(
-    data
-) {
-
-    return data.toLocaleString(
-        "pt-BR",
-        {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        }
-    );
+function formatarData(data) {
+  return data.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 // ======================================================
 // SEGURANÇA HTML
 // ======================================================
 
-function escaparHTML(
-    valor
-) {
+function escaparHTML(valor) {
+  const div = document.createElement("div");
 
-    const div =
-        document.createElement(
-            "div"
-        );
+  div.textContent = valor ?? "";
 
-    div.textContent =
-        valor ?? "";
-
-    return div.innerHTML;
+  return div.innerHTML;
 }
 
 // ======================================================
@@ -1495,24 +1031,15 @@ function escaparHTML(
 // ======================================================
 
 function adicionarEstilosPagina() {
+  if (document.querySelector("#estilos-admin-pedidos")) {
+    return;
+  }
 
-    if (
-        document.querySelector(
-            "#estilos-admin-pedidos"
-        )
-    ) {
-        return;
-    }
+  const style = document.createElement("style");
 
-    const style =
-        document.createElement(
-            "style"
-        );
+  style.id = "estilos-admin-pedidos";
 
-    style.id =
-        "estilos-admin-pedidos";
-
-    style.textContent = `
+  style.textContent = `
 
         /* ==========================================
            BOTÃO VER DETALHES
@@ -1845,59 +1372,34 @@ function adicionarEstilosPagina() {
         }
     `;
 
-    document.head.appendChild(
-        style
-    );
+  document.head.appendChild(style);
 }
 
 // ======================================================
 // TOAST
 // ======================================================
 
-function mostrarToast(
-    mensagem,
-    tipo = "sucesso"
-) {
+function mostrarToast(mensagem, tipo = "sucesso") {
+  const toastExistente = document.querySelector(".toast-pedido");
 
-    const toastExistente =
-        document.querySelector(
-            ".toast-pedido"
-        );
+  if (toastExistente) {
+    toastExistente.remove();
+  }
 
-    if (toastExistente) {
-        toastExistente.remove();
-    }
+  const toast = document.createElement("div");
 
-    const toast =
-        document.createElement(
-            "div"
-        );
+  toast.className = `toast-pedido ${tipo}`;
 
-    toast.className =
-        `toast-pedido ${tipo}`;
+  toast.textContent = mensagem;
 
-    toast.textContent =
-        mensagem;
+  document.body.appendChild(toast);
 
-    document.body.appendChild(
-        toast
-    );
+  if (!document.querySelector("#estilos-toast-pedido")) {
+    const style = document.createElement("style");
 
-    if (
-        !document.querySelector(
-            "#estilos-toast-pedido"
-        )
-    ) {
+    style.id = "estilos-toast-pedido";
 
-        const style =
-            document.createElement(
-                "style"
-            );
-
-        style.id =
-            "estilos-toast-pedido";
-
-        style.textContent = `
+    style.textContent = `
 
             .toast-pedido {
 
@@ -1961,14 +1463,10 @@ function mostrarToast(
             }
         `;
 
-        document.head.appendChild(
-            style
-        );
-    }
+    document.head.appendChild(style);
+  }
 
-    setTimeout(() => {
-
-        toast.remove();
-
-    }, 3500);
+  setTimeout(() => {
+    toast.remove();
+  }, 3500);
 }

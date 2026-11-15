@@ -1,20 +1,20 @@
 (function () {
-  const API_BASE_URL = 'http://localhost:8080/api';
-  const USER_STORAGE_KEY = 'usuarioLogado';
-  const ROLE_ADMIN = 'ROLE_ADMINISTRADOR';
+  const API_BASE_URL = "/api";
+  const USER_STORAGE_KEY = "usuarioLogado";
+  const ROLE_ADMIN = "ROLE_ADMINISTRADOR";
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     // =========================================================
     // LOGO → VOLTAR PARA A PÁGINA INICIAL
     // =========================================================
 
-    const logo = document.querySelector('.logo');
+    const logo = document.querySelector(".logo");
 
     if (logo) {
-      logo.style.cursor = 'pointer';
+      logo.style.cursor = "pointer";
 
-      logo.addEventListener('click', () => {
-        window.location.href = 'index.html';
+      logo.addEventListener("click", () => {
+        window.location.href = "index.html";
       });
     }
 
@@ -28,7 +28,7 @@
     // MENU DO USUÁRIO
     // =========================================================
 
-    const userActions = document.querySelector('.user-actions');
+    const userActions = document.querySelector(".user-actions");
 
     if (!userActions) return;
 
@@ -43,7 +43,7 @@
 
     if (!usuario) {
       if (cartLink) {
-        cartLink.style.display = 'none';
+        cartLink.style.display = "none";
       }
 
       return;
@@ -54,19 +54,13 @@
     // =========================================================
 
     if (cartLink) {
-      cartLink.style.display = '';
+      cartLink.style.display = "";
 
-      adicionarBadgeCarrinho(
-        cartLink,
-        usuario.idCliente
-      );
+      adicionarBadgeCarrinho(cartLink, usuario.idCliente);
     }
 
     if (loginLink) {
-      montarMenuUsuario(
-        loginLink,
-        usuario
-      );
+      montarMenuUsuario(loginLink, usuario);
     }
   });
 
@@ -78,10 +72,10 @@
   // =========================================================
 
   function configurarBusca() {
-    if (document.getElementById('gridProdutos')) return;
+    if (document.getElementById("gridProdutos")) return;
 
-    const input = document.querySelector('.search-bar input');
-    const botao = document.querySelector('.search-bar button');
+    const input = document.querySelector(".search-bar input");
+    const botao = document.querySelector(".search-bar button");
 
     if (!input) return;
 
@@ -90,15 +84,15 @@
 
       window.location.href = termo
         ? `produtos.html?busca=${encodeURIComponent(termo)}`
-        : 'produtos.html';
+        : "produtos.html";
     };
 
     if (botao) {
-      botao.addEventListener('click', buscar);
+      botao.addEventListener("click", buscar);
     }
 
-    input.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
         event.preventDefault();
 
         buscar();
@@ -120,10 +114,7 @@
     try {
       return JSON.parse(raw);
     } catch (err) {
-      console.error(
-        'usuarioLogado invalido no localStorage:',
-        err
-      );
+      console.error("usuarioLogado invalido no localStorage:", err);
 
       localStorage.removeItem(USER_STORAGE_KEY);
 
@@ -138,17 +129,11 @@
   function montarMenuUsuario(loginLink, usuario) {
     const ehAdmin = usuario.role === ROLE_ADMIN;
 
-    loginLink.removeAttribute('href');
+    loginLink.removeAttribute("href");
 
-    loginLink.setAttribute(
-      'role',
-      'button'
-    );
+    loginLink.setAttribute("role", "button");
 
-    loginLink.setAttribute(
-      'tabindex',
-      '0'
-    );
+    loginLink.setAttribute("tabindex", "0");
 
     loginLink.innerHTML = `
       <img
@@ -162,9 +147,9 @@
     // DROPDOWN
     // =========================================================
 
-    const dropdown = document.createElement('div');
+    const dropdown = document.createElement("div");
 
-    dropdown.className = 'user-dropdown';
+    dropdown.className = "user-dropdown";
 
     dropdown.hidden = true;
 
@@ -180,7 +165,7 @@
                 </a>
               </li>
             `
-            : ''
+            : ""
         }
 
         <li>
@@ -211,14 +196,11 @@
     // WRAPPER DO MENU
     // =========================================================
 
-    const wrapper = document.createElement('div');
+    const wrapper = document.createElement("div");
 
-    wrapper.className = 'user-menu-wrapper';
+    wrapper.className = "user-menu-wrapper";
 
-    loginLink.parentNode.insertBefore(
-      wrapper,
-      loginLink
-    );
+    loginLink.parentNode.insertBefore(wrapper, loginLink);
 
     wrapper.appendChild(loginLink);
 
@@ -234,56 +216,38 @@
       dropdown.hidden = !dropdown.hidden;
     };
 
-    loginLink.addEventListener(
-      'click',
-      toggleMenu
-    );
+    loginLink.addEventListener("click", toggleMenu);
 
-    loginLink.addEventListener(
-      'keydown',
-      (event) => {
-        if (
-          event.key === 'Enter' ||
-          event.key === ' '
-        ) {
-          event.preventDefault();
+    loginLink.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
 
-          toggleMenu(event);
-        }
+        toggleMenu(event);
       }
-    );
+    });
 
     // =========================================================
     // FECHAR AO CLICAR FORA
     // =========================================================
 
-    document.addEventListener(
-      'click',
-      (event) => {
-        if (!wrapper.contains(event.target)) {
-          dropdown.hidden = true;
-        }
+    document.addEventListener("click", (event) => {
+      if (!wrapper.contains(event.target)) {
+        dropdown.hidden = true;
       }
-    );
+    });
 
     // =========================================================
     // LOGOUT
     // =========================================================
 
-    const btnLogout =
-      dropdown.querySelector('.btn-logout');
+    const btnLogout = dropdown.querySelector(".btn-logout");
 
     if (btnLogout) {
-      btnLogout.addEventListener(
-        'click',
-        () => {
-          localStorage.removeItem(
-            USER_STORAGE_KEY
-          );
+      btnLogout.addEventListener("click", () => {
+        localStorage.removeItem(USER_STORAGE_KEY);
 
-          window.location.href = 'index.html';
-        }
-      );
+        window.location.href = "index.html";
+      });
     }
   }
 
@@ -291,41 +255,25 @@
   // BADGE DO CARRINHO
   // =========================================================
 
-  function adicionarBadgeCarrinho(
-    cartLink,
-    idCliente
-  ) {
-    fetch(
-      `${API_BASE_URL}/carrinho/${idCliente}`,
-      {
-        method: 'GET',
-        credentials: 'include',
-      }
-    )
+  function adicionarBadgeCarrinho(cartLink, idCliente) {
+    fetch(`${API_BASE_URL}/carrinho/${idCliente}`, {
+      method: "GET",
+      credentials: "include",
+    })
       .then((res) => {
         if (!res.ok) {
-          throw new Error(
-            `Erro ${res.status} ao buscar carrinho`
-          );
+          throw new Error(`Erro ${res.status} ao buscar carrinho`);
         }
 
         return res.json();
       })
 
       .then((itens) => {
-        const totalItens =
-          Array.isArray(itens)
-            ? itens.reduce(
-                (soma, item) =>
-                  soma + (item.quantidade || 0),
-                0
-              )
-            : 0;
+        const totalItens = Array.isArray(itens)
+          ? itens.reduce((soma, item) => soma + (item.quantidade || 0), 0)
+          : 0;
 
-        let badge =
-          cartLink.querySelector(
-            '.cart-badge'
-          );
+        let badge = cartLink.querySelector(".cart-badge");
 
         // =====================================================
         // TEM ITENS NO CARRINHO
@@ -333,35 +281,26 @@
 
         if (totalItens > 0) {
           if (!badge) {
-            badge =
-              document.createElement('span');
+            badge = document.createElement("span");
 
-            badge.className =
-              'cart-badge';
+            badge.className = "cart-badge";
 
-            cartLink.appendChild(
-              badge
-            );
+            cartLink.appendChild(badge);
           }
 
-          badge.textContent =
-            totalItens;
+          badge.textContent = totalItens;
         }
 
         // =====================================================
         // CARRINHO VAZIO
         // =====================================================
-
         else if (badge) {
           badge.remove();
         }
       })
 
       .catch((err) => {
-        console.error(
-          'Nao foi possivel carregar o carrinho:',
-          err
-        );
+        console.error("Nao foi possivel carregar o carrinho:", err);
       });
   }
-})(); 
+})();

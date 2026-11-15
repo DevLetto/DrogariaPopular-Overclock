@@ -1,16 +1,16 @@
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "/api";
 
 const estado = {
-    categorias: []
+  categorias: [],
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    inicializar();
+  inicializar();
 });
 
 async function inicializar() {
-    configurarEventos();
-    await carregarCategorias();
+  configurarEventos();
+  await carregarCategorias();
 }
 
 /* ================================
@@ -18,17 +18,11 @@ async function inicializar() {
 ================================ */
 
 function configurarEventos() {
-    const botaoNovaCategoria =
-        document.querySelector(
-            "#btnNovaCategoria"
-        );
+  const botaoNovaCategoria = document.querySelector("#btnNovaCategoria");
 
-    if (botaoNovaCategoria) {
-        botaoNovaCategoria.addEventListener(
-            "click",
-            () => abrirFormulario()
-        );
-    }
+  if (botaoNovaCategoria) {
+    botaoNovaCategoria.addEventListener("click", () => abrirFormulario());
+  }
 }
 
 /* ================================
@@ -36,53 +30,41 @@ function configurarEventos() {
 ================================ */
 
 async function requisicao(endpoint, opcoes = {}) {
-    const resposta = await window.AdminCsrf.fetch(
-        `${API_BASE_URL}${endpoint}`,
-        {
-            headers: {
-                "Content-Type": "application/json",
-                ...(opcoes.headers || {})
-            },
-            ...opcoes
-        }
-    );
+  const resposta = await window.AdminCsrf.fetch(`${API_BASE_URL}${endpoint}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...(opcoes.headers || {}),
+    },
+    ...opcoes,
+  });
 
-    if (!resposta.ok) {
-        let mensagem =
-            `Erro HTTP ${resposta.status}`;
-
-        try {
-            const erro =
-                await resposta.json();
-
-            mensagem =
-                erro.message ||
-                erro.mensagem ||
-                erro.error ||
-                mensagem;
-
-        } catch (_) {}
-
-        throw new Error(mensagem);
-    }
-
-    if (resposta.status === 204) {
-        return null;
-    }
-
-    const texto =
-        await resposta.text();
-
-    if (!texto) {
-        return null;
-    }
+  if (!resposta.ok) {
+    let mensagem = `Erro HTTP ${resposta.status}`;
 
     try {
-        return JSON.parse(texto);
+      const erro = await resposta.json();
 
-    } catch (_) {
-        return texto;
-    }
+      mensagem = erro.message || erro.mensagem || erro.error || mensagem;
+    } catch (_) {}
+
+    throw new Error(mensagem);
+  }
+
+  if (resposta.status === 204) {
+    return null;
+  }
+
+  const texto = await resposta.text();
+
+  if (!texto) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(texto);
+  } catch (_) {
+    return texto;
+  }
 }
 
 /* ================================
@@ -90,31 +72,20 @@ async function requisicao(endpoint, opcoes = {}) {
 ================================ */
 
 async function carregarCategorias() {
-    try {
-        const categorias =
-            await requisicao(
-                "/categoria"
-            );
+  try {
+    const categorias = await requisicao("/categoria");
 
-        estado.categorias =
-            Array.isArray(categorias)
-                ? categorias
-                : [];
+    estado.categorias = Array.isArray(categorias) ? categorias : [];
 
-        renderizarTabela();
+    renderizarTabela();
+  } catch (erro) {
+    console.error("Erro ao carregar categorias:", erro);
 
-    } catch (erro) {
-
-        console.error(
-            "Erro ao carregar categorias:",
-            erro
-        );
-
-        mostrarToast(
-            `Não foi possível carregar as categorias: ${erro.message}`,
-            "erro"
-        );
-    }
+    mostrarToast(
+      `Não foi possível carregar as categorias: ${erro.message}`,
+      "erro",
+    );
+  }
 }
 
 /* ================================
@@ -122,20 +93,16 @@ async function carregarCategorias() {
 ================================ */
 
 function renderizarTabela() {
-    const tabela =
-        document.querySelector(
-            "#tabelaCategorias"
-        );
+  const tabela = document.querySelector("#tabelaCategorias");
 
-    if (!tabela) {
-        return;
-    }
+  if (!tabela) {
+    return;
+  }
 
-    tabela.innerHTML = "";
+  tabela.innerHTML = "";
 
-    if (estado.categorias.length === 0) {
-
-        tabela.innerHTML = `
+  if (estado.categorias.length === 0) {
+    tabela.innerHTML = `
             <tr>
                 <td
                     colspan="2"
@@ -146,22 +113,16 @@ function renderizarTabela() {
             </tr>
         `;
 
-        return;
-    }
+    return;
+  }
 
-    estado.categorias.forEach(
-        (categoria) => {
+  estado.categorias.forEach((categoria) => {
+    const linha = criarLinhaCategoria(categoria);
 
-            const linha =
-                criarLinhaCategoria(
-                    categoria
-                );
+    tabela.appendChild(linha);
+  });
 
-            tabela.appendChild(linha);
-        }
-    );
-
-    adicionarEventosTabela();
+  adicionarEventosTabela();
 }
 
 /* ================================
@@ -169,20 +130,15 @@ function renderizarTabela() {
 ================================ */
 
 function criarLinhaCategoria(categoria) {
-    const tr =
-        document.createElement("tr");
+  const tr = document.createElement("tr");
 
-    const id =
-        categoria.id;
+  const id = categoria.id;
 
-    const nome =
-        categoria.nome ||
-        "Categoria";
+  const nome = categoria.nome || "Categoria";
 
-    const icone =
-        obterIconeCategoria(nome);
+  const icone = obterIconeCategoria(nome);
 
-    tr.innerHTML = `
+  tr.innerHTML = `
         <td>
 
             <div class="categoria-nome-celula">
@@ -233,7 +189,7 @@ function criarLinhaCategoria(categoria) {
         </td>
     `;
 
-    return tr;
+  return tr;
 }
 
 /* ================================
@@ -241,48 +197,25 @@ function criarLinhaCategoria(categoria) {
 ================================ */
 
 function adicionarEventosTabela() {
+  const botoesEditar = document.querySelectorAll(".btn-editar-categoria");
 
-    const botoesEditar =
-        document.querySelectorAll(
-            ".btn-editar-categoria"
-        );
+  botoesEditar.forEach((botao) => {
+    botao.addEventListener("click", async () => {
+      const id = botao.dataset.id;
 
-    botoesEditar.forEach(
-        (botao) => {
+      await editarCategoria(id);
+    });
+  });
 
-            botao.addEventListener(
-                "click",
-                async () => {
+  const botoesExcluir = document.querySelectorAll(".btn-excluir-categoria");
 
-                    const id =
-                        botao.dataset.id;
+  botoesExcluir.forEach((botao) => {
+    botao.addEventListener("click", async () => {
+      const id = botao.dataset.id;
 
-                    await editarCategoria(id);
-                }
-            );
-        }
-    );
-
-    const botoesExcluir =
-        document.querySelectorAll(
-            ".btn-excluir-categoria"
-        );
-
-    botoesExcluir.forEach(
-        (botao) => {
-
-            botao.addEventListener(
-                "click",
-                async () => {
-
-                    const id =
-                        botao.dataset.id;
-
-                    await excluirCategoria(id);
-                }
-            );
-        }
-    );
+      await excluirCategoria(id);
+    });
+  });
 }
 
 /* ================================
@@ -290,34 +223,26 @@ function adicionarEventosTabela() {
 ================================ */
 
 function abrirFormulario(categoria = null) {
+  const modalExistente = document.querySelector(".modal-overlay");
 
-    const modalExistente =
-        document.querySelector(
-            ".modal-overlay"
-        );
+  if (modalExistente) {
+    modalExistente.remove();
+  }
 
-    if (modalExistente) {
-        modalExistente.remove();
-    }
+  const editando = categoria !== null;
 
-    const editando =
-        categoria !== null;
+  const nomeAtual = categoria?.nome || "";
 
-    const nomeAtual =
-        categoria?.nome || "";
+  const modal = document.createElement("div");
 
-    const modal =
-        document.createElement("div");
+  /*
+   * O elemento principal já é o overlay.
+   * Não existe outro .modal-overlay dentro dele.
+   */
 
-    /*
-     * O elemento principal já é o overlay.
-     * Não existe outro .modal-overlay dentro dele.
-     */
+  modal.className = "modal-overlay";
 
-    modal.className =
-        "modal-overlay";
-
-    modal.innerHTML = `
+  modal.innerHTML = `
         <div class="modal">
 
             <div class="modal-header">
@@ -325,11 +250,7 @@ function abrirFormulario(categoria = null) {
                 <div>
 
                     <h2>
-                        ${
-                            editando
-                                ? "Editar categoria"
-                                : "Nova categoria"
-                        }
+                        ${editando ? "Editar categoria" : "Nova categoria"}
                     </h2>
 
                     <span>
@@ -379,11 +300,7 @@ function abrirFormulario(categoria = null) {
                         type="submit"
                         class="btn-primary"
                     >
-                        ${
-                            editando
-                                ? "Salvar alterações"
-                                : "Criar categoria"
-                        }
+                        ${editando ? "Salvar alterações" : "Criar categoria"}
                     </button>
 
                 </div>
@@ -393,147 +310,89 @@ function abrirFormulario(categoria = null) {
         </div>
     `;
 
-    document.body.appendChild(modal);
+  document.body.appendChild(modal);
 
-    /* ================================
+  /* ================================
        FECHAR MODAL
     ================================= */
 
-    const fechar =
-        modal.querySelector(
-            ".modal-fechar"
-        );
+  const fechar = modal.querySelector(".modal-fechar");
 
-    const cancelar =
-        modal.querySelector(
-            ".btn-cancelar"
-        );
+  const cancelar = modal.querySelector(".btn-cancelar");
 
-    fechar.addEventListener(
-        "click",
-        () => modal.remove()
-    );
+  fechar.addEventListener("click", () => modal.remove());
 
-    cancelar.addEventListener(
-        "click",
-        () => modal.remove()
-    );
+  cancelar.addEventListener("click", () => modal.remove());
 
-    /*
-     * Fecha somente quando clicar
-     * no fundo escuro.
-     */
+  /*
+   * Fecha somente quando clicar
+   * no fundo escuro.
+   */
 
-    modal.addEventListener(
-        "click",
-        (event) => {
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      modal.remove();
+    }
+  });
 
-            if (
-                event.target === modal
-            ) {
-                modal.remove();
-            }
-        }
-    );
-
-    /* ================================
+  /* ================================
        FORMULÁRIO
     ================================= */
 
-    const form =
-        modal.querySelector(
-            "#formCategoria"
-        );
+  const form = modal.querySelector("#formCategoria");
 
-    form.addEventListener(
-        "submit",
-        async (event) => {
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-            event.preventDefault();
+    const nome = form.querySelector("#categoriaNome").value.trim();
 
-            const nome =
-                form.querySelector(
-                    "#categoriaNome"
-                ).value.trim();
+    if (!nome) {
+      mostrarToast("Informe o nome da categoria.", "erro");
 
-            if (!nome) {
+      return;
+    }
 
-                mostrarToast(
-                    "Informe o nome da categoria.",
-                    "erro"
-                );
+    const dados = {
+      nome: nome,
+    };
 
-                return;
-            }
+    const botao = form.querySelector("button[type='submit']");
 
-            const dados = {
-                nome: nome
-            };
+    try {
+      botao.disabled = true;
 
-            const botao =
-                form.querySelector(
-                    "button[type='submit']"
-                );
+      if (editando) {
+        await requisicao(`/categoria/${categoria.id}`, {
+          method: "PUT",
+          body: JSON.stringify(dados),
+        });
 
-            try {
+        mostrarToast("Categoria atualizada com sucesso!", "sucesso");
+      } else {
+        await requisicao("/categoria", {
+          method: "POST",
+          body: JSON.stringify(dados),
+        });
 
-                botao.disabled = true;
+        mostrarToast("Categoria criada com sucesso!", "sucesso");
+      }
 
-                if (editando) {
+      modal.remove();
 
-                    await requisicao(
-                        `/categoria/${categoria.id}`,
-                        {
-                            method: "PUT",
-                            body: JSON.stringify(dados)
-                        }
-                    );
+      await carregarCategorias();
+    } catch (erro) {
+      console.error("Erro ao salvar categoria:", erro);
 
-                    mostrarToast(
-                        "Categoria atualizada com sucesso!",
-                        "sucesso"
-                    );
-
-                } else {
-
-                    await requisicao(
-                        "/categoria",
-                        {
-                            method: "POST",
-                            body: JSON.stringify(dados)
-                        }
-                    );
-
-                    mostrarToast(
-                        "Categoria criada com sucesso!",
-                        "sucesso"
-                    );
-                }
-
-                modal.remove();
-
-                await carregarCategorias();
-
-            } catch (erro) {
-
-                console.error(
-                    "Erro ao salvar categoria:",
-                    erro
-                );
-
-                mostrarToast(
-                    `Não foi possível salvar a categoria: ${erro.message}`,
-                    "erro"
-                );
-
-            } finally {
-
-                if (botao) {
-                    botao.disabled = false;
-                }
-            }
-        }
-    );
+      mostrarToast(
+        `Não foi possível salvar a categoria: ${erro.message}`,
+        "erro",
+      );
+    } finally {
+      if (botao) {
+        botao.disabled = false;
+      }
+    }
+  });
 }
 
 /* ================================
@@ -541,28 +400,18 @@ function abrirFormulario(categoria = null) {
 ================================ */
 
 async function editarCategoria(id) {
+  try {
+    const categoria = await requisicao(`/categoria/${id}`);
 
-    try {
+    abrirFormulario(categoria);
+  } catch (erro) {
+    console.error("Erro ao buscar categoria:", erro);
 
-        const categoria =
-            await requisicao(
-                `/categoria/${id}`
-            );
-
-        abrirFormulario(categoria);
-
-    } catch (erro) {
-
-        console.error(
-            "Erro ao buscar categoria:",
-            erro
-        );
-
-        mostrarToast(
-            `Não foi possível carregar a categoria: ${erro.message}`,
-            "erro"
-        );
-    }
+    mostrarToast(
+      `Não foi possível carregar a categoria: ${erro.message}`,
+      "erro",
+    );
+  }
 }
 
 /* ================================
@@ -570,44 +419,28 @@ async function editarCategoria(id) {
 ================================ */
 
 async function excluirCategoria(id) {
+  const confirmar = confirm("Tem certeza que deseja excluir esta categoria?");
 
-    const confirmar =
-        confirm(
-            "Tem certeza que deseja excluir esta categoria?"
-        );
+  if (!confirmar) {
+    return;
+  }
 
-    if (!confirmar) {
-        return;
-    }
+  try {
+    await requisicao(`/categoria/${id}`, {
+      method: "DELETE",
+    });
 
-    try {
+    mostrarToast("Categoria excluída com sucesso!", "sucesso");
 
-        await requisicao(
-            `/categoria/${id}`,
-            {
-                method: "DELETE"
-            }
-        );
+    await carregarCategorias();
+  } catch (erro) {
+    console.error("Erro ao excluir categoria:", erro);
 
-        mostrarToast(
-            "Categoria excluída com sucesso!",
-            "sucesso"
-        );
-
-        await carregarCategorias();
-
-    } catch (erro) {
-
-        console.error(
-            "Erro ao excluir categoria:",
-            erro
-        );
-
-        mostrarToast(
-            `Não foi possível excluir a categoria: ${erro.message}`,
-            "erro"
-        );
-    }
+    mostrarToast(
+      `Não foi possível excluir a categoria: ${erro.message}`,
+      "erro",
+    );
+  }
 }
 
 /* ================================
@@ -615,47 +448,33 @@ async function excluirCategoria(id) {
 ================================ */
 
 function obterIconeCategoria(nome) {
+  const texto = String(nome).toLowerCase();
 
-    const texto =
-        String(nome)
-            .toLowerCase();
+  if (texto.includes("medic") || texto.includes("farm")) {
+    return "../img/medicamentos_icon.png";
+  }
 
-    if (
-        texto.includes("medic") ||
-        texto.includes("farm")
-    ) {
-        return "../img/medicamentos_icon.png";
-    }
+  if (texto.includes("higiene") || texto.includes("cuidado")) {
+    return "../img/higiene_icon.png";
+  }
 
-    if (
-        texto.includes("higiene") ||
-        texto.includes("cuidado")
-    ) {
-        return "../img/higiene_icon.png";
-    }
+  if (
+    texto.includes("infantil") ||
+    texto.includes("bebê") ||
+    texto.includes("bebe")
+  ) {
+    return "../img/infantil_icon.png";
+  }
 
-    if (
-        texto.includes("infantil") ||
-        texto.includes("bebê") ||
-        texto.includes("bebe")
-    ) {
-        return "../img/infantil_icon.png";
-    }
+  if (texto.includes("cabel") || texto.includes("capilar")) {
+    return "../img/cabelos_icon.png";
+  }
 
-    if (
-        texto.includes("cabel") ||
-        texto.includes("capilar")
-    ) {
-        return "../img/cabelos_icon.png";
-    }
+  if (texto.includes("unha")) {
+    return "../img/unhas_icon.png";
+  }
 
-    if (
-        texto.includes("unha")
-    ) {
-        return "../img/unhas_icon.png";
-    }
-
-    return "../img/categorias_icon.png";
+  return "../img/categorias_icon.png";
 }
 
 /* ================================
@@ -663,47 +482,31 @@ function obterIconeCategoria(nome) {
 ================================ */
 
 function escaparHTML(valor) {
+  const div = document.createElement("div");
 
-    const div =
-        document.createElement("div");
+  div.textContent = valor ?? "";
 
-    div.textContent =
-        valor ?? "";
-
-    return div.innerHTML;
+  return div.innerHTML;
 }
 
 /* ================================
    TOAST
 ================================ */
 
-function mostrarToast(
-    mensagem,
-    tipo = "sucesso"
-) {
+function mostrarToast(mensagem, tipo = "sucesso") {
+  const toastExistente = document.querySelector(".toast-categoria");
 
-    const toastExistente =
-        document.querySelector(
-            ".toast-categoria"
-        );
+  if (toastExistente) {
+    toastExistente.remove();
+  }
 
-    if (toastExistente) {
-        toastExistente.remove();
-    }
+  const toast = document.createElement("div");
 
-    const toast =
-        document.createElement("div");
+  toast.className = `toast-categoria ${tipo}`;
 
-    toast.className =
-        `toast-categoria ${tipo}`;
+  toast.textContent = mensagem;
 
-    toast.textContent =
-        mensagem;
+  document.body.appendChild(toast);
 
-    document.body.appendChild(toast);
-
-    setTimeout(
-        () => toast.remove(),
-        3500
-    );
+  setTimeout(() => toast.remove(), 3500);
 }

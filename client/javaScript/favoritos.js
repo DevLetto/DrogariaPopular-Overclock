@@ -9,7 +9,7 @@
  *   await Favoritos.alternar(idProduto); // adiciona/remove; devolve true se ficou favoritado
  */
 (function () {
-  const API_BASE_URL = "http://localhost:8080/api";
+  const API_BASE_URL = "/api";
   const STORAGE_USUARIO = "usuarioLogado";
 
   let ids = new Set();

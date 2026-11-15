@@ -1,8 +1,7 @@
-const API_LOJA = "http://localhost:8080/api/loja";
+const API_LOJA = "/api/loja";
 
 let lojas = [];
 let lojaEditando = null;
-
 
 // ==========================================
 // ELEMENTOS
@@ -32,30 +31,25 @@ const latitudeLoja = document.getElementById("latitudeLoja");
 
 const longitudeLoja = document.getElementById("longitudeLoja");
 
-
 // ==========================================
 // CARREGAR LOJAS
 // ==========================================
 
 async function carregarLojas() {
+  try {
+    const resposta = await window.AdminCsrf.fetch(API_LOJA);
 
-    try {
+    if (!resposta.ok) {
+      throw new Error("Erro ao carregar lojas.");
+    }
 
-        const resposta = await window.AdminCsrf.fetch(API_LOJA);
+    lojas = await resposta.json();
 
-        if (!resposta.ok) {
-            throw new Error("Erro ao carregar lojas.");
-        }
+    renderizarLojas();
+  } catch (erro) {
+    console.error("Erro:", erro);
 
-        lojas = await resposta.json();
-
-        renderizarLojas();
-
-    } catch (erro) {
-
-        console.error("Erro:", erro);
-
-        tabelaLojas.innerHTML = `
+    tabelaLojas.innerHTML = `
             <tr>
                 <td
                     colspan="5"
@@ -65,22 +59,18 @@ async function carregarLojas() {
                 </td>
             </tr>
         `;
-    }
+  }
 }
-
 
 // ==========================================
 // RENDERIZAR LOJAS
 // ==========================================
 
 function renderizarLojas() {
+  tabelaLojas.innerHTML = "";
 
-    tabelaLojas.innerHTML = "";
-
-
-    if (lojas.length === 0) {
-
-        tabelaLojas.innerHTML = `
+  if (lojas.length === 0) {
+    tabelaLojas.innerHTML = `
             <tr>
                 <td
                     colspan="5"
@@ -91,22 +81,18 @@ function renderizarLojas() {
             </tr>
         `;
 
-        return;
-    }
+    return;
+  }
 
+  lojas.forEach((loja) => {
+    const linha = document.createElement("tr");
 
-    lojas.forEach(loja => {
+    const localizacao =
+      loja.latitude != null && loja.longitude != null
+        ? `${loja.latitude}, ${loja.longitude}`
+        : "Não informada";
 
-        const linha = document.createElement("tr");
-
-
-        const localizacao =
-            loja.latitude != null && loja.longitude != null
-                ? `${loja.latitude}, ${loja.longitude}`
-                : "Não informada";
-
-
-        linha.innerHTML = `
+    linha.innerHTML = `
 
             <td>
                 <strong>
@@ -121,9 +107,7 @@ function renderizarLojas() {
 
 
             <td>
-                ${escaparHTML(
-                    loja.horarioFuncionamento || "-"
-                )}
+                ${escaparHTML(loja.horarioFuncionamento || "-")}
             </td>
 
 
@@ -164,417 +148,290 @@ function renderizarLojas() {
 
         `;
 
-
-        tabelaLojas.appendChild(linha);
-
-    });
+    tabelaLojas.appendChild(linha);
+  });
 }
-
 
 // ==========================================
 // ABRIR MODAL - NOVA LOJA
 // ==========================================
 
-btnNovaLoja.addEventListener(
-    "click",
-    abrirNovaLoja
-);
-
+btnNovaLoja.addEventListener("click", abrirNovaLoja);
 
 function abrirNovaLoja() {
+  lojaEditando = null;
 
-    lojaEditando = null;
+  tituloModal.textContent = "Nova loja";
 
-    tituloModal.textContent = "Nova loja";
+  formLoja.reset();
 
-    formLoja.reset();
+  modalLoja.style.display = "flex";
 
-    modalLoja.style.display = "flex";
-
-    nomeLoja.focus();
+  nomeLoja.focus();
 }
-
 
 // ==========================================
 // ABRIR MODAL - EDITAR
 // ==========================================
 
 function abrirEdicao(id) {
+  const loja = lojas.find((loja) => loja.id === id);
 
-    const loja = lojas.find(
-        loja => loja.id === id
-    );
+  if (!loja) {
+    return;
+  }
 
+  lojaEditando = id;
 
-    if (!loja) {
-        return;
-    }
+  tituloModal.textContent = "Editar loja";
 
+  nomeLoja.value = loja.nome || "";
 
-    lojaEditando = id;
+  telefoneLoja.value = loja.telefone || "";
 
+  horarioLoja.value = loja.horarioFuncionamento || "";
 
-    tituloModal.textContent = "Editar loja";
+  latitudeLoja.value = loja.latitude ?? "";
 
+  longitudeLoja.value = loja.longitude ?? "";
 
-    nomeLoja.value =
-        loja.nome || "";
+  modalLoja.style.display = "flex";
 
-
-    telefoneLoja.value =
-        loja.telefone || "";
-
-
-    horarioLoja.value =
-        loja.horarioFuncionamento || "";
-
-
-    latitudeLoja.value =
-        loja.latitude ?? "";
-
-
-    longitudeLoja.value =
-        loja.longitude ?? "";
-
-
-    modalLoja.style.display = "flex";
-
-    nomeLoja.focus();
+  nomeLoja.focus();
 }
-
 
 // ==========================================
 // FECHAR MODAL
 // ==========================================
 
 function fecharModal() {
+  modalLoja.style.display = "none";
 
-    modalLoja.style.display = "none";
+  lojaEditando = null;
 
-    lojaEditando = null;
-
-    formLoja.reset();
+  formLoja.reset();
 }
 
+btnFecharModal.addEventListener("click", fecharModal);
 
-btnFecharModal.addEventListener(
-    "click",
-    fecharModal
-);
-
-
-btnCancelar.addEventListener(
-    "click",
-    fecharModal
-);
-
+btnCancelar.addEventListener("click", fecharModal);
 
 // Fechar clicando fora do modal
 
-modalLoja.addEventListener(
-    "click",
-    function (evento) {
-
-        if (evento.target === modalLoja) {
-            fecharModal();
-        }
-
-    }
-);
-
+modalLoja.addEventListener("click", function (evento) {
+  if (evento.target === modalLoja) {
+    fecharModal();
+  }
+});
 
 // ==========================================
 // SALVAR / ATUALIZAR
 // ==========================================
 
-formLoja.addEventListener(
-    "submit",
-    async function (evento) {
+formLoja.addEventListener("submit", async function (evento) {
+  evento.preventDefault();
 
-        evento.preventDefault();
+  const dados = {
+    nome: nomeLoja.value.trim(),
 
+    telefone: telefoneLoja.value.trim(),
 
-        const dados = {
+    horarioFuncionamento: horarioLoja.value.trim(),
 
-            nome: nomeLoja.value.trim(),
+    latitude:
+      latitudeLoja.value.trim() === "" ? null : Number(latitudeLoja.value),
 
-            telefone: telefoneLoja.value.trim(),
+    longitude:
+      longitudeLoja.value.trim() === "" ? null : Number(longitudeLoja.value),
+  };
 
-            horarioFuncionamento:
-                horarioLoja.value.trim(),
+  if (!dados.nome) {
+    mostrarNotificacao("Informe o nome da loja.", "aviso");
 
-            latitude:
-                latitudeLoja.value.trim() === ""
-                    ? null
-                    : Number(latitudeLoja.value),
+    nomeLoja.focus();
 
-            longitude:
-                longitudeLoja.value.trim() === ""
-                    ? null
-                    : Number(longitudeLoja.value)
+    return;
+  }
 
-        };
+  try {
+    let resposta;
 
+    // ==============================
+    // ATUALIZAR
+    // ==============================
 
-        if (!dados.nome) {
+    if (lojaEditando !== null) {
+      resposta = await window.AdminCsrf.fetch(`${API_LOJA}/${lojaEditando}`, {
+        method: "PUT",
 
-            mostrarNotificacao(
-                "Informe o nome da loja.", "aviso"
-            );
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-            nomeLoja.focus();
-
-            return;
-        }
-
-
-        try {
-
-            let resposta;
-
-
-            // ==============================
-            // ATUALIZAR
-            // ==============================
-
-            if (lojaEditando !== null) {
-
-                resposta = await window.AdminCsrf.fetch(
-                    `${API_LOJA}/${lojaEditando}`,
-                    {
-                        method: "PUT",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify(dados)
-                    }
-                );
-
-            }
-
-            // ==============================
-            // CRIAR
-            // ==============================
-
-            else {
-
-                resposta = await window.AdminCsrf.fetch(
-                    API_LOJA,
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify(dados)
-                    }
-                );
-
-            }
-
-
-            if (!resposta.ok) {
-
-                const erro = await resposta.text();
-
-                console.error(
-                    "Erro da API:",
-                    erro
-                );
-
-                throw new Error(
-                    lojaEditando !== null
-                        ? "Não foi possível atualizar a loja."
-                        : "Não foi possível cadastrar a loja."
-                );
-            }
-
-
-            fecharModal();
-
-            await carregarLojas();
-
-
-            mostrarNotificacao(
-                lojaEditando !== null
-                    ? "Loja atualizada com sucesso!"
-                    : "Loja cadastrada com sucesso!"
-            );
-
-
-        } catch (erro) {
-
-            console.error(
-                "Erro:",
-                erro
-            );
-
-            mostrarNotificacao(
-                erro.message, "erro"
-            );
-        }
-
+        body: JSON.stringify(dados),
+      });
     }
-);
 
+    // ==============================
+    // CRIAR
+    // ==============================
+    else {
+      resposta = await window.AdminCsrf.fetch(API_LOJA, {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify(dados),
+      });
+    }
+
+    if (!resposta.ok) {
+      const erro = await resposta.text();
+
+      console.error("Erro da API:", erro);
+
+      throw new Error(
+        lojaEditando !== null
+          ? "Não foi possível atualizar a loja."
+          : "Não foi possível cadastrar a loja.",
+      );
+    }
+
+    fecharModal();
+
+    await carregarLojas();
+
+    mostrarNotificacao(
+      lojaEditando !== null
+        ? "Loja atualizada com sucesso!"
+        : "Loja cadastrada com sucesso!",
+    );
+  } catch (erro) {
+    console.error("Erro:", erro);
+
+    mostrarNotificacao(erro.message, "erro");
+  }
+});
 
 // ==========================================
 // EXCLUIR LOJA
 // ==========================================
 
 async function excluirLoja(id) {
+  const loja = lojas.find((loja) => loja.id === id);
 
-    const loja = lojas.find(
-        loja => loja.id === id
-    );
+  if (!loja) {
+    return;
+  }
 
+  const confirmar = confirm(`Deseja realmente excluir a loja "${loja.nome}"?`);
 
-    if (!loja) {
-        return;
+  if (!confirmar) {
+    return;
+  }
+
+  try {
+    const resposta = await window.AdminCsrf.fetch(`${API_LOJA}/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!resposta.ok) {
+      const erro = await resposta.text();
+
+      console.error("Erro da API:", erro);
+
+      throw new Error("Não foi possível excluir a loja.");
     }
 
+    await carregarLojas();
 
-    const confirmar = confirm(
-        `Deseja realmente excluir a loja "${loja.nome}"?`
-    );
+    mostrarNotificacao("Loja excluída com sucesso!");
+  } catch (erro) {
+    console.error("Erro:", erro);
 
-
-    if (!confirmar) {
-        return;
-    }
-
-
-    try {
-
-        const resposta = await window.AdminCsrf.fetch(
-            `${API_LOJA}/${id}`,
-            {
-                method: "DELETE"
-            }
-        );
-
-
-        if (!resposta.ok) {
-
-            const erro = await resposta.text();
-
-            console.error(
-                "Erro da API:",
-                erro
-            );
-
-            throw new Error(
-                "Não foi possível excluir a loja."
-            );
-        }
-
-
-        await carregarLojas();
-
-
-        mostrarNotificacao(
-            "Loja excluída com sucesso!"
-        );
-
-
-    } catch (erro) {
-
-        console.error(
-            "Erro:",
-            erro
-        );
-
-        mostrarNotificacao(
-            erro.message, "erro"
-        );
-    }
+    mostrarNotificacao(erro.message, "erro");
+  }
 }
-
 
 // ==========================================
 // ESCAPAR HTML
 // ==========================================
 
 function escaparHTML(texto) {
+  const div = document.createElement("div");
 
-    const div = document.createElement("div");
+  div.textContent = texto;
 
-    div.textContent = texto;
-
-    return div.innerHTML;
+  return div.innerHTML;
 }
-
 
 // =========================================================
 // NOTIFICAÇÕES PERSONALIZADAS
 // =========================================================
 
 function mostrarNotificacao(mensagem, tipo = "sucesso") {
-    let container = document.querySelector(".toast-container");
+  let container = document.querySelector(".toast-container");
 
-    if (!container) {
-        container = document.createElement("div");
-        container.className = "toast-container";
-        container.setAttribute("aria-live", "polite");
-        container.setAttribute("aria-atomic", "false");
-        document.body.appendChild(container);
-    }
+  if (!container) {
+    container = document.createElement("div");
+    container.className = "toast-container";
+    container.setAttribute("aria-live", "polite");
+    container.setAttribute("aria-atomic", "false");
+    document.body.appendChild(container);
+  }
 
-    const toast = document.createElement("div");
-    toast.className = `toast ${tipo}`;
+  const toast = document.createElement("div");
+  toast.className = `toast ${tipo}`;
 
-    const icones = {
-        sucesso: "✓",
-        erro: "!",
-        aviso: "!"
-    };
+  const icones = {
+    sucesso: "✓",
+    erro: "!",
+    aviso: "!",
+  };
 
-    const icone = document.createElement("span");
-    icone.className = "toast-icone";
-    icone.textContent = icones[tipo] || "✓";
-    icone.setAttribute("aria-hidden", "true");
+  const icone = document.createElement("span");
+  icone.className = "toast-icone";
+  icone.textContent = icones[tipo] || "✓";
+  icone.setAttribute("aria-hidden", "true");
 
-    const texto = document.createElement("span");
-    texto.className = "toast-mensagem";
-    texto.textContent = mensagem;
+  const texto = document.createElement("span");
+  texto.className = "toast-mensagem";
+  texto.textContent = mensagem;
 
-    const fechar = document.createElement("button");
-    fechar.className = "toast-fechar";
-    fechar.type = "button";
-    fechar.textContent = "×";
-    fechar.setAttribute("aria-label", "Fechar notificação");
+  const fechar = document.createElement("button");
+  fechar.className = "toast-fechar";
+  fechar.type = "button";
+  fechar.textContent = "×";
+  fechar.setAttribute("aria-label", "Fechar notificação");
 
-    toast.append(icone, texto, fechar);
-    container.appendChild(toast);
+  toast.append(icone, texto, fechar);
+  container.appendChild(toast);
 
-    let removido = false;
+  let removido = false;
 
-    function removerNotificacao() {
-        if (removido) return;
-        removido = true;
+  function removerNotificacao() {
+    if (removido) return;
+    removido = true;
 
-        toast.classList.add("toast-saindo");
+    toast.classList.add("toast-saindo");
 
-        setTimeout(() => {
-            toast.remove();
+    setTimeout(() => {
+      toast.remove();
 
-            if (container.children.length === 0) {
-                container.remove();
-            }
-        }, 250);
-    }
+      if (container.children.length === 0) {
+        container.remove();
+      }
+    }, 250);
+  }
 
-    const temporizador = setTimeout(removerNotificacao, 3500);
+  const temporizador = setTimeout(removerNotificacao, 3500);
 
-    fechar.addEventListener("click", () => {
-        clearTimeout(temporizador);
-        removerNotificacao();
-    });
+  fechar.addEventListener("click", () => {
+    clearTimeout(temporizador);
+    removerNotificacao();
+  });
 }
 
 // ==========================================

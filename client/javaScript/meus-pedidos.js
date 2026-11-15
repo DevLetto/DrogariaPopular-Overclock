@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8080/api";
+const API_BASE = "/api";
 const STORAGE_USUARIO = "usuarioLogado";
 
 // =========================================================
@@ -67,7 +67,9 @@ function infoStatus(status) {
     etapa,
     cancelado,
     classe,
-    texto: cancelado ? "Cancelado" : String(status ?? "").trim() || "Indefinido",
+    texto: cancelado
+      ? "Cancelado"
+      : String(status ?? "").trim() || "Indefinido",
   };
 }
 
